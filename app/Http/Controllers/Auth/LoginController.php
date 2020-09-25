@@ -11,7 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 use Laravel\Passport\Http\Controllers\AccessTokenController;
 
-class LoginController extends AccessTokenController
+class LoginController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
@@ -71,7 +71,7 @@ class LoginController extends AccessTokenController
                 'client_secret' =>  env('PASSPORT_CLIENT_SECRET'),
                 'grant_type'    =>  env('PASSPORT_GRANT_TYPE'),
             ]);
-            return $this->issueToken($request);
+            return (new AccessTokenController)->issueToken($request);
         }
 
         // If the login attempt was unsuccessful we will increment the number of attempts
