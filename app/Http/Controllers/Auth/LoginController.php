@@ -189,7 +189,7 @@ class LoginController extends Controller
      * @return JsonResponse
      *
      */
-    public function getToken(Request $request)
+    protected function getToken(Request $request)
     {
         $request->request->add([
             'client_id'     =>  env('PASSPORT_CLIENT_ID'),

@@ -1,8 +1,5 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,7 +11,4 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::post('login', [ LoginController::class, 'login' ]);
-Route::middleware('auth:api')->prefix('api')->group( function () {
-    Route::get('/user', [LoginController::class, 'user']);
-});
+include __DIR__."/sub_routes/global/global.php";
