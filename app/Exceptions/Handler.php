@@ -84,6 +84,8 @@ class Handler extends ExceptionHandler
          * Api Request
          */
         if ( $request->expectsJson() ) {
+            if ($exception instanceof \BadMethodCallException)
+                return $this->error_response( __('validation.handler.unexpected_failure'), Response::HTTP_INTERNAL_SERVER_ERROR, $exception );
             if ($exception instanceof BindException)
                 return $this->error_response( __('auth.failed'), Response::HTTP_FORBIDDEN, $exception );
             if ($exception instanceof ThrottleRequestsException)
