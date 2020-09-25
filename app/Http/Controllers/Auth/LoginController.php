@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Adldap\Auth\BindException;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
@@ -47,7 +48,7 @@ class LoginController extends Controller
      * Handle a login request to the application.
      *
      * @param Request $request
-     * @return RedirectResponse|Response|JsonResponse
+     * @return JsonResponse|RedirectResponse|Response|\Symfony\Component\HttpFoundation\Response|void
      *
      * @throws ValidationException
      */
@@ -95,13 +96,17 @@ class LoginController extends Controller
     /**
      * Attempt to log the user into the application.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @return bool
      */
     protected function attemptLogin(Request $request)
     {
-        return $this->guard()->attempt(
-            $this->credentials($request), $request->filled('remember')
-        );
+        try {
+            return $this->guard()->attempt(
+                $this->credentials($request), $request->filled('remember')
+            );
+        } catch (BindException $e) {
+            return false;
+        }
     }
 }
