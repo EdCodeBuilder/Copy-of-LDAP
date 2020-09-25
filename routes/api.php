@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Http\Request;
 
 /*
@@ -13,8 +14,7 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::post('login', [ \App\Http\Controllers\Auth\LoginController::class, 'login' ]);
-
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user()->ldap;
+Route::post('login', [ LoginController::class, 'login' ]);
+Route::middleware('auth:api')->prefix('api')->group( function () {
+    Route::get('/user', [LoginController::class, 'user']);
 });

@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Validation\ValidationException;
 use Laravel\Passport\Http\Controllers\AccessTokenController;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
@@ -36,6 +37,13 @@ class LoginController extends Controller
      * @var string
      */
     protected $redirectTo = '/home';
+
+    /**
+     * The maximum number of attempts to allow.
+     *
+     * @var  int
+     */
+    protected $maxAttempts = 3;
 
     /**
      * Create a new controller instance.
@@ -70,14 +78,7 @@ class LoginController extends Controller
         }
 
         if ($this->attemptLogin($request)) {
-            $request->request->add([
-                'client_id'     =>  env('PASSPORT_CLIENT_ID'),
-                'client_secret' =>  env('PASSPORT_CLIENT_SECRET'),
-                'grant_type'    =>  env('PASSPORT_GRANT_TYPE'),
-            ]);
-
-            $data = (new DiactorosFactory)->createRequest( $request );
-            return app( AccessTokenController::class )->issueToken($data);
+            return $this->getToken( $request );
         }
 
         // If the login attempt was unsuccessful we will increment the number of attempts
@@ -86,6 +87,38 @@ class LoginController extends Controller
         $this->incrementLoginAttempts($request);
 
         return $this->sendFailedLoginResponse($request);
+    }
+
+    /**
+     * Log the user out of the application.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function logout(Request $request)
+    {
+        $token = auth('api')->user()->token();
+        $token->revoke();
+        $this->guard()->logout();
+        $request->session()->invalidate();
+        return $this->success_message(__('validation.handler.logout'), Response::HTTP_OK);
+    }
+
+    /**
+     * Log the user out of the application and revoke all tokens associated.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function logoutAllDevices(Request $request)
+    {
+        $tokens = auth('api')->user()->tokens;
+        foreach ($tokens as $token) {
+            $token->revoke();
+        }
+        $this->guard()->logout();
+        $request->session()->invalidate();
+        return $this->success_message(__('validation.handler.logout'), Response::HTTP_OK);
     }
 
     /**
@@ -102,7 +135,7 @@ class LoginController extends Controller
      * Attempt to log the user into the application.
      *
      * @param Request $request
-     * @return bool
+     * @return bool|JsonResponse
      */
     protected function attemptLogin(Request $request)
     {
@@ -111,7 +144,73 @@ class LoginController extends Controller
                 $this->credentials($request), $request->filled('remember')
             );
         } catch (BindException $e) {
-            return false;
+            return $this->getToken( $request );
         }
+    }
+
+    /**
+     * Get the failed login response instance.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     *
+     */
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        return $this->error_response(
+            __('auth.failed'),
+            Response::HTTP_UNPROCESSABLE_ENTITY
+        );
+    }
+
+    /**
+     * Redirect the user after determining they are locked out.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     *
+     */
+    protected function sendLockoutResponse(Request $request)
+    {
+        $seconds = $this->limiter()->availableIn(
+            $this->throttleKey($request)
+        );
+
+        return $this->error_response(
+            __('auth.throttle', ['seconds' => $seconds]),
+            Response::HTTP_TOO_MANY_REQUESTS
+        );
+    }
+
+    /**
+     * Return token if user is successful logged in.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     *
+     */
+    public function getToken(Request $request)
+    {
+        $request->request->add([
+            'client_id'     =>  env('PASSPORT_CLIENT_ID'),
+            'client_secret' =>  env('PASSPORT_CLIENT_SECRET'),
+            'grant_type'    =>  env('PASSPORT_GRANT_TYPE'),
+        ]);
+        $data = (new DiactorosFactory)->createRequest( $request );
+        return app( AccessTokenController::class )->issueToken($data);
+    }
+
+    /**
+     * Return authenticated user.
+     *
+     * @return JsonResponse
+     *
+     */
+    public function user()
+    {
+        return $this->success_message(
+            \auth()->user(),
+            Response::HTTP_OK
+        );
     }
 }
