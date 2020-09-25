@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use Adldap\Auth\BindException;
 use App\Http\Controllers\Controller;
+use GuzzleHttp\Psr7\ServerRequest;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -12,6 +13,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Laravel\Passport\Http\Controllers\AccessTokenController;
+use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 
 class LoginController extends Controller
 {
@@ -73,7 +75,9 @@ class LoginController extends Controller
                 'client_secret' =>  env('PASSPORT_CLIENT_SECRET'),
                 'grant_type'    =>  env('PASSPORT_GRANT_TYPE'),
             ]);
-            return app( AccessTokenController::class )->issueToken($request);
+
+            $data = (new DiactorosFactory)->createRequest( $request );
+            return app( AccessTokenController::class )->issueToken($data);
         }
 
         // If the login attempt was unsuccessful we will increment the number of attempts
