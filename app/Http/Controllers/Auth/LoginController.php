@@ -36,7 +36,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/';
 
     /**
      * The maximum number of attempts to allow.
@@ -209,7 +209,7 @@ class LoginController extends Controller
     public function user()
     {
         return $this->success_message(
-            \auth()->user(),
+            auth('api')->user(),
             Response::HTTP_OK
         );
     }
