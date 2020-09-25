@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use Adldap\Auth\BindException;
+use Adldap\Laravel\Facades\Adldap;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Laravel\Passport\Http\Controllers\AccessTokenController;
 
@@ -108,5 +110,15 @@ class LoginController extends Controller
         } catch (BindException $e) {
             return false;
         }
+    }
+
+    /**
+     * Get the guard to be used during authentication.
+     *
+     * @return \Illuminate\Contracts\Auth\StatefulGuard
+     */
+    protected function guard()
+    {
+        return Adldap::guard();
     }
 }
