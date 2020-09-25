@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use Adldap\Auth\BindException;
+use Adldap\Laravel\Facades\Adldap;
 use App\Http\Controllers\Controller;
 use GuzzleHttp\Psr7\ServerRequest;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -140,9 +141,7 @@ class LoginController extends Controller
     protected function attemptLogin(Request $request)
     {
         try {
-            return $this->guard()->attempt(
-                $this->credentials($request), $request->filled('remember')
-            );
+            return Adldap::auth()->attempt($this->credentials($request)[ $this->username() ], $this->credentials($request)['password'], $bindAsUser = true);
         } catch (BindException $e) {
             return $this->getToken( $request );
         }
