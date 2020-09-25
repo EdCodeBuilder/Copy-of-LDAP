@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use Adldap\Auth\BindException;
-use Adldap\Laravel\Facades\Adldap;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
@@ -119,6 +118,6 @@ class LoginController extends Controller
      */
     protected function guard()
     {
-        return Adldap::guard();
+        return Auth::guard('api');
     }
 }
