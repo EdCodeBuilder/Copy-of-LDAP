@@ -205,7 +205,7 @@ class LoginController extends Controller
         try {
             $http = new Client();
             $response = $http->post(route('passport.token'), [
-                'form-params' => [
+                'form_params' => [
                     'client_id'     =>  env('PASSPORT_CLIENT_ID'),
                     'client_secret' =>  env('PASSPORT_CLIENT_SECRET'),
                     'grant_type'    =>  env('PASSPORT_GRANT_TYPE'),
