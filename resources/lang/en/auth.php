@@ -14,6 +14,8 @@ return [
     */
 
     'failed' => 'These credentials do not match our records.',
+    'password_policy' => 'Your new password does not match the password policy',
+    'password_changed' => 'Your password has been changed successfully',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
     'javascript' => "We're sorry but this page doesn't work properly without JavaScript enabled. Please enable it to continue."
 

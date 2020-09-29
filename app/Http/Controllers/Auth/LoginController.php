@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Adldap\AdldapException;
 use Adldap\AdldapInterface;
 use Adldap\Auth\BindException;
 use Adldap\Auth\PasswordRequiredException;
 use Adldap\Auth\UsernameRequiredException;
 use Adldap\Laravel\Facades\Adldap;
+use Adldap\Models\UserPasswordIncorrectException;
+use Adldap\Models\UserPasswordPolicyException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Auth\ActiveRecordResource;
 use App\Http\Resources\Auth\UserResource;
@@ -233,5 +236,42 @@ class LoginController extends Controller
         } catch (\Exception $e) {}
         auth('api')->user()->ldap = $ldap ? $ldap : null;
         return $this->success_response( new UserResource( auth('api')->user() ), Response::HTTP_OK );
+    }
+
+
+    public function changePassword(Request $request)
+    {
+        $user = Adldap::users()->findByGuid(auth('api')->user()->guid);
+        if ( $user instanceof \Adldap\Models\User) {
+            try {
+                if ( $user->changePassword($request->get('old_password'), $request->get('new_password')) ) {
+                    auth()->user()->password = Hash::make( $request->get('new_password') );
+                    auth()->user()->save();
+                    return $this->success_message(
+                        __('auth.password_changed'),
+                        Response::HTTP_OK
+                    );
+                }
+            } catch (UserPasswordIncorrectException $e) {
+                return $this->error_response(
+                    __('auth.failed'),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+            } catch (UserPasswordPolicyException $e) {
+                return $this->error_response(
+                    __('auth.password_policy'),
+                    Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+            } catch (AdldapException $e) {
+                return $this->error_response(
+                    __('validation.handler.unexpected_failure'),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
+            }
+        }
+        return $this->error_response(
+            __('auth.failed'),
+            Response::HTTP_UNPROCESSABLE_ENTITY
+        );
     }
 }

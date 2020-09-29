@@ -17,6 +17,7 @@ Route::post('login', [ LoginController::class, 'login' ])->name('passport.login'
 
 Route::middleware('auth:api')->prefix('api')->group( function () {
     Route::get('user', [LoginController::class, 'user'])->name('passport.user');
+    Route::post('change-password', [LoginController::class, 'changePassword'])->name('ldap.change.password');
     Route::post('logout', [LoginController::class, 'logout'])->name('passport.logout');
     Route::post('logout-all-devices', [LoginController::class, 'logoutAllDevices'])->name('passport.logout.all');
 });
