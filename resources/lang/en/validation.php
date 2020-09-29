@@ -142,7 +142,7 @@ return [
     |
     */
     'attributes' => [
-        'campaign_id'           => 'campaign',
+
     ],
 
 ];

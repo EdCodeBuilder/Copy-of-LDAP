@@ -221,6 +221,6 @@ return [
         'subject'               => 'asunto',
         'message'               => 'mensaje',
         'document'              => 'documento',
-        'new_password_confirmation' => 'confirmación de la contraseña nueva',
+        'old_password'          => 'contraseña anterior'
     ],
 ];

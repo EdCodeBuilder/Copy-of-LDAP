@@ -292,8 +292,8 @@ class LoginController extends Controller
     {
         $request->validate([
             'old_password'  => 'required|string',
-            'new_password'  => 'required|string',
-            'new_password_confirmation'  => 'required|string|confirmed',
+            'password'  => 'required|string',
+            'password_confirmation'  => 'required|string|confirmed',
         ]);
     }
 }
