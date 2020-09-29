@@ -241,7 +241,7 @@ class LoginController extends Controller
 
     public function changePassword(Request $request)
     {
-        $user = Adldap::users()->findByGuid(auth('api')->user()->guid);
+        $user = Adldap::search()->findByGuid(auth('api')->user()->guid);
         if ( $user instanceof \Adldap\Models\User) {
             try {
                 if ( $user->changePassword($request->get('old_password'), $request->get('new_password')) ) {
