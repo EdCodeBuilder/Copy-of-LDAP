@@ -33,7 +33,7 @@ class ForgotPasswordController extends Controller
         $token = $this->broker()->getRepository();
 
         $response = $this->sendResetLink(
-            $this->credentials($request)
+            $request->only('username', 'document', 'email')
         );
 
         return $response == Password::RESET_LINK_SENT
