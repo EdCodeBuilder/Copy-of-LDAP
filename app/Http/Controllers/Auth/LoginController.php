@@ -192,21 +192,13 @@ class LoginController extends Controller
      */
     protected function getToken(Request $request)
     {
-        try {
-            $http = new Client();
-            $response = $http->post(route('passport.token'), [
-                'form_params' => [
-                    'client_id'     =>  env('PASSPORT_CLIENT_ID'),
-                    'client_secret' =>  env('PASSPORT_CLIENT_SECRET'),
-                    'grant_type'    =>  env('PASSPORT_GRANT_TYPE'),
-                    'username'      =>  $request->get('username'),
-                    'password'      =>  $request->get('password')
-                ],
-            ]);
-            return json_decode((string) $response->getBody(), true);
-        } catch (ClientException $e) {
-            return $this->sendFailedLoginResponse( $request );
-        }
+        $request->request->add([
+            'client_id'     =>  env('PASSPORT_CLIENT_ID'),
+            'client_secret' =>  env('PASSPORT_CLIENT_SECRET'),
+            'grant_type'    =>  env('PASSPORT_GRANT_TYPE'),
+        ]);
+        $data = (new DiactorosFactory)->createRequest( $request );
+        return app( AccessTokenController::class )->issueToken($data);
     }
 
     /**
