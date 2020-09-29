@@ -60,6 +60,22 @@ class ResetPasswordController extends Controller
     }
 
     /**
+     * Get the password reset credentials from the request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    protected function credentials(Request $request)
+    {
+        $request->request->add([
+            'username'  =>  strstr($request->get('email'), '@', true)
+        ]);
+        return $request->only(
+            'email', 'username', 'password', 'password_confirmation', 'token'
+        );
+    }
+
+    /**
      * Reset the given user's password.
      *
      * @param CanResetPassword $user
