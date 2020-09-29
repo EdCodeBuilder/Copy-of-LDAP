@@ -8,6 +8,8 @@ use Adldap\Auth\PasswordRequiredException;
 use Adldap\Auth\UsernameRequiredException;
 use Adldap\Laravel\Facades\Adldap;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Auth\ActiveRecordResource;
+use App\Http\Resources\Auth\UserResource;
 use App\Models\Security\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -225,12 +227,11 @@ class LoginController extends Controller
      */
     public function user()
     {
-        auth('api')->user()->ldap = $this->ldap->search()->findByGuid(auth('api')->user()->guid);
-        return $this->success_message(
-            auth('api')->user(),
-            Response::HTTP_OK,
-            Response::HTTP_OK,
-            auth('api')->user()->ldap
-        );
+        $ldap = null;
+        try {
+            $ldap = $this->ldap->search()->findByGuid(auth('api')->user()->guid);
+        } catch (\Exception $e) {}
+        auth('api')->user()->ldap = $ldap ? $ldap : null;
+        return $this->success_response( new UserResource( auth('api')->user() ), Response::HTTP_OK );
     }
 }

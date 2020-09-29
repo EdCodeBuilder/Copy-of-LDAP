@@ -73,6 +73,28 @@ class User extends Authenticatable implements Auditable
         'expires_at' => 'datetime',
     ];
 
+    /*
+     * ---------------------------------------------------------
+     * Accessors and Mutator
+     * ---------------------------------------------------------
+     */
+
+    /**
+     * Get the user's full name.
+     *
+     * @return string
+     */
+    public function getFullNameAttribute()
+    {
+        return toUpper( "{$this->name} {$this->surname}" );
+    }
+
+    /*
+    * ---------------------------------------------------------
+    * Data Change Auditor
+    * ---------------------------------------------------------
+    */
+
     /**
      * Attributes to include in the Audit.
      *
@@ -112,6 +134,12 @@ class User extends Authenticatable implements Auditable
         return ['user'];
     }
 
+    /*
+    * ---------------------------------------------------------
+    * Query Scopes
+    * ---------------------------------------------------------
+    */
+
     /**
      * Check if user is active
      *
@@ -122,6 +150,12 @@ class User extends Authenticatable implements Auditable
     {
         return $query->where('expires_at', '>', now()->format('Y-m-d H:i:s'));
     }
+
+    /*
+    * ---------------------------------------------------------
+    * Passport Validations
+    * ---------------------------------------------------------
+    */
 
     /**
      * Find the user instance for the given username.
