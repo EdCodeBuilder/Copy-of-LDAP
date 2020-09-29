@@ -249,8 +249,8 @@ class LoginController extends Controller
         $user = Adldap::search()->findByGuid(auth('api')->user()->guid);
         if ( $user instanceof \Adldap\Models\User) {
             try {
-                if ( $user->changePassword($request->get('old_password'), $request->get('new_password')) ) {
-                    auth()->user()->password = Hash::make( $request->get('new_password') );
+                if ( $user->changePassword($request->get('old_password'), $request->get('password')) ) {
+                    auth()->user()->password = Hash::make( $request->get('password') );
                     auth()->user()->save();
                     return $this->success_message(
                         __('auth.password_changed'),
@@ -292,8 +292,7 @@ class LoginController extends Controller
     {
         $request->validate([
             'old_password'  => 'required|string',
-            'password'  => 'required|string',
-            'password_confirmation'  => 'required|string|confirmed',
+            'password'  => 'required|string|confirmed',
         ]);
     }
 }
