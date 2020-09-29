@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use Adldap\Auth\BindException;
+use Adldap\Auth\PasswordRequiredException;
+use Adldap\Auth\UsernameRequiredException;
 use Adldap\Laravel\Facades\Adldap;
 use App\Http\Controllers\Controller;
+use App\Models\Security\User;
 use GuzzleHttp\Psr7\ServerRequest;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
@@ -12,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Validation\ValidationException;
 use Laravel\Passport\Http\Controllers\AccessTokenController;
@@ -137,13 +141,19 @@ class LoginController extends Controller
      *
      * @param Request $request
      * @return bool|JsonResponse
+     * @throws PasswordRequiredException
+     * @throws UsernameRequiredException
      */
     protected function attemptLogin(Request $request)
     {
         try {
             return Adldap::auth()->attempt($this->credentials($request)[ $this->username() ], $this->credentials($request)['password'], $bindAsUser = true);
         } catch (BindException $e) {
-            return $this->getToken( $request );
+            $user = User::active()->where('username', $request->get( $this->username() ))->first();
+            if ( $user ) {
+                return Hash::check($request->get('password'), $user->password);
+            }
+            return false;
         }
     }
 
