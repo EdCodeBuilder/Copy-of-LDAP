@@ -286,6 +286,7 @@ class LoginController extends Controller
      * @param Request $request
      * @return void
      *
+     * @throws \Illuminate\Validation\ValidationException
      */
     protected function validateChangePassword(Request $request)
     {
