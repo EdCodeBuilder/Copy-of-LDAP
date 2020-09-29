@@ -21,7 +21,13 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
-        ]
+        ],
+        AccessTokenCreated::class => [
+            RevokeOldTokens::class,
+        ],
+        RefreshTokenCreated::class => [
+            PruneOldTokens::class,
+        ],
     ];
 
     /**
