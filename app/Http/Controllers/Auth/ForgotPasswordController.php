@@ -66,7 +66,7 @@ class ForgotPasswordController extends Controller
     protected function sendResetLinkResponse(Request $request, $response)
     {
         return $this->success_message(
-            $response,
+            __($response),
             Response::HTTP_OK
         );
     }
@@ -81,7 +81,7 @@ class ForgotPasswordController extends Controller
     protected function sendResetLinkFailedResponse(Request $request, $response)
     {
         return $this->validation_errors([
-            'email' =>  $response,
+            'email' =>  __($response),
         ], Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
