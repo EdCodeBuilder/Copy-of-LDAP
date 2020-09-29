@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Adldap\AdldapInterface;
 use Adldap\Auth\BindException;
 use Adldap\Auth\PasswordRequiredException;
 use Adldap\Auth\UsernameRequiredException;
@@ -51,6 +52,21 @@ class LoginController extends Controller
      * @var  int
      */
     protected $maxAttempts = 3;
+
+    /**
+     * @var Adldap
+     */
+    protected $ldap;
+
+    /**
+     * Constructor.
+     *
+     * @param AdldapInterface $ldap
+     */
+    public function __construct(AdldapInterface $ldap)
+    {
+        $this->ldap = $ldap;
+    }
 
     /**
      * Handle a login request to the application.
@@ -209,9 +225,12 @@ class LoginController extends Controller
      */
     public function user()
     {
+        auth('api')->user()->ldap = $this->ldap->search()->findByGuid(auth('api')->user()->guid);
         return $this->success_message(
             auth('api')->user(),
-            Response::HTTP_OK
+            Response::HTTP_OK,
+            Response::HTTP_OK,
+            auth('api')->user()->ldap
         );
     }
 }
