@@ -241,6 +241,7 @@ class LoginController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
+     * @throws ValidationException
      */
     public function changePassword(Request $request)
     {
