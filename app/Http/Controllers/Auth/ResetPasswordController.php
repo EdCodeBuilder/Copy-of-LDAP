@@ -139,8 +139,9 @@ class ResetPasswordController extends Controller
      */
     protected function sendResetFailedResponse(Request $request, $response)
     {
-        return $this->validation_errors([
-            'email' =>  __($response),
-        ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        return $this->error_response(
+            __($response),
+         Response::HTTP_UNPROCESSABLE_ENTITY
+        );
     }
 }
