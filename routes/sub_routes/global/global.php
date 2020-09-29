@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,10 @@ use App\Http\Controllers\Auth\LoginController;
 */
 
 Route::post('login', [ LoginController::class, 'login' ])->name('passport.login');
+Route::prefix('password')->group( function () {
+    Route::post('forgot', [ ForgotPasswordController::class, 'sendResetLinkEmail' ])->name('password.forgot');
+    Route::get('reset', [ ResetPasswordController::class, 'reset' ])->name('password.reset');
+});
 
 Route::middleware('auth:api')->prefix('api')->group( function () {
     Route::get('user', [LoginController::class, 'user'])->name('passport.user');

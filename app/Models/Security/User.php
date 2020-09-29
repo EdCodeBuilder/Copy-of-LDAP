@@ -7,6 +7,8 @@ use Adldap\Auth\PasswordRequiredException;
 use Adldap\Auth\UsernameRequiredException;
 use Adldap\Laravel\Facades\Adldap;
 use Adldap\Laravel\Traits\HasLdapUser;
+use App\Notifications\Auth\ResetPassword;
+use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Notifications\Notifiable;
@@ -18,7 +20,7 @@ use Silber\Bouncer\Database\HasRolesAndAbilities;
 
 class User extends Authenticatable implements Auditable
 {
-    use Notifiable, HasApiTokens, SoftDeletes, HasLdapUser, HasRolesAndAbilities, \OwenIt\Auditing\Auditable;
+    use Notifiable, HasApiTokens, SoftDeletes, HasLdapUser, HasRolesAndAbilities, \OwenIt\Auditing\Auditable, CanResetPassword;
 
     /**
      * The connection name for the model.
@@ -190,5 +192,22 @@ class User extends Authenticatable implements Auditable
         } catch (BindException $e) {
             return Hash::check($password, $this->password);
         }
+    }
+
+    /*
+    * ---------------------------------------------------------
+    * Password Reset Notification
+    * ---------------------------------------------------------
+    */
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification( $token )
+    {
+        $this->notify( new ResetPassword( $token, request()->get('email') ) );
     }
 }
