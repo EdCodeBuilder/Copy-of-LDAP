@@ -238,9 +238,14 @@ class LoginController extends Controller
         return $this->success_response( new UserResource( auth('api')->user() ), Response::HTTP_OK );
     }
 
-
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function changePassword(Request $request)
     {
+        $this->validateChangePassword( $request );
+        // Find authenticated user and change password
         $user = Adldap::search()->findByGuid(auth('api')->user()->guid);
         if ( $user instanceof \Adldap\Models\User) {
             try {
@@ -273,5 +278,21 @@ class LoginController extends Controller
             __('auth.failed'),
             Response::HTTP_UNPROCESSABLE_ENTITY
         );
+    }
+
+    /**
+     * Validate the user password change.
+     *
+     * @param Request $request
+     * @return void
+     *
+     */
+    protected function validateChangePassword(Request $request)
+    {
+        $request->validate([
+            'old_password'  => 'required|string',
+            'new_password'  => 'required|string',
+            'new_password_confirmation'  => 'required|string|confirmed',
+        ]);
     }
 }
