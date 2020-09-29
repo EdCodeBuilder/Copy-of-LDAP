@@ -9,6 +9,7 @@ use Adldap\Laravel\Facades\Adldap;
 use App\Http\Controllers\Controller;
 use App\Models\Security\User;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\ServerRequest;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
@@ -201,16 +202,21 @@ class LoginController extends Controller
      */
     protected function getToken(Request $request)
     {
-        $request->request->add([
-            'client_id'     =>  env('PASSPORT_CLIENT_ID'),
-            'client_secret' =>  env('PASSPORT_CLIENT_SECRET'),
-            'grant_type'    =>  env('PASSPORT_GRANT_TYPE'),
-        ]);
-        $http = new Client();
-        $response = $http->post(route('passport.token'), [
-            'form-params' => $request->all(),
-        ]);
-        return json_decode((string) $response->getBody(), true);
+        try {
+            $http = new Client();
+            $response = $http->post(route('passport.token'), [
+                'form-params' => [
+                    'client_id'     =>  env('PASSPORT_CLIENT_ID'),
+                    'client_secret' =>  env('PASSPORT_CLIENT_SECRET'),
+                    'grant_type'    =>  env('PASSPORT_GRANT_TYPE'),
+                    'username'      =>  $request->get('username'),
+                    'password'      =>  $request->get('password')
+                ],
+            ]);
+            return json_decode((string) $response->getBody(), true);
+        } catch (ClientException $e) {
+            return $this->sendFailedLoginResponse( $request );
+        }
     }
 
     /**
