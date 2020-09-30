@@ -35,7 +35,7 @@ Route::middleware('auth:api')->prefix('api')->group( function () {
         Route::post('sync-sim', [ActiveDirectoryController::class, 'sync'])
             ->middleware('can:sync-users')
             ->name('admin.sync.sim_users');
-        Route::namespace('Auth')->resource('modules', 'ModuleController', [
+        Route::resource('modules', 'Auth\ModuleController', [
             'except'     =>     ['create', 'edit'],
             'parameters' => [ 'modules' => 'module' ]
         ]);
