@@ -42,6 +42,11 @@ class ActiveDirectoryController extends Controller
         }
     }
 
+    /**
+     * Sync SIM users id in LDAP database
+     *
+     * @return JsonResponse
+     */
     public function sync()
     {
         User::chunk(100, function ($users) {

@@ -28,6 +28,7 @@ class UserResource extends JsonResource
             "company"     =>    isset( $this->company ) ? $this->company : null,
             "phone"       =>    isset( $this->phone ) ? $this->phone : null,
             "ext"         =>    isset( $this->ext ) ? $this->ext : null,
+            "sim_id"      =>    isset( $this->sim_id ) ? $this->sim_id : null,
             "expires_at"  =>    isset( $this->expires_at ) ? $this->expires_at->format('Y-m-d H:i:s') : null,
             "created_at"  =>    isset( $this->created_at ) ? $this->created_at->format('Y-m-d H:i:s') : null,
             "updated_at"  =>    isset( $this->updated_at ) ? $this->updated_at->format('Y-m-d H:i:s') : null,

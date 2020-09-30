@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ActiveDirectory\ActiveDirectoryController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -24,15 +25,15 @@ Route::prefix('password')->group( function () {
 
 Route::middleware('auth:api')->prefix('api')->group( function () {
     Route::get('user', [LoginController::class, 'user'])->name('passport.user');
-    Route::post('change-password', [LoginController::class, 'changePassword'])->name('ldap.change.password');
+    Route::post('change-password', [LoginController::class, 'changePassword'])->name('password.change');
     Route::post('logout', [LoginController::class, 'logout'])->name('passport.logout');
     Route::post('logout-all-devices', [LoginController::class, 'logoutAllDevices'])->name('passport.logout.all');
     Route::prefix('admin')->group( function () {
-        Route::middleware('can:sync-users')
-            ->post('sync-users', [ActiveDirectoryController::class, 'import'])
-            ->name('admin.sync.users');
-        Route::middleware('can:sync-users')
-            ->post('sync-sim', [ActiveDirectoryController::class, 'sync'])
+        Route::post('sync-users', [ActiveDirectoryController::class, 'import'])
+            ->middleware('can:sync-users')
+            ->name('admin.sync.ldap_users');
+        Route::post('sync-sim', [ActiveDirectoryController::class, 'sync'])
+            ->middleware('can:sync-users')
             ->name('admin.sync.sim_users');
     });
 });

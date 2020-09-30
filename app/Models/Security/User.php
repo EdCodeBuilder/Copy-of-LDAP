@@ -48,6 +48,7 @@ class User extends Authenticatable implements Auditable
         'ext',
         'password',
         'expires_at',
+        'sim_id',
     ];
 
     /**
@@ -115,6 +116,7 @@ class User extends Authenticatable implements Auditable
         'phone',
         'ext',
         'expires_at',
+        'sim_id',
     ];
 
     /**
