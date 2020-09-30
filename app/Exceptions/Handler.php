@@ -22,6 +22,7 @@ use Illuminate\Http\Response;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -100,7 +101,7 @@ class Handler extends ExceptionHandler
                 return $this->error_response(__('validation.handler.resource_not_found_url'), Response::HTTP_NOT_FOUND, $exception);
             if ($exception instanceof RelationNotFoundException)
                 return $this->error_response(__('validation.handler.relation_not_found'), Response::HTTP_NOT_FOUND, $exception);
-            if ($exception instanceof AuthorizationException)
+            if ($exception instanceof AuthorizationException || $exception instanceof AccessDeniedHttpException)
                 return $this->error_response(__('validation.handler.unauthorized'), Response::HTTP_FORBIDDEN, $exception);
             if ($exception instanceof MethodNotAllowedHttpException)
                 return $this->error_response(__('validation.handler.method_allow'), Response::HTTP_METHOD_NOT_ALLOWED, $exception);
