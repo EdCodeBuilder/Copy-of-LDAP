@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\ModuleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ActiveDirectory\ActiveDirectoryController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -35,5 +36,9 @@ Route::middleware('auth:api')->prefix('api')->group( function () {
         Route::post('sync-sim', [ActiveDirectoryController::class, 'sync'])
             ->middleware('can:sync-users')
             ->name('admin.sync.sim_users');
+        Route::resource('modules', ModuleController::class, [
+            'except'     =>     ['create', 'edit'],
+            'parameters' => [ 'modules' => 'module' ]
+        ]);
     });
 });
