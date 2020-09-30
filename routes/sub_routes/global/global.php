@@ -28,6 +28,6 @@ Route::middleware('auth:api')->prefix('api')->group( function () {
     Route::post('logout', [LoginController::class, 'logout'])->name('passport.logout');
     Route::post('logout-all-devices', [LoginController::class, 'logoutAllDevices'])->name('passport.logout.all');
     Route::prefix('admin')->group( function () {
-        Route::middleware('can:sync-users')->get('sync-users', ActiveDirectoryController::class)->name('admin.sync.users');
+        Route::middleware('can:sync-users')->get('sync-users', [ActiveDirectoryController::class])->name('admin.sync.users');
     });
 });
