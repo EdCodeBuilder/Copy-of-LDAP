@@ -129,6 +129,7 @@ return [
         'logout'                    => 'Logged out successfully.',
         'locked'                    => 'Locked successfully.',
         'unlocked'                  => 'Unlocked successfully.',
+        'ldap_fail'                 => "Can't contact LDAP server"
     ],
 
     /*

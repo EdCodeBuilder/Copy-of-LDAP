@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActiveDirectory\ActiveDirectoryController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -26,4 +27,7 @@ Route::middleware('auth:api')->prefix('api')->group( function () {
     Route::post('change-password', [LoginController::class, 'changePassword'])->name('ldap.change.password');
     Route::post('logout', [LoginController::class, 'logout'])->name('passport.logout');
     Route::post('logout-all-devices', [LoginController::class, 'logoutAllDevices'])->name('passport.logout.all');
+    Route::prefix('admin')->group( function () {
+        Route::middleware('can:sync-users')->get('sync-users', ActiveDirectoryController::class)->name('admin.sync.users');
+    });
 });
