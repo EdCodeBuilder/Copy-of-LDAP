@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActiveDirectory\ActiveDirectoryController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -27,6 +28,11 @@ Route::middleware('auth:api')->prefix('api')->group( function () {
     Route::post('logout', [LoginController::class, 'logout'])->name('passport.logout');
     Route::post('logout-all-devices', [LoginController::class, 'logoutAllDevices'])->name('passport.logout.all');
     Route::prefix('admin')->group( function () {
-        Route::middleware('can:sync-users')->get('sync-users', 'ActiveDirectory\ActiveDirectoryController')->name('admin.sync.users');
+        Route::middleware('can:sync-users')
+            ->post('sync-users', [ActiveDirectoryController::class, 'import'])
+            ->name('admin.sync.users');
+        Route::middleware('can:sync-users')
+            ->post('sync-sim', [ActiveDirectoryController::class, 'sync'])
+            ->name('admin.sync.users');
     });
 });

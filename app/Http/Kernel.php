@@ -37,12 +37,14 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            'bouncer',
             'signature',
             'localization',
             'json.response'
         ],
 
         'api' => [
+            'bouncer',
             'api.throttle:60,1',
             'bindings',
             'signature',
@@ -75,6 +77,7 @@ class Kernel extends HttpKernel
         'signature' => \App\Http\Middleware\Signature::class,
         'api.throttle' => \App\Http\Middleware\ApiThrottleRequest::class,
         'json.response' => \App\Http\Middleware\ForceJsonResponse::class,
+        'bouncer'       => \App\Http\Middleware\ScopeBouncer::class,
     ];
 
     /**
