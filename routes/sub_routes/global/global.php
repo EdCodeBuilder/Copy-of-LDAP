@@ -33,6 +33,6 @@ Route::middleware('auth:api')->prefix('api')->group( function () {
             ->name('admin.sync.users');
         Route::middleware('can:sync-users')
             ->post('sync-sim', [ActiveDirectoryController::class, 'sync'])
-            ->name('admin.sync.users');
+            ->name('admin.sync.sim_users');
     });
 });
