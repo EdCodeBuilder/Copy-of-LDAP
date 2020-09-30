@@ -25,6 +25,12 @@ class CreateProfilesTable extends Migration
             $table->unsignedBigInteger('gender_identity_id')->nullable()->comment('Identidad de género');
             $table->unsignedBigInteger('user_id')->comment('Usuario relacionado al perfil');
             $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('city_id')->references('id')->on('cities');
+            $table->foreign('gender_id')->references('id')->on('genders');
+            $table->foreign('ethnicity_id')->references('id')->on('ethnicities');
+            $table->foreign('gender_identity_id')->references('id')->on('gender_identities');
+            $table->foreign('document_type_id')->references('id')->on('document_types');
         });
     }
 
