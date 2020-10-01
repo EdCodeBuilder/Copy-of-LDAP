@@ -169,6 +169,7 @@ return [
         Adldap\Laravel\AdldapServiceProvider::class,
         Adldap\Laravel\AdldapAuthServiceProvider::class,
         Silber\Bouncer\BouncerServiceProvider::class,
+        FruitCake\Cors\CorsServiceProvider::class,
 
         /*
          * Application Service Providers...
