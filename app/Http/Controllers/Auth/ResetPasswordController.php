@@ -68,15 +68,24 @@ class ResetPasswordController extends Controller
      */
     protected function credentials(Request $request)
     {
-        $user = User::where('email', $request->get('email'))->first();
-        $request->request->add([
-            'username'  =>  isset( $user->username )
-                            ? $user->username
-                            : strstr($request->get('email'), '@', true)
-        ]);
         return $request->only(
             'email', 'username', 'password', 'password_confirmation', 'token'
         );
+    }
+
+    /**
+     * Get the password reset validation rules.
+     *
+     * @return array
+     */
+    protected function rules()
+    {
+        return [
+            'token'    => 'required',
+            'email'    => 'required|email',
+            'username' => 'required|exists:mysql_ldap.users',
+            'password' => 'required|confirmed|min:8',
+        ];
     }
 
     /**
