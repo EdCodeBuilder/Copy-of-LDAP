@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use Adldap\AdldapException;
 use Adldap\Laravel\Facades\Adldap;
+use App\Models\Security\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\StatefulGuard;
@@ -67,8 +68,11 @@ class ResetPasswordController extends Controller
      */
     protected function credentials(Request $request)
     {
+        $user = User::where('email', $request->get('email'))->first();
         $request->request->add([
-            'username'  =>  strstr($request->get('email'), '@', true)
+            'username'  =>  isset( $user->username )
+                            ? $user->username
+                            : strstr($request->get('email'), '@', true)
         ]);
         return $request->only(
             'email', 'username', 'password', 'password_confirmation', 'token'

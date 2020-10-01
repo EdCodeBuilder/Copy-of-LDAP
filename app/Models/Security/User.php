@@ -9,6 +9,7 @@ use Adldap\Laravel\Facades\Adldap;
 use Adldap\Laravel\Traits\HasLdapUser;
 use App\Notifications\Auth\ResetPassword;
 use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Notifications\Notifiable;
@@ -211,5 +212,21 @@ class User extends Authenticatable implements Auditable
     public function sendPasswordResetNotification( $token )
     {
         $this->notify( new ResetPassword( $token, request()->get('email') ) );
+    }
+
+    /*
+    * ---------------------------------------------------------
+    * Eloquent Relations
+    * ---------------------------------------------------------
+    */
+
+    /**
+     *  User has profile
+     *
+     * @return HasOne
+     */
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
     }
 }
