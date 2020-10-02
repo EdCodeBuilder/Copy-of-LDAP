@@ -117,8 +117,6 @@ class LoginController extends Controller
     {
         $token = auth('api')->user()->token();
         $token->revoke();
-        $this->guard()->logout();
-        $request->session()->invalidate();
         return $this->success_message(__('validation.handler.logout'), Response::HTTP_OK);
     }
 
@@ -134,8 +132,6 @@ class LoginController extends Controller
         foreach ($tokens as $token) {
             $token->revoke();
         }
-        $this->guard()->logout();
-        $request->session()->invalidate();
         return $this->success_message(__('validation.handler.logout'), Response::HTTP_OK);
     }
 
