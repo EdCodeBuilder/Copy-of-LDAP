@@ -65,7 +65,10 @@ trait ApiResponse
 
     public function validation_errors($errors, $code = Response::HTTP_UNPROCESSABLE_ENTITY)
     {
-        return response()->json($errors, $code);
+        return response()->json([
+            'message'   => __('validation.handler.validation_failed'),
+            'errors'    => $errors,
+        ], $code);
     }
 
     /**
