@@ -39,7 +39,7 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
-        //
+        $this->mapOrfeoRoutes();
     }
 
     /**
@@ -68,5 +68,11 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware('api')
              ->namespace($this->namespace)
              ->group(base_path('routes/api.php'));
+    }
+
+    public function mapOrfeoRoutes()
+    {
+        Route::middleware('api')
+            ->group(base_path('routes/sub_routes/orfeo/orfeo.php'));
     }
 }
