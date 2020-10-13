@@ -3,6 +3,7 @@
 namespace App\Listeners\Security;
 
 use Adldap\Laravel\Events\DiscoveredWithCredentials;
+use App\Exceptions\PasswordExpiredException;
 use Illuminate\Http\Response;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -22,17 +23,14 @@ class PasswordExpiredListener
     /**
      * Handle the event.
      *
-     * @param  object  $event
-     * @return \Illuminate\Http\JsonResponse
+     * @param DiscoveredWithCredentials $event
+     * @return void
+     * @throws PasswordExpiredException
      */
     public function handle(DiscoveredWithCredentials $event)
     {
         if ((int) $event->user->getPasswordLastSet() !== 0) {
-            return response()->json([
-                'message' =>  'Password Bloqueado',
-                'details' => '',
-                'code'  =>  Response::HTTP_UNPROCESSABLE_ENTITY
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            throw new PasswordExpiredException('Password Expired');
         }
     }
 }
