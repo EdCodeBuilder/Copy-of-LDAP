@@ -121,7 +121,7 @@ class Filed extends Model
      */
     public function attachments()
     {
-        return $this->hasMany(Attachment::class, 'anex_radi_nume')->orderByDesc('anex_numero');
+        return $this->hasMany(Attachment::class, 'anex_radi_nume')->orderBy('anex_numero');
     }
 
     /**
@@ -151,6 +151,6 @@ class Filed extends Model
      */
     public function informed()
     {
-        return $this->hasMany(Informed::class, 'radi_nume_radi')->orderByDesc('info_fech');
+        return $this->hasMany(Informed::class, 'radi_nume_radi');
     }
 }

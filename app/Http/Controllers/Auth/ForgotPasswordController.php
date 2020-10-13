@@ -50,7 +50,7 @@ class ForgotPasswordController extends Controller
     protected function validateEmail(Request $request)
     {
         $request->validate([
-            'email'     => 'required|email',
+            'email'     => 'required|email|confirmed',
             'username'  =>  'required|exists:mysql_ldap.users',
             'document'  =>  'required|exists:mysql_ldap.users',
         ]);

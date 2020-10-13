@@ -25,7 +25,7 @@ class InformedResource extends JsonResource
             'user_document'     => isset( $this->user->document ) ? (int) $this->user->document : null,
             'description'       => isset( $this->info_desc ) ? toUpper( $this->info_desc ) : null,
             'read'              => isset( $this->info_leido ) ? (bool) $this->info_leido : null,
-            'created_at'        =>  isset( $this->anex_radi_fech ) ? $this->anex_radi_fech : null,
+            'created_at'        =>  isset( $this->info_fech ) ? $this->info_fech : null,
         ];
     }
 }

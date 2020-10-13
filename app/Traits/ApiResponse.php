@@ -93,7 +93,7 @@ trait ApiResponse
      */
     protected function success_response(JsonResource $collection, int $code = Response::HTTP_OK )
     {
-        return $collection->response()->setStatusCode( $code );
+        return $collection->additional(['code' => $code])->response()->setStatusCode( $code );
     }
 
     protected function success_message($message, $code = Response::HTTP_OK, $overrideCode = null, $details = null)

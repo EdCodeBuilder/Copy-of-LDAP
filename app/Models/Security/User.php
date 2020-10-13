@@ -48,6 +48,8 @@ class User extends Authenticatable implements Auditable
         'phone',
         'ext',
         'password',
+        'vacation_start_date',
+        'vacation_final_date',
         'expires_at',
         'sim_id',
     ];
@@ -66,7 +68,7 @@ class User extends Authenticatable implements Auditable
      *
      * @var array
      */
-    protected $dates = [ 'expires_at' ];
+    protected $dates = [ 'expires_at', 'vacation_start_date', 'vacation_final_date' ];
 
     /**
      * The attributes that should be cast to native types.
@@ -75,6 +77,8 @@ class User extends Authenticatable implements Auditable
      */
     protected $casts = [
         'expires_at' => 'datetime',
+        'vacation_start_date' => 'datetime',
+        'vacation_final_date' => 'datetime',
     ];
 
     /*
@@ -116,6 +120,8 @@ class User extends Authenticatable implements Auditable
         'company',
         'phone',
         'ext',
+        'vacation_start_date',
+        'vacation_final_date',
         'expires_at',
         'sim_id',
     ];

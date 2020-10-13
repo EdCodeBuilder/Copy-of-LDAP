@@ -29,6 +29,8 @@ class CreateUsersTable extends Migration
             $table->string('phone', 20)->nullable()->comment('Número de teléfono dentro de la Sede');
             $table->string('ext', 20)->nullable()->comment('Extensión del número de teléfono de la Sede');
             $table->string('password')->nullable()->comment('Contraseña que se sincroniza del Directorio Activo');
+            $table->timestamp('vacation_start_date')->nullable()->comment('Fecha inicial de vacaciones/suspención del usuario');
+            $table->timestamp('vacation_final_date')->nullable()->comment('Fecha final de vacaciones/suspención del usuario');
             $table->timestamp('expires_at')->nullable()->comment('Fecha de vencimiento del contrato');
             $table->unsignedBigInteger('sim_id')->nullable()->comment('Identifica si el usuario ya habia sido creado en el S.I.M. anteriormente');
             $table->rememberToken();

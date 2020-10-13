@@ -67,12 +67,14 @@ class ResetPassword extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
+        $url = config('app.env') === 'production' ? config('app.url') : 'http://localhost:3000/es/password/reset';
+
         return (new MailMessage)
             ->cc( $this->email )
             ->subject("Notificación de Restablecimiento de Contraseña")
             ->greeting('Hola')
             ->line('Recibió este correo electrónico porque recibimos una solicitud de restablecimiento de contraseña para su cuenta.')
-            ->action('Restablecer Contraseña', url(config('app.url').route('password.reset', ['token' => $this->token, 'email' => $notifiable->getEmailForPasswordReset()], false)))
+            ->action('Restablecer Contraseña', url($url.route('password.reset', ['token' => $this->token, 'email' => $notifiable->getEmailForPasswordReset()], false)))
             ->line(Lang::getFromJson('Este enlace de restablecimiento de contraseña caducará en :count minutos.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]))
             ->line('Si no solicitó un restablecimiento de contraseña, no se requiere ninguna otra acción.')
             ->salutation('Cordialmente/Best Regards: Sistema de Información Misional S.I.M.');

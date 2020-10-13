@@ -28,6 +28,15 @@ class LdapAttributeHandler
         $eloquentUser->description       = isset( $ldapUser->description ) ? toUpper( $ldapUser->getFirstAttribute('description') ) : 'SIN DESCRIPCIPCIÓN';
         $eloquentUser->dependency        = isset( $ldapUser->physicaldeliveryofficename ) ? toUpper( $ldapUser->getFirstAttribute('physicaldeliveryofficename') ) : 'IDRD';
         $eloquentUser->company           = isset( $ldapUser->company ) ? toUpper( $ldapUser->getFirstAttribute('company') ) : 'SEDE EXTERNA';
+        $eloquentUser->vacation_start_date = isAValidDate( $ldapUser->getFirstAttribute('fechainiciovac') )
+                                           ? Carbon::parse($ldapUser->getFirstAttribute('fechainiciovac'))->format('Y-m-d H:i:s')
+                                           : null;
+        $eloquentUser->vacation_final_date = isAValidDate( $ldapUser->getFirstAttribute('fechafinvac') )
+                                           ? Carbon::parse($ldapUser->getFirstAttribute('fechafinvac'))->format('Y-m-d H:i:s')
+                                           : null;
+        if ( $ldapUser->getFirstAttribute('postalcode') ) {
+            $eloquentUser->document = $ldapUser->getPostalCode();
+        }
         if ( strlen( $ldapUser->getTelephoneNumber() ) > 0 && strlen( $ldapUser->getTelephoneNumber() ) <= 4 ) {
             $eloquentUser->phone         = '6605400';
             $eloquentUser->ext           = $ldapUser->getTelephoneNumber();

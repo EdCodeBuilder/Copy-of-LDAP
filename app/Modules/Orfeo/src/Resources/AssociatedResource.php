@@ -19,7 +19,7 @@ class AssociatedResource extends JsonResource
         return [
             'id'                =>  isset( $this->radi_asociado ) ? (int) $this->radi_asociado : null,
             'filed_id'          =>  isset( $this->radi_padre ) ? (int) $this->radi_padre : null,
-            'created_at'        =>  isset( $this->fecha_crea ) ? $this->fecha_crea : null,
+            'created_at'        =>  isset( $this->fech_crea ) ? $this->fech_crea : null,
         ];
     }
 
