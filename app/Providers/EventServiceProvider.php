@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Adldap\Laravel\Events\AuthenticatedWithCredentials;
+use Adldap\Laravel\Events\Authenticating;
 use Adldap\Laravel\Events\DiscoveredWithCredentials;
 use App\Listeners\Security\PasswordExpiredListener;
 use App\Listeners\Security\PruneOldTokens;
@@ -31,7 +32,7 @@ class EventServiceProvider extends ServiceProvider
         RefreshTokenCreated::class => [
             PruneOldTokens::class,
         ],
-        DiscoveredWithCredentials::class => [
+        Authenticating::class => [
             PasswordExpiredListener::class,
         ],
     ];
