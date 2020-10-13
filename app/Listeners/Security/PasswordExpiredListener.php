@@ -2,6 +2,7 @@
 
 namespace App\Listeners\Security;
 
+use Adldap\Laravel\Events\AuthenticatedWithCredentials;
 use Adldap\Laravel\Events\DiscoveredWithCredentials;
 use App\Exceptions\PasswordExpiredException;
 use Illuminate\Http\Response;
@@ -23,11 +24,11 @@ class PasswordExpiredListener
     /**
      * Handle the event.
      *
-     * @param DiscoveredWithCredentials $event
+     * @param AuthenticatedWithCredentials $event
      * @return void
      * @throws PasswordExpiredException
      */
-    public function handle(DiscoveredWithCredentials $event)
+    public function handle(AuthenticatedWithCredentials $event)
     {
         if ((int) $event->user->getPasswordLastSet() !== 0) {
             throw new PasswordExpiredException('Password Expired');
