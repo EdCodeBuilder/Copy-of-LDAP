@@ -83,6 +83,11 @@ class FiledController extends Controller
         return $this->success_message($count);
     }
 
+    public function countByFileType()
+    {
+        
+    }
+
     /**
      * Display a listing of the resource.
      *
