@@ -31,7 +31,7 @@ class EventServiceProvider extends ServiceProvider
         RefreshTokenCreated::class => [
             PruneOldTokens::class,
         ],
-        AuthenticatedWithCredentials::class => [
+        DiscoveredWithCredentials::class => [
             PasswordExpiredListener::class,
         ],
     ];

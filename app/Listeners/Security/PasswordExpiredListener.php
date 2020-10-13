@@ -25,11 +25,11 @@ class PasswordExpiredListener
     /**
      * Handle the event.
      *
-     * @param AuthenticatedWithCredentials $event
+     * @param DiscoveredWithCredentials $event
      * @return void
      * @throws PasswordExpiredException
      */
-    public function handle(AuthenticatedWithCredentials $event)
+    public function handle(DiscoveredWithCredentials $event)
     {
         Log::info('Entrada al Listener de contraseñas');
         if ((int) $event->user->getPasswordLastSet() !== 0) {
