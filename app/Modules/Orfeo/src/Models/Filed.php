@@ -39,7 +39,7 @@ class Filed extends Model
      *
      * @var array
      */
-    protected $with = ['user', 'dependency', 'city', 'document_type'];
+    protected $with = ['user', 'dependency', 'city', 'document_type', 'folder'];
 
     /**
      * The relations to eager load on every query.
@@ -112,6 +112,16 @@ class Filed extends Model
     public function document_type()
     {
         return $this->belongsTo(DocumentType::class, 'tdoc_codi');
+    }
+
+    /**
+     *  Filed belongs to document type
+     *
+     * @return BelongsTo
+     */
+    public function folder()
+    {
+        return $this->belongsTo(Folder::class, 'carp_codi');
     }
 
     /**

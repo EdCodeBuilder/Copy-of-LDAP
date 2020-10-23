@@ -52,7 +52,7 @@ class ActiveDirectoryController extends Controller
         User::chunk(100, function ($users) {
             foreach ($users as $user) {
                 if ( isset( $user->document ) ) {
-                    $sim = DB::connection('mysql_ldap')->table('idrdgov_simgeneral.persona')
+                    $sim = DB::connection('mysql_sim')->table('idrdgov_simgeneral.persona')
                                                     ->where('Cedula', $user->document)
                                                     ->first();
                     if ( isset( $sim->Id_Persona ) ) {

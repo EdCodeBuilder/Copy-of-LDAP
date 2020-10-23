@@ -4,24 +4,32 @@ namespace App\Modules\Orfeo\src\Controllers;
 
 use App\Modules\Orfeo\src\Models\Attachment;
 use App\Modules\Orfeo\src\Models\Dependency;
+use App\Modules\Orfeo\src\Models\DocumentType;
 use App\Modules\Orfeo\src\Models\Filed;
+use App\Modules\Orfeo\src\Models\FiledType;
+use App\Modules\Orfeo\src\Models\Folder;
+use App\Modules\Orfeo\src\Models\User;
 use App\Modules\Orfeo\src\Resources\DependencyResource;
+use App\Modules\Orfeo\src\Resources\DocumentTypeResource;
 use App\Modules\Orfeo\src\Resources\FiledResource;
+use App\Modules\Orfeo\src\Resources\FolderResource;
 use App\Modules\Orfeo\src\Resources\HistoryResource;
 use App\Modules\Orfeo\src\Resources\InformedResource;
+use App\Modules\Orfeo\src\Resources\UserResource;
 use Carbon\Carbon;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class FiledController extends Controller
 {
     public function countByMonth(Request $request)
     {
-        $data = Filed::query()
+        $data = $this->getBuilder( $request, Filed::query() )
             ->without(['user', 'dependency', 'city', 'document_type'])
             ->select(DB::raw('EXTRACT(MONTH FROM radi_fech_radi) AS month, COUNT(*) AS count'))
             ->whereBetween('radi_fech_radi', [now()->startOfYear()->format('Y-m-d H:i:s'), now()->endOfYear()->format('Y-m-d H:i:s')])
@@ -34,6 +42,22 @@ class FiledController extends Controller
                 ];
             });
         return $this->success_message($data);
+    }
+
+    public function countByFolder(Request $request)
+    {
+        $data = Folder::active()->withCount([
+            'filed' => function(Builder $query) use ( $request ) {
+                return $this->getBuilder( $request, $query );
+            },
+            'read'  => function(Builder $query) use ( $request ) {
+                return $this->getBuilder( $request, $query );
+            },
+            'unread'    => function(Builder $query) use ( $request ) {
+                return $this->getBuilder( $request, $query );
+            },
+        ])->get();
+        return $this->success_response( FolderResource::collection( $data ) );
     }
 
     public function countByDependency(Request $request)
@@ -83,9 +107,52 @@ class FiledController extends Controller
         return $this->success_message($count);
     }
 
-    public function countByFileType()
+    public function countByRead(Request $request)
     {
-        
+        $read = $this->getBuilder( $request, Filed::query() )
+                ->where('radi_leido', true)->count();
+
+        $unread = $this->getBuilder( $request, Filed::query() )
+            ->where('radi_leido', false)->count();
+        return $this->success_message([
+            'read'    =>  $read,
+            'unread'  =>  $unread,
+        ]);
+    }
+
+    public function countByFileType(Request $request)
+    {
+        $types = FiledType::all();
+        $data = [];
+        $i = 0;
+        $total = $this->getBuilder( $request, Filed::query() )->count();
+        foreach ($types as $type) {
+            $id = isset( $type->id ) ? (int) $type->id : null;
+            $data[] = [
+                'id'    =>  $id,
+                'name'  =>  isset( $type->description ) ? $type->description : null,
+                'color' =>  [
+                    'cyan',
+                    'green',
+                    'amber',
+                    'orange',
+                    'pink',
+                    'indigo',
+                    'red',
+                    'blue',
+                    'light-blue',
+                    'purple',
+                    'teal',
+                    'lime',
+                    'deep-orange',
+                    'brown',
+                    ][$i],
+                'count' =>  $id ? (int) $this->getBuilder( $request, Filed::query() )
+                                             ->where("radi_nume_radi", 'LIKE', "%$id")->count() : null,
+            ];
+            $i++;
+        }
+        return $this->success_message($data, Response::HTTP_OK, Response::HTTP_OK, $total);
     }
 
     /**
@@ -107,18 +174,17 @@ class FiledController extends Controller
     public function calendar(Request $request)
     {
         $start = $request->has('start_date')
-                ? Carbon::parse( $request->get('start_date') )
-                : now()->startOfMonth();
+            ? Carbon::parse( $request->get('start_date') )->startOfDay()
+            : now()->startOfMonth();
         $final = $request->has('final_date')
-            ? Carbon::parse( $request->get('final_date') )
+            ? Carbon::parse( $request->get('final_date') )->endOfDay()
             : now()->endOfMonth();
-        $resource = $this->getBuilder( $request, Filed::query() )
-                         ->where([
-                             ['radi_fech_radi', '>=', $start->format('Y-m-d H:i:s')],
-                             ['radi_fech_radi', '<=', $final->format('Y-m-d H:i:s')],
-                         ]);
+        $resource = Filed::query()->where([
+            ['radi_fech_radi', '>=', $start],
+            ['radi_fech_radi', '<=', $final],
+        ]);
         return $this->success_response(
-            FiledResource::collection( $resource->orderByDesc('radi_nume_radi')->get())
+            FiledResource::collection( $resource->get())
         );
     }
 
@@ -143,14 +209,28 @@ class FiledController extends Controller
      */
     public function getBuilder(Request $request, Builder $resource)
     {
+        $start = $request->has('start_date')
+            ? Carbon::parse( $request->get('start_date') )->startOfDay()
+            : now()->startOfMonth();
+        $final = $request->has('final_date')
+            ? Carbon::parse( $request->get('final_date') )->endOfDay()
+            : now()->endOfMonth();
         return $resource->when($request->has('document_type'), function ($query) use ( $request ) {
             return $query->whereIn('tdoc_codi', $request->get('document_type'));
-        })->when( $request->has('city_id'), function ($query) use ( $request ) {
-            return $query->whereIn('muni_codi', $request->get('city_id'));
+        })->when( ($request->has('start_date') && $request->has('final_date') ), function ($query) use ( $start, $final ) {
+            return $query->where([
+                ['radi_fech_radi', '>=', $start],
+                ['radi_fech_radi', '<=', $final],
+            ]);
         })->when( $request->has('current_user_id'), function ($query) use ( $request ) {
             return $query->whereIn('radi_usua_actu', $request->get('current_user_id'));
+        })->when( $request->has('read'), function ($query) use ( $request ) {
+            $bool = filter_var($request->get('read'), FILTER_VALIDATE_BOOLEAN);
+            return $query->where('radi_leido', $bool);
         })->when( $request->has('current_dependency_id'), function ($query) use ( $request ) {
             return $query->whereIn('radi_depe_actu', $request->get('current_dependency_id'));
+        })->when( $request->has('folder'), function ($query) use ( $request ) {
+            return $query->whereIn('carp_codi', $request->get('folder'));
         })->when( $request->has('query'), function ($query) use ( $request ) {
             return $query->where('radi_nume_radi', $request->get('query'));
         })->when( $request->has('where_has'), function ($query) use ( $request ) {
@@ -174,6 +254,29 @@ class FiledController extends Controller
     public function dependencies()
     {
         return $this->success_response( DependencyResource::collection( Dependency::all() ) );
+    }
+
+    public function documentTypes(Request $request)
+    {
+        $data = DocumentType::where('sgd_tpr_descrip', 'ilike', "%{$request->get('query')}%")
+                            ->take(50)
+                            ->get();
+        return $this->success_response( DocumentTypeResource::collection( $data ) );
+    }
+
+    public function users(Request $request)
+    {
+        $data = User::query()
+                    ->where('usua_nomb', 'ilike', "%{$request->get('query')}%")
+                    ->orWhere('usua_doc', 'ilike', "%{$request->get('query')}%")
+                    ->orWhere('usua_email', 'ilike', "%{$request->get('query')}%")
+                    ->take(50)->get();
+        return $this->success_response( UserResource::collection( $data ) );
+    }
+
+    public function folders()
+    {
+        return $this->success_response( FolderResource::collection( Folder::active()->get() ) );
     }
 
     public function informed(Filed $filed)

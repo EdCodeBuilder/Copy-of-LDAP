@@ -67,7 +67,7 @@ class ResetPassword extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        $url = config('app.env') === 'production' ? config('app.url') : 'http://localhost:3000/es/password/reset';
+        $url = config('app.env') === 'production' ? config('app.url') : 'http://localhost:3000/es/';
 
         return (new MailMessage)
             ->cc( $this->email )

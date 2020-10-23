@@ -27,6 +27,11 @@ class User extends Model
      */
     protected $primaryKey = 'usua_codi';
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'usua_nomb',
         'usua_doc',
@@ -38,6 +43,16 @@ class User extends Model
      * Accessors and Mutator
      * ---------------------------------------------------------
      */
+
+    /**
+     * Get the user id.
+     *
+     * @return integer
+     */
+    public function getIdAttribute()
+    {
+        return (int) $this->usua_codi;
+    }
 
     /**
      * Get the full name.

@@ -29,6 +29,9 @@ class FiledResource extends JsonResource
             'final_day'         =>  $this->getFinalDateAttribute(),
             'status'            =>  $this->getStatus(),
             'color'             =>  $this->getStatusColor(),
+            'read'              =>  isset( $this->radi_leido ) ? (bool) $this->radi_leido : null,
+            'folder_id'         =>  isset( $this->carp_codi ) ? (int) $this->carp_codi : null,
+            'folder'            =>  isset( $this->folder->name ) ? $this->folder->name : null,
             'addressee_document'=>  isset( $this->radi_nume_iden ) ? (int) $this->radi_nume_iden : null,
             'addressee_full_name'=>  isset( $this->addressee_full_name ) ? $this->addressee_full_name : null,
             'address'            =>  isset( $this->radi_dire_corr ) ? toUpper($this->radi_dire_corr) : null,
@@ -123,7 +126,7 @@ class FiledResource extends JsonResource
                 break;
             case 'RADICADO':
             default:
-                return 'error';
+                return 'danger';
                 break;
         }
     }
