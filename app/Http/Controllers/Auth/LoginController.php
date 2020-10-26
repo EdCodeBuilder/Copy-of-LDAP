@@ -156,7 +156,7 @@ class LoginController extends Controller
     protected function attemptLogin(Request $request)
     {
         try {
-            return auth()->attempt($this->credentials($request)[ $this->username() ], $this->credentials($request)['password']);
+            return auth()->attempt($this->credentials($request));
         } catch (BindException $e) {
             $user = User::active()->where('username', $request->get( $this->username() ))->first();
             if ( $user ) {
