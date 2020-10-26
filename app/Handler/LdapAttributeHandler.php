@@ -34,6 +34,8 @@ class LdapAttributeHandler
         $eloquentUser->vacation_final_date = isAValidDate( $ldapUser->getFirstAttribute('fechafinvac') )
                                            ? Carbon::parse($ldapUser->getFirstAttribute('fechafinvac'))->format('Y-m-d H:i:s')
                                            : null;
+        $eloquentUser->password_expired = ((int) $ldapUser->getPasswordLastSet() === 0);
+        $eloquentUser->is_locked = ((int) $ldapUser->getFirstAttribute('useraccountcontrol') === 514);
         if ( $ldapUser->getFirstAttribute('postalcode') ) {
             $eloquentUser->document = $ldapUser->getPostalCode();
         }

@@ -48,6 +48,8 @@ class User extends Authenticatable implements Auditable
         'phone',
         'ext',
         'password',
+        'password_expired',
+        'is_locked',
         'vacation_start_date',
         'vacation_final_date',
         'expires_at',
@@ -76,6 +78,8 @@ class User extends Authenticatable implements Auditable
      * @var array
      */
     protected $casts = [
+        'password_expired' => 'boolean',
+        'is_locked' => 'boolean',
         'expires_at' => 'datetime',
         'vacation_start_date' => 'datetime',
         'vacation_final_date' => 'datetime',
@@ -122,6 +126,8 @@ class User extends Authenticatable implements Auditable
         'ext',
         'vacation_start_date',
         'vacation_final_date',
+        'password_expired',
+        'is_locked',
         'expires_at',
         'sim_id',
     ];
@@ -162,6 +168,28 @@ class User extends Authenticatable implements Auditable
         return $query->where('expires_at', '>', now()->format('Y-m-d H:i:s'));
     }
 
+    /**
+     * Check if user is not locked
+     *
+     * @param $query
+     * @return Builder
+     */
+    public function scopeUnlocked($query)
+    {
+        return $query->where('is_locked', '!=', true);
+    }
+
+    /**
+     * Check if user is not locked
+     *
+     * @param $query
+     * @return Builder
+     */
+    public function scopePasswordNotExpired($query)
+    {
+        return $query->where('password_expired', '!=', true);
+    }
+
     /*
     * ---------------------------------------------------------
     * Passport Validations
@@ -184,13 +212,15 @@ class User extends Authenticatable implements Auditable
      *
      * @param string $password
      * @return bool
-     * @throws PasswordRequiredException
-     * @throws UsernameRequiredException
      */
     public function validateForPassportPasswordGrant(string $password)
     {
         try {
-            if ( Adldap::auth()->attempt($this->username, $password, $bindAsUser = true) ) {
+            $credentials = [
+                'username'  =>  $this->username,
+                'password'  =>  $password,
+            ];
+            if ( auth()->attempt($credentials) ) {
                 if ( ! Hash::check($password, $this->password) ) {
                     $this->password = Hash::make( $password );
                     $this->save();

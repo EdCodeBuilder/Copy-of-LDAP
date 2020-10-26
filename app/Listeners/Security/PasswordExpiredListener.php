@@ -32,14 +32,16 @@ class PasswordExpiredListener
      */
     public function handle(Authenticating $event)
     {
-        Log::info('Authenticating Listener...');
+        Log::info('Starting Authentication Listener...');
+        Log::info('Username: '.$event->user->getFirstAttribute('samaccountname'));
         Log::info('Password last set: '.$event->user->getPasswordLastSet());
         Log::info('Account Control: '.$event->user->getFirstAttribute('useraccountcontrol'));
+        Log::info('Finishing Authentication Listener');
         if ((int) $event->user->getPasswordLastSet() !== 0) {
-            throw new PasswordExpiredException('Password Expired');
+            throw new PasswordExpiredException(trans('passwords.expired'));
         }
         if ((int) $event->user->getFirstAttribute('useraccountcontrol') !== 514) {
-            throw new PasswordExpiredException('Cuenta inactiva');
+            throw new PasswordExpiredException(trans('passwords.inactive'));
         }
     }
 }

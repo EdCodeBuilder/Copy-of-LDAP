@@ -17,4 +17,6 @@ return [
     'sent'     => '¡Te hemos enviado por correo el enlace para restablecer tu contraseña, verifica los correos no deseados!',
     'token'    => 'El token de recuperación de contraseña es inválido.',
     'user'     => 'No podemos encontrar ningún usuario con ese correo electrónico.',
+    'expired'  => 'Tu contraseña ha expirado, por favor cámbiala y vuelve a intentarlo más tarde.',
+    'inactive' => 'Tu cuenta está inactiva, por favor comunícate con el área de sistemas para reactivarla.',
 ];

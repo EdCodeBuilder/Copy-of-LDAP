@@ -95,7 +95,7 @@ class Handler extends ExceptionHandler
             if ($exception instanceof ModelNotFoundException)
                 return $this->error_response(__('validation.handler.resource_not_found'), Response::HTTP_NOT_FOUND, $exception);
             if ($exception instanceof PasswordExpiredException)
-                return $this->error_response('Contraseña expirada', Response::HTTP_UNPROCESSABLE_ENTITY, $exception);
+                return $this->error_response($exception->getMessage(), Response::HTTP_UNPROCESSABLE_ENTITY, $exception);
             if ($exception instanceof AuthenticationException)
                 return $this->unauthenticated($request, $exception);
             if ($exception instanceof NotFoundHttpException)

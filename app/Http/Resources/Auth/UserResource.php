@@ -29,6 +29,8 @@ class UserResource extends JsonResource
             "phone"       =>    isset( $this->phone ) ? $this->phone : null,
             "ext"         =>    isset( $this->ext ) ? $this->ext : null,
             "sim_id"      =>    isset( $this->sim_id ) ? (int) $this->sim_id : null,
+            "password_expired"      =>    isset( $this->password_expired ) ? (boolean) $this->password_expired : null,
+            "is_locked"      =>    isset( $this->is_locked ) ? (boolean) $this->is_locked : null,
             "vacation_start_date"  =>    isset( $this->vacation_start_date ) ? $this->vacation_start_date->format('Y-m-d H:i:s') : null,
             "vacation_final_date"  =>    isset( $this->vacation_final_date ) ? $this->vacation_final_date->format('Y-m-d H:i:s') : null,
             "expires_at"  =>    isset( $this->expires_at ) ? $this->expires_at->format('Y-m-d H:i:s') : null,

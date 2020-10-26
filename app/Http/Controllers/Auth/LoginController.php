@@ -10,6 +10,7 @@ use Adldap\Auth\UsernameRequiredException;
 use Adldap\Laravel\Facades\Adldap;
 use Adldap\Models\UserPasswordIncorrectException;
 use Adldap\Models\UserPasswordPolicyException;
+use App\Exceptions\PasswordExpiredException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Auth\ActiveRecordResource;
 use App\Http\Resources\Auth\UserResource;
@@ -150,8 +151,7 @@ class LoginController extends Controller
      *
      * @param Request $request
      * @return bool|JsonResponse
-     * @throws PasswordRequiredException
-     * @throws UsernameRequiredException
+     * @throws PasswordExpiredException
      */
     protected function attemptLogin(Request $request)
     {
@@ -160,6 +160,12 @@ class LoginController extends Controller
         } catch (BindException $e) {
             $user = User::active()->where('username', $request->get( $this->username() ))->first();
             if ( $user ) {
+                if ( $user->is_locked ) {
+                    throw new PasswordExpiredException(trans('passwords.inactive'));
+                }
+                if ( $user->password_expired ) {
+                    throw new PasswordExpiredException(trans('passwords.expired'));
+                }
                 return Hash::check($request->get('password'), $user->password);
             }
             return false;

@@ -29,6 +29,8 @@ class CreateUsersTable extends Migration
             $table->string('phone', 20)->nullable()->comment('Número de teléfono dentro de la Sede');
             $table->string('ext', 20)->nullable()->comment('Extensión del número de teléfono de la Sede');
             $table->string('password')->nullable()->comment('Contraseña que se sincroniza del Directorio Activo');
+            $table->boolean('password_expired')->default(false)->nullable()->comment('Contraseña que se sincroniza del Directorio Activo ha expirado');
+            $table->boolean('is_locked')->default(false)->nullable()->comment('Usuario que se sincroniza del Directorio Activo está inactivo');
             $table->timestamp('vacation_start_date')->nullable()->comment('Fecha inicial de vacaciones/suspención del usuario');
             $table->timestamp('vacation_final_date')->nullable()->comment('Fecha final de vacaciones/suspención del usuario');
             $table->timestamp('expires_at')->nullable()->comment('Fecha de vencimiento del contrato');

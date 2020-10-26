@@ -14,6 +14,6 @@ class PasswordExpiredException extends Exception
      */
     public function report()
     {
-        Log::debug('Password Expired');
+        Log::debug('Password Expired or Account Inactive');
     }
 }
