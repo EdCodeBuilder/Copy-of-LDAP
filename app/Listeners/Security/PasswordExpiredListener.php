@@ -37,10 +37,10 @@ class PasswordExpiredListener
         Log::info('Password last set: '.$event->user->getPasswordLastSet());
         Log::info('Account Control: '.$event->user->getFirstAttribute('useraccountcontrol'));
         Log::info('Finishing Authentication Listener');
-        if ((int) $event->user->getPasswordLastSet() !== 0) {
+        if ((int) $event->user->getPasswordLastSet() === 0) {
             throw new PasswordExpiredException(trans('passwords.expired'));
         }
-        if ((int) $event->user->getFirstAttribute('useraccountcontrol') !== 514) {
+        if ((int) $event->user->getFirstAttribute('useraccountcontrol') === 514) {
             throw new PasswordExpiredException(trans('passwords.inactive'));
         }
     }
