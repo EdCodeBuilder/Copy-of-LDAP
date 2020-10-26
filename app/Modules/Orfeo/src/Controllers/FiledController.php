@@ -173,16 +173,7 @@ class FiledController extends Controller
 
     public function calendar(Request $request)
     {
-        $start = $request->has('start_date')
-            ? Carbon::parse( $request->get('start_date') )->startOfDay()
-            : now()->startOfMonth();
-        $final = $request->has('final_date')
-            ? Carbon::parse( $request->get('final_date') )->endOfDay()
-            : now()->endOfMonth();
-        $resource = Filed::query()->where([
-            ['radi_fech_radi', '>=', $start],
-            ['radi_fech_radi', '<=', $final],
-        ]);
+        $resource = $resource = $this->getBuilder( $request, Filed::query() );
         return $this->success_response(
             FiledResource::collection( $resource->get())
         );
