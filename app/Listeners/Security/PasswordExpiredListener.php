@@ -32,7 +32,9 @@ class PasswordExpiredListener
      */
     public function handle(Authenticating $event)
     {
-        Log::info('Entrada al Listener de contraseñas');
+        Log::info('Authenticating Listener...');
+        Log::info('Password last set: '.$event->user->getPasswordLastSet());
+        Log::info('Account Control: '.$event->user->getFirstAttribute('useraccountcontrol'));
         if ((int) $event->user->getPasswordLastSet() !== 0) {
             throw new PasswordExpiredException('Password Expired');
         }
