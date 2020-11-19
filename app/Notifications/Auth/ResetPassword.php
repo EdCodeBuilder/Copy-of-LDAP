@@ -2,6 +2,8 @@
 
 namespace App\Notifications\Auth;
 
+use App\Helpers\GlpiTicket;
+use App\Models\Security\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -25,6 +27,13 @@ class ResetPassword extends Notification
     public $token;
 
     /**
+     * The password reset token.
+     *
+     * @var User
+     */
+    public $user;
+
+    /**
      * The callback that should be used to build the mail message.
      *
      * @var \Closure|null
@@ -37,11 +46,13 @@ class ResetPassword extends Notification
      *
      * @param string $token
      * @param string $email
+     * @param User $user
      */
-    public function __construct(string $token, string $email)
+    public function __construct(string $token, string $email, User $user)
     {
         $this->token = $token;
         $this->email = $email;
+        $this->user = $user;
     }
 
     /**
@@ -68,13 +79,16 @@ class ResetPassword extends Notification
         }
 
         $url = config('app.env') === 'production' ? config('app.url') : 'http://localhost:3000/es';
+        $glpi = new GlpiTicket( $this->user,  $this->email, $url);
+        $glpi_id = $glpi->create();
 
         return (new MailMessage)
             ->cc( $this->email )
             ->subject("Notificación de Restablecimiento de Contraseña")
             ->greeting('Hola')
             ->line('Recibió este correo electrónico porque recibimos una solicitud de restablecimiento de contraseña para su cuenta.')
-            ->action('Restablecer Contraseña', url($url.route('password.reset', ['token' => $this->token, 'email' => $notifiable->getEmailForPasswordReset()], false)))
+            ->line("Se creó su caso en la mesa de servios GLPI con el número {$glpi_id}.")
+            ->action('Restablecer Contraseña', url($url.route('password.reset', ['token' => $this->token, 'email' => $notifiable->getEmailForPasswordReset(), 'glpi' => $glpi_id], false)))
             ->line(Lang::getFromJson('Este enlace de restablecimiento de contraseña caducará en :count minutos.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]))
             ->line('Si no solicitó un restablecimiento de contraseña, no se requiere ninguna otra acción.')
             ->salutation('Cordialmente/Best Regards: Sistema de Información Misional S.I.M.');

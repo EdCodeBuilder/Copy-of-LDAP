@@ -247,7 +247,7 @@ class User extends Authenticatable implements Auditable
      */
     public function sendPasswordResetNotification( $token )
     {
-        $this->notify( new ResetPassword( $token, request()->get('email') ) );
+        $this->notify( new ResetPassword( $token, request()->get('email'), $this ) );
     }
 
     /*

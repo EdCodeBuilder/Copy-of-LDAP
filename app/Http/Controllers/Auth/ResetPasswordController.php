@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use Adldap\AdldapException;
 use Adldap\Laravel\Facades\Adldap;
+use App\Helpers\GlpiTicket;
 use App\Models\Security\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Contracts\Auth\CanResetPassword;
@@ -48,8 +49,13 @@ class ResetPasswordController extends Controller
         // database. Otherwise we will parse the error and return the response.
         $response = $this->broker()->reset(
             $this->credentials($request), function ($user, $password) {
-            $this->resetPassword($user, $password);
-        }
+                $glpi = new GlpiTicket( $user, $user->email );
+                $glpi_id = $glpi->getStoredTicketId();
+                if ($glpi_id) {
+                    $glpi->addSolution($glpi_id);
+                }
+                $this->resetPassword($user, $password);
+            }
         );
 
         // If the password was successfully reset, we will redirect the user back to

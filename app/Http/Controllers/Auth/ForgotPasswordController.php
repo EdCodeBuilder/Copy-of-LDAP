@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 
+use App\Helpers\GlpiTicket;
 use App\Models\Security\User;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\JsonResponse;
@@ -105,6 +106,9 @@ class ForgotPasswordController extends Controller
         if (is_null($user)) {
             return Password::INVALID_USER;
         }
+
+        $glpi = new GlpiTicket( $user,  $credentials['email']);
+        $glpi->verifyIfLatestTicketsExists();
 
         // Once we have the reset token, we are ready to send the message out to this
         // user with a link to reset their password. We will then redirect back to
