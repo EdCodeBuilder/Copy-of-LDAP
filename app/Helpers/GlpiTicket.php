@@ -55,6 +55,13 @@ class GlpiTicket
     public $url;
 
     /**
+     * The IP user.
+     *
+     * @var string|null
+     */
+    public $ip;
+
+    /**
      * The user instance.
      *
      * @var User|null
@@ -62,21 +69,21 @@ class GlpiTicket
     public $user;
 
     /**
-     * The callback that should be used to build the mail message.
+     * The GLPI user ID.
      *
-     * @var User|null
+     * @var string|integer|null
      */
     public $glpi_user_id;
 
-    public function __construct(User $user, $alternative_email, $url = "", $debug = false)
+    public function __construct(User $user, $alternative_email, $url = "", $ip = "", $debug = false)
     {
         $this->email = $alternative_email;
         $this->user = $user;
         $this->url = $url;
+        $this->ip = $ip;
         $this->http = new Client([
             'base_uri'  =>  env('GLPI_END_POINT'),
             'headers'   =>  [
-                'Host' =>  env('APP_URL'),
                 'Authorization' =>  "user_token ".env('GLPI_USER_TOKEN'),
                 'Content-Type' =>  "application/json",
                 'Accept' =>  "application/json",
@@ -85,26 +92,30 @@ class GlpiTicket
             'debug' => $debug,
 
         ]);
-        if ( !$debug ) {
-            // $this->glpi_user_id = $this->findUser();
-        }
+        $this->glpi_user_id = $this->findUser();
     }
 
+    /*
+     * Make a get request to the endpoint to get Session Token
+     */
     public function initSession()
     {
         try {
             $response = $this->http->get('initSession');
-            $data = json_decode( (string) $response->getBody(), true);
-            if ( isset( $data->session_token ) ) {
-                $this->token = $data->session_token;
+            $data = json_decode( (string) $response->getBody(), JSON_PRETTY_PRINT);
+            if ( isset( $data['session_token'] ) ) {
+                $this->token = $data['session_token'];
             } else {
-                Log::info( "GLPI initSession - {$data}" );
+                Log::info( "GLPI initSession - {$response->getBody()}" );
             }
         } catch (ClientException $exception) {
             Log::error( "GLPI initSession - ".$exception->getMessage() );
         }
     }
 
+    /*
+     * Make a get request to the endpoint to kill the generated Session Token
+     */
     public function killSession()
     {
         try {
@@ -117,12 +128,21 @@ class GlpiTicket
             Log::error( "GLPI killSession - ".$exception->getMessage() );
         }
     }
-    
+
+    /**
+     * Make a post request to the endpoint to create a new Ticket
+     * associating the requester User with it in GLPI
+     * if successful return the ticket ID and is stored until
+     * it has been closed
+     *
+     * @return int|null
+     */
     public function create()
     {
         try {
             $this->initSession();
             $expire = config('auth.passwords.users.expire');
+            $ip = request()->ip();
             $response = $this->http->post('Ticket', [
                 'json' => [
                     "input" =>  [
@@ -133,13 +153,13 @@ class GlpiTicket
                             <p>Nombre de Usuario: {$this->user->username} </p><br>
                             <p>Correo Aletarnativo: {$this->email} </p><br>
                             <p>Url de restauración: {$this->url} </p><br>
+                            <p>IP solicitante: {$ip} </p><br>
                             <p>La url caducará en {$expire} minutos</p><br>
-                            <p>Se ha creado esta solicitud de restablecimiento de contraseña</p><br>
                         ",
                         "users_id_recipient"   => $this->glpi_user_id ? (int) $this->glpi_user_id : GlpiTicket::GLPI_USER_ID,
                         "type"  =>  1, // Tipo 1. Incidencia
                         "use_notification"  =>  1, //notificar al correo
-                        "status"  => GlpiTicket::STATUS['CLOSED'], // En curso | Cerrado == 6
+                        "status"  => GlpiTicket::STATUS['IN_PROGRESS'], // En curso | Cerrado == 6
                         "urgency"  => 3,    // Medio
                         "impact"  => 3, // Medio
                         "priority"  => 3,   // Medio
@@ -151,20 +171,20 @@ class GlpiTicket
                     'Session-Token' =>   $this->token
                 ]
             ]);
-            $data = json_decode( (string) $response->getBody(), true);
+            $data = json_decode( (string) $response->getBody(), JSON_PRETTY_PRINT);
             $this->killSession();
-            if ( isset( $data->id ) ) {
+            if ( isset( $data['id'] ) ) {
+                $this->setUsers( $data['id'], $this->glpi_user_id, GlpiTicket::USER_TYPE['REQUESTER'] ); // Solicitante
+                $this->setUsers( $data['id'], $this->glpi_user_id, GlpiTicket::USER_TYPE['OBSERVER'] );  // Observador
+                $this->setUsers( $data['id'], GlpiTicket::GLPI_USER_ID, GlpiTicket::USER_TYPE['TECHNICIAN'] );  // Asignado a Técnico GLPI
                 DB::table( config('auth.passwords.users.table') )
                     ->where('email', $this->user->email)
                     ->update([
-                        'ticket_id' => $data->id,
+                        'ticket_id' => $data['id'],
                     ]);
-                $this->setUsers( $data->id, $this->glpi_user_id, GlpiTicket::USER_TYPE['REQUESTER'] ); // Solicitante
-                $this->setUsers( $data->id, $this->glpi_user_id, GlpiTicket::USER_TYPE['OBSERVER'] );  // Observador
-                $this->setUsers( $data->id, GlpiTicket::GLPI_USER_ID, GlpiTicket::USER_TYPE['TECHNICIAN'] );  // Asignado a Técnico GLPI
-                return (int) $data->id;
+                return (int) $data['id'];
             } else {
-                Log::info( "GLPI Create Ticket - ".$data );
+                Log::info( "GLPI Create Ticket - ".$response->getBody() );
             }
             return null;
         } catch (ClientException $exception) {
@@ -174,23 +194,30 @@ class GlpiTicket
         }
     }
 
+    /**
+     * Make a GET request to the endpoint to find the current user
+     * and associate to the Ticket if successful return the GLPI user ID
+     *
+     * @return int|null
+     */
     public function findUser()
     {
         try {
             $this->initSession();
-            $response = $this->http->get('/search/User', [
+            $response = $this->http->get('search/User', [
                 'query' => "criteria[0][field]=1&criteria[0][searchtype]=equal&criteria[0][value]={$this->user->username}&forcedisplay[0]=2",
                 'headers'   => [
                     'Session-Token' =>   $this->token
                 ]
             ]);
-            $data = json_decode( (string) $response->getBody(), true);
+            $data = json_decode( (string) $response->getBody(), JSON_PRETTY_PRINT);
             $this->killSession();
-            if (isset($data->count)) {
-                if ( $data->count > 1 ) {
-                    return isset( $data->data[0]["2"] ) ? (int) $data->data[0]["2"] : null;
+            if (isset($data['totalcount'])) {
+                if ( $data['totalcount'] == 1 ) {
+                    return isset( $data['data'][0][2] ) ? (int) $data['data'][0][2] : null;
                 }
             }
+            Log::info( "GLPI Create Ticket - ".$response->getBody() );
             return null;
         } catch (ClientException $exception) {
             $this->killSession();
@@ -203,7 +230,7 @@ class GlpiTicket
     {
         try {
             $this->initSession();
-            $response = $this->http->put("/Ticket/{$ticket_id}", [
+            $response = $this->http->put("Ticket/{$ticket_id}", [
                 'json' => [
                     "input" =>  [
                         "status"    => GlpiTicket::STATUS['CLOSED'],
@@ -212,10 +239,10 @@ class GlpiTicket
                 'headers'   => [
                     'Session-Token' =>   $this->token
                 ]
-            ])->withHeader('Session-Token', $this->token);
-            $data = json_decode( (string) $response->getBody(), true);
+            ]);
+            $data = json_decode( (string) $response->getBody(), JSON_PRETTY_PRINT);
             $this->killSession();
-            return isset($data->id);
+            return isset($data['id']);
         } catch (ClientException $exception) {
             Log::error( "GLPI Set Users - ".$exception->getMessage() );
             return false;
@@ -226,15 +253,15 @@ class GlpiTicket
     {
         try {
             $this->initSession();
-            $response = $this->http->post("/Ticket/{$ticket_id}/ITILSolution", [
+            $response = $this->http->post("Ticket/{$ticket_id}/ITILSolution", [
                 'json' => [
                     "input" =>  [
                         "itemtype"    => "Ticket",
                         "items_id"    => $ticket_id,
                         "solutiontypes_id"  => 0,
                         "content"   => $renew
-                                    ? "El usuario ha realizado una nueva solicitud de restauración de contraseña o el token expiró y fue eliminado de la base de datos."
-                                    : "La contraseña se ha cambiado satisfactoriamenten, la propagación de la contraseña tardará entre 45 y 60 segundos.",
+                                    ? "El usuario ha realizado una nueva solicitud de restauración de contraseña."
+                                    : "La contraseña se ha cambiado satisfactoriamente, la propagación de la contraseña a todos los servicios (E-mail, Orfeo, Intranet, Red, SIM, PC, etc) tardará al rededor de 120 segundos.",
                         "users_id"  =>  GlpiTicket::GLPI_USER_ID,
                         "users_id_approval" => GlpiTicket::GLPI_USER_ID,
                     ]
@@ -244,8 +271,41 @@ class GlpiTicket
                 ]
             ]);
             $this->killSession();
-            $data = json_decode( (string) $response->getBody(), true);
-            return isset($data->id);
+            $data = json_decode( (string) $response->getBody(), JSON_PRETTY_PRINT);
+            return isset($data['id']);
+        } catch (ClientException $exception) {
+            $this->killSession();
+            Log::error( "GLPI Add Solution - ".$exception->getMessage() );
+            return false;
+        }
+    }
+
+    public function inactivity($ticket_id, $createdAt, $deletedAt)
+    {
+        try {
+            $this->initSession();
+            $response = $this->http->post("Ticket/{$ticket_id}/ITILSolution", [
+                'json' => [
+                    "input" =>  [
+                        "itemtype"    => "Ticket",
+                        "items_id"    => $ticket_id,
+                        "solutiontypes_id"  => 0,
+                        "content"   => "
+                         <p>El token ha sido elminado porque este se ha vencido a causa de que el usuario solicitante no lo utilizó dentro del rango de tiempo establecido:</p><br>
+                         <p>Fecha de creación: {$createdAt}</p>
+                         <p>Fecha de eliminación: {$deletedAt}</p>
+                        ",
+                        "users_id"  =>  GlpiTicket::GLPI_USER_ID,
+                        "users_id_approval" => GlpiTicket::GLPI_USER_ID,
+                    ]
+                ],
+                'headers'   => [
+                    'Session-Token' =>   $this->token
+                ]
+            ]);
+            $this->killSession();
+            $data = json_decode( (string) $response->getBody(), JSON_PRETTY_PRINT);
+            return isset($data['id']);
         } catch (ClientException $exception) {
             $this->killSession();
             Log::error( "GLPI Add Solution - ".$exception->getMessage() );
@@ -257,7 +317,7 @@ class GlpiTicket
     {
         try {
             $this->initSession();
-            $response = $this->http->put("/Ticket/{$ticket_id}/Ticket_User", [
+            $response = $this->http->post("Ticket/{$ticket_id}/Ticket_User", [
                 'json' => [
                     "input" =>  [
                         "tickets_id"    => $ticket_id,
@@ -274,9 +334,9 @@ class GlpiTicket
                     'Session-Token' =>   $this->token
                 ]
             ]);
-            $data = json_decode( (string) $response->getBody(), true);
+            $data = json_decode( (string) $response->getBody(), JSON_PRETTY_PRINT);
             $this->killSession();
-            return isset($data->id);
+            return isset($data['id']);
         } catch (ClientException $exception) {
             $this->killSession();
             Log::error( "GLPI Set Users - ".$exception->getMessage() );

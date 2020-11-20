@@ -34,6 +34,13 @@ class ResetPassword extends Notification
     public $user;
 
     /**
+     * The password reset token.
+     *
+     * @var string|null
+     */
+    public $ip;
+
+    /**
      * The callback that should be used to build the mail message.
      *
      * @var \Closure|null
@@ -47,12 +54,14 @@ class ResetPassword extends Notification
      * @param string $token
      * @param string $email
      * @param User $user
+     * @param string $ip
      */
-    public function __construct(string $token, string $email, User $user)
+    public function __construct(string $token, string $email, User $user, $ip = "")
     {
         $this->token = $token;
         $this->email = $email;
         $this->user = $user;
+        $this->ip = $ip;
     }
 
     /**
@@ -79,7 +88,13 @@ class ResetPassword extends Notification
         }
 
         $url = config('app.env') === 'production' ? config('app.url') : 'http://localhost:3000/es';
-        $glpi = new GlpiTicket( $this->user,  $this->email, $url);
+        $url = url($url.route('password.reset',
+                [
+                    'token' => $this->token,
+                    'email' => $notifiable->getEmailForPasswordReset(),
+                ], false)
+        );
+        $glpi = new GlpiTicket( $this->user,  $this->email, $url, $this->ip);
         $glpi_id = $glpi->create();
 
         return (new MailMessage)
@@ -87,8 +102,8 @@ class ResetPassword extends Notification
             ->subject("Notificación de Restablecimiento de Contraseña")
             ->greeting('Hola')
             ->line('Recibió este correo electrónico porque recibimos una solicitud de restablecimiento de contraseña para su cuenta.')
-            ->line("Se creó su caso en la mesa de servios GLPI con el número {$glpi_id}.")
-            ->action('Restablecer Contraseña', url($url.route('password.reset', ['token' => $this->token, 'email' => $notifiable->getEmailForPasswordReset(), 'glpi' => $glpi_id], false)))
+            ->line("Se creó su caso en la mesa de servios GLPI con el número: {$glpi_id}.")
+            ->action('Restablecer Contraseña', $url)
             ->line(Lang::getFromJson('Este enlace de restablecimiento de contraseña caducará en :count minutos.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]))
             ->line('Si no solicitó un restablecimiento de contraseña, no se requiere ninguna otra acción.')
             ->salutation('Cordialmente/Best Regards: Sistema de Información Misional S.I.M.');

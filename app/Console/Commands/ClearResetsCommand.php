@@ -51,17 +51,20 @@ class ClearResetsCommand extends Command
     {
         $expiredAt = Carbon::now()->subSeconds($this->expires);
 
-        $tokens = DB::table( config('auth.passwords.users.table') )
-            ->where('created_at', '<', $expiredAt)->get();
-
-        foreach ($tokens as $token) {
-            $user = User::where( "email", $token->email )->first();
-            if ( isset($user->id) && $token->ticket_id ) {
-                $glpi = new GlpiTicket( $user, $token->email );
-                $glpi->addSolution( $token->ticket_id, true );
+        DB::table(config('auth.passwords.users.table'))
+            ->where('created_at', '<', $expiredAt)
+            ->orderBy('created_at')->chunk(100, function ($tokens) {
+            foreach ($tokens as $token) {
+                $user = User::where( "email", $token->email )->first();
+                if ( isset($user->id) && $token->ticket_id ) {
+                    $glpi = new GlpiTicket( $user, $token->email );
+                    $glpi->inactivity( $token->ticket_id, $token->created_at,  now()->format('Y-m-d H:i:s'));
+                }
             }
-            $token->delete();
-        }
+        });
+
+        DB::table( config('auth.passwords.users.table') )
+            ->where('created_at', '<', $expiredAt)->delete();
 
         $this->info('Expired reset tokens cleared and GLPI tickets closed');
     }

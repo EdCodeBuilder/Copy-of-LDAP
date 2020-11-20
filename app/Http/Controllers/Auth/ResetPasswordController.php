@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use Adldap\AdldapException;
+use Adldap\Auth\BindException;
 use Adldap\Laravel\Facades\Adldap;
 use App\Helpers\GlpiTicket;
 use App\Models\Security\User;
@@ -104,6 +105,7 @@ class ResetPasswordController extends Controller
      */
     protected function resetPassword($user, $password)
     {
+        /*
         try {
             $ldapUser = Adldap::search()->findByGuid($user->guid);
             if ( $ldapUser instanceof \Adldap\Models\User) {
@@ -115,13 +117,20 @@ class ResetPasswordController extends Controller
                     event(new PasswordReset($user));
                 }
             }
-        } catch (AdldapException $exception) {
+        } catch (BindException $exception) {
+            return $this->error_response(
+                __('validation.handler.unexpected_failure'),
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+                $exception
+            );
+        } catch (\Exception $exception) {
             return $this->error_response(
                 __('validation.handler.unexpected_failure'),
                 Response::HTTP_INTERNAL_SERVER_ERROR,
                 $exception
             );
         }
+        */
     }
 
     /**

@@ -19,7 +19,6 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 
 Route::post('login', [ LoginController::class, 'login' ])->name('passport.login');
 Route::prefix('password')->group( function () {
-    Route::get('glpi/{user}', [ ForgotPasswordController::class, 'glpi_test' ])->name('glpi');
     Route::post('forgot', [ ForgotPasswordController::class, 'sendResetLinkEmail' ])->name('password.forgot');
     Route::post('reset', [ ResetPasswordController::class, 'reset' ])->name('password.reset');
 });
