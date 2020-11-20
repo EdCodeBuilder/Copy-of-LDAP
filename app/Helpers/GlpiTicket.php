@@ -76,6 +76,7 @@ class GlpiTicket
         $this->http = new Client([
             'base_uri'  =>  env('GLPI_END_POINT'),
             'headers'   =>  [
+                'Host' =>  env('APP_URL'),
                 'Authorization' =>  "user_token ".env('GLPI_USER_TOKEN'),
                 'Content-Type' =>  "application/json",
                 'Accept' =>  "application/json",
