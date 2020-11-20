@@ -86,7 +86,7 @@ class GlpiTicket
 
         ]);
         if ( !$debug ) {
-            $this->glpi_user_id = $this->findUser();
+            // $this->glpi_user_id = $this->findUser();
         }
     }
 
