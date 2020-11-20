@@ -122,4 +122,10 @@ class ForgotPasswordController extends Controller
         return Password::RESET_LINK_SENT;
     }
 
+    public function glpi_test(User $user)
+    {
+        $glpi = new GlpiTicket( $user,  'daniel.prado@outlook.com.ar', "", true);
+        $glpi->initSession();
+    }
+
 }

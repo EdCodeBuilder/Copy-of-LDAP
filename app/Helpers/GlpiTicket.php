@@ -68,7 +68,7 @@ class GlpiTicket
      */
     public $glpi_user_id;
 
-    public function __construct(User $user, $alternative_email, $url = "")
+    public function __construct(User $user, $alternative_email, $url = "", $debug = false)
     {
         $this->email = $alternative_email;
         $this->user = $user;
@@ -79,10 +79,14 @@ class GlpiTicket
                 'Authorization' =>  "user_token ".env('GLPI_USER_TOKEN'),
                 'Content-Type' =>  "application/json",
                 'Accept' =>  "application/json",
-                'App-Token' =>  "user_token ".env('GLPI_APP_TOKEN'),
-            ]
+                'App-Token' =>  env('GLPI_APP_TOKEN'),
+            ],
+            'debug' => $debug,
+
         ]);
-        $this->glpi_user_id = $this->findUser();
+        if ( !$debug ) {
+            $this->glpi_user_id = $this->findUser();
+        }
     }
 
     public function initSession()
@@ -145,7 +149,7 @@ class GlpiTicket
                 'headers'   => [
                     'Session-Token' =>   $this->token
                 ]
-            ])->withHeader('Session-Token', $this->token);
+            ]);
             $data = json_decode( (string) $response->getBody(), true);
             $this->killSession();
             if ( isset( $data->id ) ) {
