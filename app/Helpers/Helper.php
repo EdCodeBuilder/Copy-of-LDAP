@@ -99,10 +99,14 @@ if ( ! function_exists('ldapDateToCarbon') ) {
      * @return string
      */
     function ldapDateToCarbon($date) {
-        $winSecs       = (int)($date / 10000000); // divide by 10 000 000 to get seconds
-        $unixTimestamp = ($winSecs - 11644473600); // 1.1.1600 -> 1.1.1970 difference in seconds
-        $date = date(DateTime::RFC822, $unixTimestamp);
-        return Carbon::parse( $date )->format('Y-m-d H:i:s');
+        if ( $date == "0" || $date == 0 ) {
+            return now()->addYears(2)->format('Y-m-d H:i:s');
+        } else {
+            $winSecs       = (int)($date / 10000000); // divide by 10 000 000 to get seconds
+            $unixTimestamp = ($winSecs - 11644473600); // 1.1.1600 -> 1.1.1970 difference in seconds
+            $date = date(DateTime::RFC822, $unixTimestamp);
+            return Carbon::parse( $date )->format('Y-m-d H:i:s');
+        }
     }
 }
 
