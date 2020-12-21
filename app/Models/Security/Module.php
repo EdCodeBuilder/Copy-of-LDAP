@@ -112,4 +112,15 @@ class Module extends Model
     {
         return ['module'];
     }
+
+    /*
+    * ---------------------------------------------------------
+    * Eloquent
+    * ---------------------------------------------------------
+    */
+
+    public function incompatible_access()
+    {
+        return $this->hasMany( IncompatibleAccess::class, 'Id_Modulo', 'id' );
+    }
 }

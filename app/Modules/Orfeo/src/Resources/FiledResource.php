@@ -21,6 +21,7 @@ class FiledResource extends JsonResource
     {
         return [
             'id'                =>  isset( $this->radi_nume_radi ) ? (int) $this->radi_nume_radi : null,
+            'open_new_link'     =>  isset( $this->radi_nume_radi ) ? "https://orfeo.idrd.gov.co/old/linkArchivo.php?&numrad={$this->radi_nume_radi}" : null,
             'subject'           =>  isset( $this->ra_asun ) ? toUpper($this->ra_asun) : null,
             'document_type_id'  =>  isset( $this->tdoc_codi ) ? (int) $this->tdoc_codi : null,
             'document_type'     =>  isset($this->document_type->name) ? $this->document_type->name : null,

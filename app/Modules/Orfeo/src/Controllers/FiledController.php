@@ -29,10 +29,22 @@ class FiledController extends Controller
 {
     public function countByMonth(Request $request)
     {
+        $start = $request->has('start_date')
+            ? Carbon::parse( $request->get('start_date') )->startOfDay()
+            : now()->startOfYear();
+        $final = $request->has('final_date')
+            ? Carbon::parse( $request->get('final_date') )->endOfDay()
+            : now()->endOfYear();
+
+        $request->request->add([
+            'start_date'    =>  $start,
+            'final_date'    =>  $final,
+        ]);
+
         $data = $this->getBuilder( $request, Filed::query() )
             ->without(['user', 'dependency', 'city', 'document_type'])
             ->select(DB::raw('EXTRACT(MONTH FROM radi_fech_radi) AS month, COUNT(*) AS count'))
-            ->whereBetween('radi_fech_radi', [now()->startOfYear()->format('Y-m-d H:i:s'), now()->endOfYear()->format('Y-m-d H:i:s')])
+            ->whereBetween('radi_fech_radi', [$start->format('Y-m-d H:i:s'), $final->format('Y-m-d H:i:s')])
             ->groupBy( [DB::raw('EXTRACT(MONTH FROM radi_fech_radi)')] )
             ->orderBy('month')
             ->get()->map(function ($query) {
@@ -41,7 +53,11 @@ class FiledController extends Controller
                     'count' => (int) $query->count,
                 ];
             });
-        return $this->success_message($data);
+        return $this->success_message($data, Response::HTTP_OK, Response::HTTP_OK, [
+            'years'  =>  $start->year == $final->year
+                        ? $start->year
+                        : "{$start->year} - {$final->year}"
+        ]);
     }
 
     public function countByFolder(Request $request)

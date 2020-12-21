@@ -11,6 +11,11 @@ use Illuminate\Http\Response;
 
 class ModuleController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     /**
      * Display a listing of the resource.
      *

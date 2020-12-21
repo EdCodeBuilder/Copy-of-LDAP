@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\UserModuleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ActiveDirectory\ActiveDirectoryController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -25,6 +26,7 @@ Route::prefix('password')->group( function () {
 
 Route::middleware('auth:api')->prefix('api')->group( function () {
     Route::get('user', [LoginController::class, 'user'])->name('passport.user');
+    Route::get('my-modules', [UserModuleController::class, 'index'])->name('passport.modules');
     Route::post('change-password', [LoginController::class, 'changePassword'])->name('password.change');
     Route::post('logout', [LoginController::class, 'logout'])->name('passport.logout');
     Route::post('logout-all-devices', [LoginController::class, 'logoutAllDevices'])->name('passport.logout.all');
