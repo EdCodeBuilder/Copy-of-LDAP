@@ -14,6 +14,9 @@ class ModuleResource extends JsonResource
      */
     public function toArray($request)
     {
+        $permissions = ActivityResource::collection($this->whenLoaded('incompatible_access', null, []));
+        $vector = [];
+        $vector[0] = auth()->check() && auth()->user()->sim_id ? auth()->user()->sim_id : null;
         return [
             'id'        => isset( $this->id ) ? (int) $this->id : null,
             'name'      => isset( $this->name ) ? $this->name : null,
@@ -23,7 +26,22 @@ class ModuleResource extends JsonResource
             'status'    => isset( $this->status ) ? (bool) $this->status : null,
             'missionary'        => isset( $this->missionary ) ? (bool) $this->missionary : null,
             'compatible'        => isset( $this->compatible ) ? (bool) $this->compatible : null,
-            'access'            => ActivityResource::collection($this->whenLoaded('incompatible_access')),
+            'access'            => $permissions,
+            'encoded'     => $this->when(auth()->check(), function () use ($permissions, $vector){
+                                urlencode(
+                                    serialize(
+                                        array_merge(
+                                            $vector,
+                                            $permissions
+                                                ->collection
+                                                ->map(function ($data) {
+                                                    return isset( $data->permission[0]['status_int'] ) ? intval($data->permission[0]['status_int']) : 0;
+                                                })
+                                                ->toArray()
+                                        )
+                                    )
+                                );
+                            }, []),
             "created_at"  =>    isset( $this->created_at ) ? $this->created_at->format('Y-m-d H:i:s') : null,
             "updated_at"  =>    isset( $this->updated_at ) ? $this->updated_at->format('Y-m-d H:i:s') : null,
         ];
