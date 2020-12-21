@@ -35,7 +35,7 @@ class ModuleResource extends JsonResource
                                             $permissions
                                                 ->collection
                                                 ->map(function ($data) {
-                                                    return isset( $data->permission[0]['status_int'] ) ? intval($data->permission[0]['status_int']) : 0;
+                                                    return isset( $data->permission[0]['Estado'] ) ? $data->permission[0]['Estado'] : 0;
                                                 })
                                                 ->toArray()
                                         )
