@@ -28,7 +28,7 @@ class ModuleResource extends JsonResource
             'compatible'        => isset( $this->compatible ) ? (bool) $this->compatible : null,
             'access'            => $permissions,
             'encoded'     => $this->when(auth()->check(), function () use ($permissions, $vector){
-                                urlencode(
+                                return urlencode(
                                     serialize(
                                         array_merge(
                                             $vector,
