@@ -14,7 +14,7 @@ class ModuleResource extends JsonResource
      */
     public function toArray($request)
     {
-        $permissions = ActivityResource::collection($this->whenLoaded('incompatible_access', null, []));
+        $permissions = ActivityResource::collection($this->whenLoaded('incompatible_access'));
         $vector = [];
         $vector[0] = auth()->check() && auth()->user()->sim_id ? auth()->user()->sim_id : null;
         return [
