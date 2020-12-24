@@ -32,7 +32,7 @@ class AuthServiceProvider extends ServiceProvider
         Passport::routes(function ($router) {
             $router->forAccessTokens();
             $router->forTransientTokens();
-        });
+        }, ['middleware' => 'api']);
         Passport::tokensExpireIn(now()->addHours(8));
         Passport::refreshTokensExpireIn(now()->addHours(16));
         Passport::$pruneRevokedTokens = true;
