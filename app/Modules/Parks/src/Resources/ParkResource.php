@@ -170,7 +170,7 @@ class ParkResource extends JsonResource
         }
     }
 
-    public function setMap(): string
+    public function setMap()
     {
         $id = isset( $this->Id_IDRD ) ? toUpper($this->Id_IDRD) : null;
         if ($id) {

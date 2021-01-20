@@ -70,7 +70,7 @@ class UpdateParkRequest extends FormRequest
      *
      * @return array
      */
-    public function attributes(): array
+    public function attributes()
     {
         return [
             'code'                  =>  __('parks.attributes.code'),
