@@ -64,7 +64,7 @@ class Enclosure extends Model implements Auditable
      *
      * @return array
      */
-    public function generateTags() : array
+    public function generateTags()
     {
         return ['park_enclosure'];
     }
@@ -80,7 +80,7 @@ class Enclosure extends Model implements Auditable
      *
      * @return int
      */
-    public function getIdAttribute(): int
+    public function getIdAttribute()
     {
         return (int) $this->Id_Cerramiento;
     }
@@ -90,7 +90,7 @@ class Enclosure extends Model implements Auditable
      *
      * @return string
      */
-    public function getNameAttribute(): string
+    public function getNameAttribute()
     {
         return $this->Cerramiento;
     }

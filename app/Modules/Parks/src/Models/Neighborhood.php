@@ -46,7 +46,7 @@ class Neighborhood extends Model
      *
      * @return string
      */
-    public function getNameAttribute(): string
+    public function getNameAttribute()
     {
         return toUpper($this->Barrio);
     }
@@ -62,7 +62,7 @@ class Neighborhood extends Model
      *
      * @return BelongsTo
      */
-    public function upz(): BelongsTo
+    public function upz()
     {
         return $this->belongsTo(Upz::class, 'CodUpz', 'cod_upz');
     }

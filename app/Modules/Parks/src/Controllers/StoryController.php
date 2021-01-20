@@ -29,7 +29,7 @@ class StoryController extends Controller
      * @param $park
      * @return JsonResponse
      */
-    public function index($park): JsonResponse
+    public function index($park)
     {
         $data = Park::with('story')
             ->where('Id_IDRD', $park)
@@ -50,7 +50,7 @@ class StoryController extends Controller
      * @param RupiRequest $request
      * @return JsonResponse
      */
-    public function store($park, StoryRequest $request): JsonResponse
+    public function store($park, StoryRequest $request)
     {
         $data = Park::with('story')
             ->where('Id_IDRD', $park)
@@ -75,7 +75,7 @@ class StoryController extends Controller
      * @param Story $story
      * @return JsonResponse
      */
-    public function update(StoryRequest $request, $park, Story $story): JsonResponse
+    public function update(StoryRequest $request, $park, Story $story)
     {
         $story->fill([
             'Subtitulo'   => $request->get('title'),
@@ -93,7 +93,7 @@ class StoryController extends Controller
      * @return JsonResponse
      * @throws \Exception
      */
-    public function destroy($park, Story $story): JsonResponse
+    public function destroy($park, Story $story)
     {
         $story->delete();
         return $this->success_message(__('validation.handler.deleted'));

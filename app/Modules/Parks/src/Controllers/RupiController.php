@@ -26,7 +26,7 @@ class RupiController extends Controller
      * @param $park
      * @return JsonResponse
      */
-    public function index($park): JsonResponse
+    public function index($park)
     {
         $data = Park::with('rupis')
             ->where('Id_IDRD', $park)
@@ -47,7 +47,7 @@ class RupiController extends Controller
      * @param RupiRequest $request
      * @return JsonResponse
      */
-    public function store($park, RupiRequest $request): JsonResponse
+    public function store($park, RupiRequest $request)
     {
         $data = Park::with('rupis')
             ->where('Id_IDRD', $park)
@@ -70,7 +70,7 @@ class RupiController extends Controller
      * @param Rupi $rupi
      * @return JsonResponse
      */
-    public function update(RupiRequest $request, $park, Rupi $rupi): JsonResponse
+    public function update(RupiRequest $request, $park, Rupi $rupi)
     {
         $rupi->fill([
             'Rupi'  => $request->get('name')
@@ -87,7 +87,7 @@ class RupiController extends Controller
      * @return JsonResponse
      * @throws \Exception
      */
-    public function destroy($park, Rupi $rupi): JsonResponse
+    public function destroy($park, Rupi $rupi)
     {
         $rupi->delete();
         return $this->success_message(__('validation.handler.deleted'));

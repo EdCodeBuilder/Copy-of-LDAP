@@ -13,7 +13,7 @@ class UpzResource extends JsonResource
      * @param  Request  $request
      * @return array
      */
-    public function toArray($request): array
+    public function toArray($request)
     {
         $name = isset( $this->Upz ) ? " - $this->Upz" : null;
         $code = isset( $this->cod_upz ) ? $this->cod_upz : null;

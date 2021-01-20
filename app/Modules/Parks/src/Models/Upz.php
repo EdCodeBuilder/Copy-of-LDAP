@@ -47,7 +47,7 @@ class Upz extends Model
      *
      * @return string
      */
-    public function getNameAttribute(): string
+    public function getNameAttribute()
     {
         return toUpper($this->Upz);
     }
@@ -63,7 +63,7 @@ class Upz extends Model
      *
      * @return HasMany
      */
-    public function neighborhoods(): HasMany
+    public function neighborhoods()
     {
         return $this->hasMany(Neighborhood::class, 'CodUpz','cod_upz');
     }
@@ -73,7 +73,7 @@ class Upz extends Model
      *
      * @return BelongsTo
      */
-    public function locality(): BelongsTo
+    public function locality()
     {
         return $this->belongsTo(Location::class, 'IdLocalidad', 'Id_Localidad');
     }

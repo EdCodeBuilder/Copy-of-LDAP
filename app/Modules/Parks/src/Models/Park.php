@@ -151,7 +151,7 @@ class Park extends Model implements Auditable
      *
      * @return array
      */
-    public function generateTags() : array
+    public function generateTags()
     {
         return ['park'];
     }
@@ -221,7 +221,7 @@ class Park extends Model implements Auditable
      *
      * @return HasOne
      */
-    public function location(): HasOne
+    public function location()
     {
         return $this->hasOne(Location::class, 'Id_Localidad', 'Id_Localidad');
     }
@@ -231,7 +231,7 @@ class Park extends Model implements Auditable
      *
      * @return HasOne
      */
-    public function scale(): HasOne
+    public function scale()
     {
         return $this->hasOne(Scale::class, 'Id_Tipo', 'Id_Tipo');
     }
@@ -241,7 +241,7 @@ class Park extends Model implements Auditable
      *
      * @return HasOne
      */
-    public function upz_name(): HasOne
+    public function upz_name()
     {
         return $this->hasOne(Upz::class, 'cod_upz', 'Upz');
     }
@@ -251,7 +251,7 @@ class Park extends Model implements Auditable
      *
      * @return HasOne
      */
-    public function neighborhood(): HasOne
+    public function neighborhood()
     {
         return $this->hasOne(Neighborhood::class, 'IdBarrio', 'Id_Barrio');
     }
@@ -261,7 +261,7 @@ class Park extends Model implements Auditable
      *
      * @return HasOne
      */
-    public function certified(): HasOne
+    public function certified()
     {
         return $this->hasOne( Certified::class, 'id_EstadoCertificado', 'EstadoCertificado' );
     }
@@ -281,7 +281,7 @@ class Park extends Model implements Auditable
      *
      * @return BelongsToMany
      */
-    public function endowments(): BelongsToMany
+    public function endowments()
     {
         return $this->belongsToMany(Endowment::class, 'parquedotacion', 'Id_Parque', 'Id_Dotacion')
             ->withPivot('Num_Dotacion', 'Estado', 'Material', 'iluminacion', 'Aprovechamientoeconomico', 'Area', 'MaterialPiso', 'Cerramiento', 'Camerino', 'Luz', 'Agua', 'Gas', 'Capacidad', 'Carril', 'Bano', 'BateriaSanitaria', 'Descripcion', 'Diag_Mantenimiento', 'Diag_Construcciones', 'Posicionamiento', 'Destinacion', 'Imagen', 'Fecha', 'TipoCerramiento', 'AlturaCerramiento', 'Largo', 'Ancho', 'Cubierto', 'Dunt', 'B_Masculino', 'B_Femenino', 'B_Discapacitado', 'C_Vehicular', 'C_BiciParqueadero', 'Publico');
@@ -292,7 +292,7 @@ class Park extends Model implements Auditable
      *
      * @return HasMany
      */
-    public function sectors(): HasMany
+    public function sectors()
     {
         return $this->hasMany(Sector::class, 'i_fk_id_parque');
     }
@@ -302,7 +302,7 @@ class Park extends Model implements Auditable
      *
      * @return HasMany
      */
-    public function rupis(): HasMany
+    public function rupis()
     {
         return $this->hasMany(Rupi::class, 'Id_Parque', 'Id');
     }
@@ -332,7 +332,7 @@ class Park extends Model implements Auditable
      *
      * @return HasMany
      */
-    public function story(): HasMany
+    public function story()
     {
         return $this->hasMany(Story::class, 'idParque','Id');
     }
@@ -342,7 +342,7 @@ class Park extends Model implements Auditable
      *
      * @return HasMany
      */
-    public function emergency_plans(): HasMany
+    public function emergency_plans()
     {
         return $this->hasMany(EmergencyPlan::class, 'idParque', 'Id');
     }
@@ -351,7 +351,7 @@ class Park extends Model implements Auditable
      * @param array $request
      * @return array
      */
-    public function transformRequest(array $request): array
+    public function transformRequest(array $request)
     {
         return [
             'Id_IDRD'               =>  Arr::get($request, 'code', null),

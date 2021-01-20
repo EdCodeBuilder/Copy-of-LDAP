@@ -15,7 +15,7 @@ class EquipmentController extends Controller
         parent::__construct();
     }
 
-    public function index(): JsonResponse
+    public function index()
     {
         return $this->success_response( EquipmentResource::collection( Equipment::all() ) );
     }

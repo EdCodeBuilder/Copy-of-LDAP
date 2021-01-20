@@ -46,7 +46,7 @@ class Location extends Model
      *
      * @return string
      */
-    public function getNameAttribute(): string
+    public function getNameAttribute()
     {
         return toUpper($this->Localidad);
     }
@@ -62,7 +62,7 @@ class Location extends Model
      *
      * @return HasMany
      */
-    public function parks(): HasMany
+    public function parks()
     {
         return $this->hasMany(Park::class, 'Id_Localidad', 'Id_Localidad');
     }
@@ -72,7 +72,7 @@ class Location extends Model
      *
      * @return HasMany
      */
-    public function upz(): HasMany
+    public function upz()
     {
         return $this->hasMany(Upz::class, 'IdLocalidad', 'Id_Localidad');
     }

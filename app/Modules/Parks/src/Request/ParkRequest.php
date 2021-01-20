@@ -12,7 +12,7 @@ class ParkRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize(): bool
+    public function authorize()
     {
         return true;
     }
@@ -22,7 +22,7 @@ class ParkRequest extends FormRequest
      *
      * @return array
      */
-    public function rules(): array
+    public function rules()
     {
         return [
             'code'                  =>  'required|string|min:1|max:20|unique:mysql_parks.parque,Id_IDRD',
@@ -70,7 +70,7 @@ class ParkRequest extends FormRequest
      *
      * @return array
      */
-    public function attributes(): array
+    public function attributes()
     {
         return [
             'code'                  =>  __('parks.attributes.code'),

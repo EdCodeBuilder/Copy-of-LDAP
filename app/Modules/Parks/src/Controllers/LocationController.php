@@ -25,7 +25,7 @@ class LocationController extends Controller
      *
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index()
     {
         return $this->success_response( LocationResource::collection( Location::all() ) );
     }
@@ -36,7 +36,7 @@ class LocationController extends Controller
      * @param Location $location
      * @return JsonResponse
      */
-    public function upz(Location $location): JsonResponse
+    public function upz(Location $location)
     {
         return $this->success_response(UpzResource::collection($location->upz));
     }
@@ -48,7 +48,7 @@ class LocationController extends Controller
      * @param Upz $upz
      * @return JsonResponse
      */
-    public function neighborhoods($location, Upz $upz): JsonResponse
+    public function neighborhoods($location, Upz $upz)
     {
         return $this->success_response(NeighborhoodResource::collection($upz->neighborhoods));
     }

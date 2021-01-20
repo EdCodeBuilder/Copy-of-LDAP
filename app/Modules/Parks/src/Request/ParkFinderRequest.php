@@ -12,7 +12,7 @@ class ParkFinderRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize(): bool
+    public function authorize()
     {
         return true;
     }
@@ -22,7 +22,7 @@ class ParkFinderRequest extends FormRequest
      *
      * @return array
      */
-    public function rules(): array
+    public function rules()
     {
         return [
             'query'        => [ new ParkFinderRule() ],

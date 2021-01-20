@@ -195,7 +195,7 @@ class FiledController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
         $resource = $this->getBuilder( $request, Filed::query() );
         return $this->success_response(
@@ -211,7 +211,7 @@ class FiledController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function calendar(Request $request): JsonResponse
+    public function calendar(Request $request)
     {
         $resource = $resource = $this->getBuilder( $request, Filed::query() );
         return $this->success_response(

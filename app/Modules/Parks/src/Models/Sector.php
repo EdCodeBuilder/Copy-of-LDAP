@@ -55,7 +55,7 @@ class Sector extends Model
     /**
      * @return HasMany
      */
-    public function endowments(): HasMany
+    public function endowments()
     {
         return $this->hasMany(ParkEndowment::class, 'i_fk_id_sector');
     }

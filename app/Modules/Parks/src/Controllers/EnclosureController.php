@@ -23,7 +23,7 @@ class EnclosureController extends Controller
      *
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index()
     {
         return $this->success_response( EnclosureResource::collection( Enclosure::all() ) );
     }

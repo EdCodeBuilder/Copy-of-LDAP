@@ -28,7 +28,7 @@ class StatsController extends Controller
      *
      * @return JsonResponse
      */
-    public function stats(): JsonResponse
+    public function stats()
     {
         $stats = Scale::withCount('parks')->get();
         return $this->success_response( ScaleStatsResource::collection( $stats ) );
@@ -39,7 +39,7 @@ class StatsController extends Controller
      *
      * @return JsonResponse
      */
-    public function count(): JsonResponse
+    public function count()
     {
         $data = [
             'total'     =>  Park::count(),
@@ -54,7 +54,7 @@ class StatsController extends Controller
      *
      * @return JsonResponse
      */
-    public function enclosure(): JsonResponse
+    public function enclosure()
     {
         $data = Park::selectRaw(DB::raw('Cerramiento AS enclosure, COUNT(*) as parks_count'))
             ->groupBy(['Cerramiento'])
@@ -73,7 +73,7 @@ class StatsController extends Controller
      *
      * @return JsonResponse
      */
-    public function certified(): JsonResponse
+    public function certified()
     {
         $data = Park::where('EstadoCertificado', 1)->count();
         $total = Park::count();
@@ -89,7 +89,7 @@ class StatsController extends Controller
      *
      * @return JsonResponse
      */
-    public function localities(): JsonResponse
+    public function localities()
     {
         $stats = Location::withCount('parks')->get();
         return $this->success_response(StatsLocationResource::collection( $stats ));
@@ -100,7 +100,7 @@ class StatsController extends Controller
      *
      * @return JsonResponse
      */
-    public function upz(): JsonResponse
+    public function upz()
     {
         $stats = Park::query()
             ->selectRaw(DB::raw('upz.Upz as name, parque.Upz as code, COUNT(*) as parks_count'))

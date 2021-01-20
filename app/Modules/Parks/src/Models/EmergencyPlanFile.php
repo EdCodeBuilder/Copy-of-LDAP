@@ -54,7 +54,7 @@ class EmergencyPlanFile extends Model
      *
      * @return BelongsTo
      */
-    public function parks(): BelongsTo
+    public function parks()
     {
         return $this->belongsTo(Park::class, 'Id', 'idParque');
     }

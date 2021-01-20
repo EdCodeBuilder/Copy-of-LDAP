@@ -40,7 +40,7 @@ class Scale extends Model
      *
      * @return HasMany
      */
-    public function parks(): HasMany
+    public function parks()
     {
         return $this->hasMany(Park::class, 'Id_Tipo', 'Id_Tipo');
     }

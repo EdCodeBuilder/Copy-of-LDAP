@@ -67,7 +67,7 @@ class Rupi extends Model implements Auditable
      *
      * @return array
      */
-    public function generateTags() : array
+    public function generateTags()
     {
         return ['park_rupi'];
     }
@@ -83,7 +83,7 @@ class Rupi extends Model implements Auditable
      *
      * @return BelongsTo
      */
-    public function park(): BelongsTo
+    public function park()
     {
         return $this->belongsTo(Park::class, 'idParque', 'Id');
     }

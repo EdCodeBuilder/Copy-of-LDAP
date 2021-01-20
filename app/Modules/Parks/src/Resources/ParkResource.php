@@ -15,7 +15,7 @@ class ParkResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function toArray($request): array
+    public function toArray($request)
     {
         return [
             'id'        =>  (int) isset( $this->Id ) ? (int) $this->Id : null,

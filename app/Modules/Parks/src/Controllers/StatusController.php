@@ -25,7 +25,7 @@ class StatusController extends Controller
      *
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index()
     {
         return $this->success_response( StatusResource::collection( Status::all() ) );
     }
@@ -35,7 +35,7 @@ class StatusController extends Controller
      *
      * @return JsonResponse
      */
-    public function type_zones(): JsonResponse
+    public function type_zones()
     {
         $data = [
             [
@@ -111,7 +111,7 @@ class StatusController extends Controller
      *
      * @return JsonResponse
      */
-    public function concerns(): JsonResponse
+    public function concerns()
     {
         $data = [
             [
@@ -155,7 +155,7 @@ class StatusController extends Controller
      *
      * @return JsonResponse
      */
-    public function vigilance(): JsonResponse
+    public function vigilance()
     {
         $data = [
             [

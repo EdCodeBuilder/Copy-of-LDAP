@@ -45,7 +45,7 @@ class Status extends Model
      *
      * @return int
      */
-    public function getIdAttribute(): int
+    public function getIdAttribute()
     {
         return (int) $this->Id_Estado;
     }
@@ -55,7 +55,7 @@ class Status extends Model
      *
      * @return string
      */
-    public function getNameAttribute(): string
+    public function getNameAttribute()
     {
         return $this->Estado;
     }

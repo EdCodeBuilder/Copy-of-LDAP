@@ -18,7 +18,7 @@ class UserController extends Controller
      *
      * @return JsonResponse
      */
-    public function menu(): JsonResponse
+    public function menu()
     {
         $menu = collect([
             [

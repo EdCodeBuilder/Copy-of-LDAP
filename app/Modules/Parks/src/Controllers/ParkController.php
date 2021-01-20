@@ -34,7 +34,7 @@ class ParkController extends Controller
      * @param ParkFinderRequest $request
      * @return JsonResponse
      */
-    public function index(ParkFinderRequest $request): JsonResponse
+    public function index(ParkFinderRequest $request)
     {
         $parks = Park::query()
             ->select( ['Id', 'Id_IDRD', 'Nombre', 'Direccion', 'Upz', 'Id_Localidad', 'Id_Tipo'] )
@@ -61,7 +61,7 @@ class ParkController extends Controller
      * @param $park
      * @return JsonResponse
      */
-    public function show($park): JsonResponse
+    public function show($park)
     {
         $data = Park::with('rupis', 'story')
                     ->where('Id_IDRD', $park)
@@ -90,7 +90,7 @@ class ParkController extends Controller
      * @param ParkRequest $request
      * @return JsonResponse
      */
-    public function store(ParkRequest $request): JsonResponse
+    public function store(ParkRequest $request)
     {
         $park = new Park();
         $filled = $park->transformRequest( $request->validated() );
@@ -109,7 +109,7 @@ class ParkController extends Controller
      * @param Park $park
      * @return JsonResponse
      */
-    public function update(UpdateParkRequest $request, Park $park): JsonResponse
+    public function update(UpdateParkRequest $request, Park $park)
     {
         $filled = $park->transformRequest( $request->validated() );
         $park->fill($filled);

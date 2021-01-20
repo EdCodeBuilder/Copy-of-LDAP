@@ -77,7 +77,7 @@ class Story extends Model implements Auditable
      *
      * @return array
      */
-    public function generateTags() : array
+    public function generateTags()
     {
         return ['park_story'];
     }
@@ -93,7 +93,7 @@ class Story extends Model implements Auditable
      *
      * @return BelongsTo
      */
-    public function parks(): BelongsTo
+    public function parks()
     {
         return $this->belongsTo(Park::class, 'idParque', 'Id');
     }
