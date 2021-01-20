@@ -2,6 +2,7 @@
 
 namespace App\Modules\Orfeo\src\Controllers;
 
+use App\Modules\Orfeo\src\Exports\OrfeoExport;
 use App\Modules\Orfeo\src\Models\Attachment;
 use App\Modules\Orfeo\src\Models\Dependency;
 use App\Modules\Orfeo\src\Models\DocumentType;
@@ -60,6 +61,23 @@ class FiledController extends Controller
         ]);
     }
 
+    public function excel(Request $request)
+    {
+        $start = $request->has('start_date')
+            ? Carbon::parse( $request->get('start_date') )->startOfDay()
+            : now()->startOfMonth();
+        $final = $request->has('final_date')
+            ? Carbon::parse( $request->get('final_date') )->endOfDay()
+            : now()->endOfMonth();
+
+        $request->request->add([
+            'start_date'    =>  $start,
+            'final_date'    =>  $final,
+        ]);
+
+        return (new OrfeoExport($request))->download('Orfeo.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+    }
+
     public function countByFolder(Request $request)
     {
         $data = Folder::active()->withCount([
@@ -85,8 +103,8 @@ class FiledController extends Controller
             ->get()->map(function ($data) {
                 return [
                     'id'  => isset( $data->radi_depe_actu ) ? (int) $data->radi_depe_actu : null,
-                    'count'  => isset( $data->count ) ? (int) $data->count : null,
-                    'name'  => isset( $data->dependency->depe_nomb ) ? toUpper($data->dependency->depe_nomb) : null,
+                    'count'  => isset( $data->count ) ? (int) $data->count : 0,
+                    'name'  => isset( $data->dependency->depe_nomb ) ? toUpper($data->dependency->depe_nomb) : '',
                 ];
             });
         return $this->success_message($data);
@@ -177,7 +195,7 @@ class FiledController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $resource = $this->getBuilder( $request, Filed::query() );
         return $this->success_response(
@@ -187,7 +205,13 @@ class FiledController extends Controller
         );
     }
 
-    public function calendar(Request $request)
+    /**
+     * Display a listing of the resource.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function calendar(Request $request): JsonResponse
     {
         $resource = $resource = $this->getBuilder( $request, Filed::query() );
         return $this->success_response(

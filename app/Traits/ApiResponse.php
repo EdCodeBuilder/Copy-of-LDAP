@@ -90,12 +90,14 @@ trait ApiResponse
     /**
      * @param JsonResource $collection
      * @param int $code
+     * @param null $additional
      * @return JsonResponse
      */
-    protected function success_response(JsonResource $collection, int $code = Response::HTTP_OK )
+    protected function success_response(JsonResource $collection, int $code = Response::HTTP_OK, $additional = null )
     {
         return $collection->additional([
             'code' => $code,
+            'details'   => $additional,
             'requested_at'  =>  now()->toIso8601String()
         ])->response()->setStatusCode( $code );
     }

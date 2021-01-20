@@ -35,6 +35,7 @@ class AuthServiceProvider extends ServiceProvider
         }, ['middleware' => 'api']);
         Passport::tokensExpireIn(now()->addHours(8));
         Passport::refreshTokensExpireIn(now()->addHours(16));
+        Passport::$ignoreCsrfToken = true;
         Passport::$pruneRevokedTokens = true;
         Passport::$revokeOtherTokens = true;
         Passport::$cookie = "dashboard_idrd_token";

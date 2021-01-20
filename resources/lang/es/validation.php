@@ -178,6 +178,13 @@ return [
         'ldap_fail'                 => 'No se pudo conectar al servidor LDAP'
     ],
 
+    'events' => [
+        'created'   =>  'Creado',
+        'updated'   =>  'Actualizado',
+        'deleted'   =>  'Eliminado',
+        'restored'  =>  'Restablecido',
+    ],
+
 
     /*
     |--------------------------------------------------------------------------

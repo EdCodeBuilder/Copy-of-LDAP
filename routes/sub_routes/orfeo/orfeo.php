@@ -3,7 +3,8 @@
 use App\Modules\Orfeo\src\Controllers\FiledController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('api')->prefix('api/orfeo')->group( function () {
+Route::middleware('auth:api')->prefix('api/orfeo')->group( function () {
+    Route::get('excel', [FiledController::class, 'excel']);
     Route::get('dependencies', [FiledController::class, 'dependencies']);
     Route::get('users', [FiledController::class, 'users']);
     Route::get('folders', [FiledController::class, 'folders']);
