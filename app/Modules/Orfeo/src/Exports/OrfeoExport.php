@@ -43,7 +43,7 @@ class OrfeoExport implements FromQuery, WithMapping, WithColumnFormatting, WithH
         return $this->getBuilder( $this->orfeo, Filed::query() );
     }
 
-    public function headings() {
+    public function headings(): array {
         return [
             'RADICADO',
             'FECHA DE RADICADO',
@@ -68,7 +68,7 @@ class OrfeoExport implements FromQuery, WithMapping, WithColumnFormatting, WithH
         ];
     }
 
-    public function map($row)
+    public function map($row): array
     {
         return [
             'id'                =>  isset( $row->radi_nume_radi ) ? (string) $row->radi_nume_radi : null,
@@ -94,7 +94,7 @@ class OrfeoExport implements FromQuery, WithMapping, WithColumnFormatting, WithH
         ];
     }
 
-    public function columnFormats()
+    public function columnFormats(): array
     {
         return [
             'A' => NumberFormat::FORMAT_NUMBER,
