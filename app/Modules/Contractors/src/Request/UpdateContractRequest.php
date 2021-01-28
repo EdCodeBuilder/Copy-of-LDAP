@@ -30,26 +30,22 @@ class UpdateContractRequest extends FormRequest
         return [
             // Contract
             'contract_id' =>  'required|numeric|exists:mysql_contractors.contracts,id',
+            'contract_type_id' =>  'required|numeric',
             'contract' =>  'required|string',
-            'transport' =>  'required|boolean',
-            'position'  =>  'required|string',
             'start_date'    =>  'required|date|date_format:Y-m-d|before:final_date',
             'final_date'    =>  'required|date|date_format:Y-m-d|after:start_date',
-            'total' =>  'required|numeric',
-            'day'   =>  'required|array',
-            'risk'  =>  'required|numeric|between:1,5',
-            'subdirectorate_id'    =>  'required|numeric|exists:mysql_ldap.subdirectorates,id',
-            'dependency_id'    =>  'required|numeric|exists:mysql_ldap.areas,id',
+            'day'   =>  'nullable|required|array',
+            'transport' =>  'nullable|boolean',
+            'position'  =>  'nullable|string',
+            'total' =>  'nullable|numeric',
+            'risk'  =>  'nullable|numeric|between:1,5',
+            'subdirectorate_id'    =>  'nullable|numeric|exists:mysql_ldap.subdirectorates,id',
+            'dependency_id'    =>  'nullable|numeric|exists:mysql_ldap.areas,id',
             'other_dependency_subdirectorate'    =>  [
-                Rule::requiredIf(function () {
-                    $area = Area::query()->where('id', $this->get('dependency_id'))->first();
-                    return isset($area->name) && $area->name === 'OTRO';
-                }),
                 'nullable',
                 'string',
             ],
             'supervisor_email'  =>  'nullable|email',
-            'contract_type_id' =>  'required|numeric',
         ];
     }
 
