@@ -164,8 +164,8 @@ class ContractorResource extends JsonResource
             ? [
                 [
                     'align' => "right",
-                    'field' => "Fecha de nacimiento",
-                    'value'  =>  "birthdate",
+                    'label' => "Fecha de nacimiento",
+                    'field'  =>  "birthdate",
                     'icon'  =>  'mdi-calendar',
                 ],
                 [
