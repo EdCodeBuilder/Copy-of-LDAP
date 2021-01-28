@@ -58,7 +58,7 @@ class Rupi extends Model implements Auditable
      * @var array
      */
     protected $auditInclude = [
-        'idParque',
+        'Id_Parque',
         'Rupi',
     ];
 
@@ -67,7 +67,7 @@ class Rupi extends Model implements Auditable
      *
      * @return array
      */
-    public function generateTags()
+    public function generateTags(): array
     {
         return ['park_rupi'];
     }

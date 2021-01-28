@@ -16,6 +16,8 @@ class CreateFileTypesTable extends Migration
         Schema::create('file_types', function (Blueprint $table) {
             $table->bigIncrements('id')->comment('Identificador del registro');
             $table->string('name', 191)->comment('Nombre del tipo de archivo');
+            $table->string('notifiable', 191)->comment('Correo electrónico de notificación');
+            $table->string('mimes', 191)->comment('Tipos de archivos de aceptados. PDF, Imágenes, etc');
             $table->timestamps();
         });
     }

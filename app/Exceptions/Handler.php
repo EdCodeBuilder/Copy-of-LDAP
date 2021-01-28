@@ -207,6 +207,6 @@ class Handler extends ExceptionHandler
     {
         return $request->expectsJson()
             ?   $this->error_response(__('validation.handler.unauthenticated'), Response::HTTP_UNAUTHORIZED, $exception)
-            :   redirect()->guest(route('home'));
+            :   redirect()->guest(route('welcome'));
     }
 }

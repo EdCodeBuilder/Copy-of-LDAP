@@ -71,6 +71,7 @@ class LoginController extends Controller
      */
     public function __construct(AdldapInterface $ldap)
     {
+        parent::__construct();
         $this->ldap = $ldap;
     }
 

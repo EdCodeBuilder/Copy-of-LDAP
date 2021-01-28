@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'failed' => 'These credentials do not match our records.',
+    'failed' => 'These credentials do not match our records or you do not have permission to enter this module.',
     'password_policy' => 'Your new password does not match the password policy',
     'password_changed' => 'Your password has been changed successfully',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',

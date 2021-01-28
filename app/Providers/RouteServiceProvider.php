@@ -42,6 +42,8 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapOrfeoRoutes();
 
         $this->mapParksRoutes();
+
+        $this->mapContractorsRoutes();
     }
 
     /**
@@ -82,5 +84,12 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::middleware('api')
             ->group(base_path('routes/sub_routes/parks/parks.php'));
+    }
+
+    public function mapContractorsRoutes()
+    {
+        Route::middleware('api')
+            ->prefix('api')
+            ->group(base_path('routes/sub_routes/contractors/api.php'));
     }
 }

@@ -204,7 +204,7 @@ class User extends Authenticatable implements Auditable
      */
     public function findForPassport( string $username )
     {
-        return $this->active()->where('username', $username)->first();
+        return $this->where('username', $username)->first();
     }
 
     /**

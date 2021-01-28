@@ -64,7 +64,7 @@ class Enclosure extends Model implements Auditable
      *
      * @return array
      */
-    public function generateTags()
+    public function generateTags(): array
     {
         return ['park_enclosure'];
     }
