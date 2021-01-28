@@ -98,12 +98,6 @@ class ContractorController extends Controller
                     })->orWhere('name', 'like', "%{$data}%")
                       ->orWhere('surname', 'like', "%{$data}%")
                       ->orWhere('document', 'like', "%{$data}%");
-                })->when($is_legal_and_not_admin, function ($query) {
-                    return $query->whereHas('contracts', function ($query) {
-                        return $query->latest()->whereHas('files', function ($query) {
-                            return $query->where('file_type_id', 1);
-                        });
-                    });
                 });
     }
 
