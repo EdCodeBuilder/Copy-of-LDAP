@@ -244,41 +244,41 @@ class Contractor extends Model implements Auditable
 
     public function afp_name()
     {
-        return $this->hasOne(Afp::class);
+        return $this->hasOne(Afp::class, 'id', 'afp_id');
     }
 
     public function residence_country()
     {
-        return $this->hasOne(CountryLDAP::class, 'country_id');
+        return $this->hasOne(CountryLDAP::class, 'id','country_id');
     }
 
     public function residence_state()
     {
-        return $this->hasOne(StateLDAP::class, 'state_id');
+        return $this->hasOne(StateLDAP::class, 'id','state_id');
     }
 
     public function residence_city()
     {
-        return $this->hasOne(CityLDAP::class, 'city_id');
+        return $this->hasOne(CityLDAP::class, 'id','city_id');
     }
 
     public function locality()
     {
-        return $this->hasOne(Location::class, 'locality_id');
+        return $this->hasOne(Location::class, 'Id_Localidad', 'locality_id');
     }
 
     public function upz()
     {
-        return $this->hasOne(Upz::class);
+        return $this->hasOne(Upz::class, 'upz_id', 'Id_Upz');
     }
 
     public function neighborhood_name()
     {
-        return $this->hasOne(Neighborhood::class);
+        return $this->hasOne(Neighborhood::class, 'neighborhood_id', 'IdBarrio');
     }
 
     public function user()
     {
-        return $this->hasOne(User::class);
+        return $this->hasOne(User::class, 'user_id', 'id');
     }
 }
