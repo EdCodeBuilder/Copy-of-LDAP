@@ -38,7 +38,7 @@ class ContractorResource extends JsonResource
             'final_date'                        =>  isset($contract->final_date) ? $contract->final_date->format('Y-m-d') : null,
             'total'                             =>  isset($contract->total) ? (int) $contract->total : null,
             'day'                               =>  isset($contract->day) ? $contract->day : [],
-            'day_string'                        =>  isset($contract->day) ? $contract->day : null,
+            'day_string'                        =>  isset($contract->day) ? $contract->getOriginal('day') : null,
             'risk'                              =>  isset($contract->risk) ? $contract->risk : null,
             'subdirectorate'                    =>  isset($contract->subdirectorate->name) ? $contract->subdirectorate->name : null,
             'dependency'                        =>  isset($contract->dependency->name) ? $contract->dependency->name : null,
@@ -100,6 +100,11 @@ class ContractorResource extends JsonResource
                 'value'  =>  "id",
             ],
             [
+                'align' => "right",
+                'text' => "Detalles",
+                'value'  =>  "view",
+            ],
+            [
                 'text' => 'Tipo de trámite',
                 'value'  =>  'contract_type',
                 // 'icon'  =>  'mdi-clipboard-text-outline',
@@ -149,11 +154,6 @@ class ContractorResource extends JsonResource
                 'text' => "Teléfono",
                 'value'  =>  "phone",
                 'icon'  =>  'mdi-phone',
-            ],
-            [
-                'align' => "right",
-                'text' => "Detalles",
-                'value'  =>  "view",
             ],
         ];
     }

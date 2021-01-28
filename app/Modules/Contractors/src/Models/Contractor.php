@@ -269,12 +269,12 @@ class Contractor extends Model implements Auditable
 
     public function upz()
     {
-        return $this->hasOne(Upz::class, 'upz_id', 'Id_Upz');
+        return $this->hasOne(Upz::class, 'Id_Upz','upz_id');
     }
 
     public function neighborhood_name()
     {
-        return $this->hasOne(Neighborhood::class, 'neighborhood_id', 'IdBarrio');
+        return $this->hasOne(Neighborhood::class, 'IdBarrio','neighborhood_id');
     }
 
     public function user()
