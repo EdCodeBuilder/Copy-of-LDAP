@@ -55,10 +55,11 @@ class FileController extends Controller
     {
         $ext = $request->file('file')->getClientOriginalExtension();
         $document = isset($contract->contractor->document) ? $contract->contractor->document : '00000';
+        $contract_number = isset($contract->contract) ? str_replace('-','_', $contract->contract) : '000_0000';
         $type = FileType::find( $request->get('file_type_id') );
         $type = isset( $type->name ) ? str_replace(' ', '_', $type->name) : 'SYSTEM';
         $now = now()->format('YmdHis');
-        $filename = "{$type}_{$document}_{$now}.$ext";
+        $filename = "{$type}_{$document}_{$contract_number}_{$now}.$ext";
         if ($request->file('file')->storeAs('arl', $filename, [ 'disk' => 'local' ])) {
             $contract->files()->create([
                 'name'          =>  $filename,
