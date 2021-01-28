@@ -234,7 +234,7 @@ class Contractor extends Model implements Auditable
 
     public function eps_name()
     {
-        return $this->hasOne(Eps::class);
+        return $this->hasOne(Eps::class, 'id', 'eps_id');
     }
 
     public function sex()
