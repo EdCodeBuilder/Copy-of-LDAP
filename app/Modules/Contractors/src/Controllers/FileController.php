@@ -84,7 +84,7 @@ class FileController extends Controller
         abort(Response::HTTP_NOT_FOUND);
     }
 
-    public function destroy(File $file)
+    public function destroy($contract, File $file)
     {
         $name = isset($file->name) ? $file->name : null;
         $file->delete();
