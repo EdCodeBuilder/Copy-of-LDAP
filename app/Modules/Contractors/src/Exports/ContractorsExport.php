@@ -122,7 +122,7 @@ class ContractorsExport implements FromQuery, WithMapping, WithHeadings
             'surname'               =>  isset($row->surname) ? $row->surname : null,
             'birthdate'             =>  isset($row->birthdate) ? $row->birthdate->format('Y-m-d H:i:s') : null,
             'age'                   =>  isset($row->birthdate) ? $row->birthdate->age : null,
-            'sex'                   =>  isset($row->sex) ? $row->sex : null,
+            'sex'                   =>  isset($row->sex->name) ? $row->sex->name : null,
             'email'                 =>  isset($row->email) ? $row->email : null,
             'institutional_email'   =>  isset($row->institutional_email) ? $row->institutional_email : null,
             'phone'                 =>  isset($row->phone) ? $row->phone : null,
@@ -133,9 +133,9 @@ class ContractorsExport implements FromQuery, WithMapping, WithHeadings
             'residence_country'     =>  isset($row->residence_country->name) ? $row->residence_country->name : null,
             'residence_state'       =>  isset($row->residence_state->name) ? $row->residence_state->name : null,
             'residence_city'        =>  isset($row->residence_city->name) ? $row->residence_city->name : null,
-            'locality'              =>  isset($row->locality) ? $row->locality : null,
-            'upz'                   =>  isset($row->upz) ? $row->upz : null,
-            'neighborhood_name'     =>  isset($row->neighborhood_name->name) ? $row->neighborhood_name->name : null,
+            'locality'              =>  $this->setLocalityName($row),
+            'upz'                   =>  $this->setUpzName($row),
+            'neighborhood_name'     =>  $this->setNeighborhoodName($row),
             'neighborhood'          =>  isset($row->neighborhood) ? $row->neighborhood : null,
             'address'               =>  isset($row->address) ? $row->address : null,
             'user'                  =>  isset($row->user->full_name) ? $row->user->full_name : null,
@@ -167,5 +167,24 @@ class ContractorsExport implements FromQuery, WithMapping, WithHeadings
                 ->orWhere('surname', 'like', "%{$data}%")
                 ->orWhere('document', 'like', "%{$data}%");
         });
+    }
+
+    public function setNeighborhoodName($row)
+    {
+        $state = isset($row->residence_city_id) ? (int) $row->residence_city_id : null;
+        $neighborhood = isset($row->neighborhood_name->name) ? $row->neighborhood_name->name : null;
+        return !is_null($state) && $state != 12688 && is_null($neighborhood) ? 'OTRO' : $neighborhood;
+    }
+    public function setLocalityName($row)
+    {
+        $state = isset($row->residence_city_id) ? (int) $row->residence_city_id : null;
+        $locality = isset($row->locality->name) ? $row->locality->name : null;
+        return !is_null($state) && $state != 12688 && is_null($locality) ? 'OTRO' : $locality;
+    }
+    public function setUpzName($row)
+    {
+        $state = isset($row->residence_city_id) ? (int) $row->residence_city_id : null;
+        $upz = isset($row->upz->name) ? $row->upz->name : null;
+        return !is_null($state) && $state != 12688 && is_null($upz) ? 'OTRO' : $upz;
     }
 }
