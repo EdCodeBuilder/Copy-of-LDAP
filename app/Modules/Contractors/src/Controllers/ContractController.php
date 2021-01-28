@@ -5,6 +5,7 @@ namespace App\Modules\Contractors\src\Controllers;
 
 
 use App\Http\Controllers\Controller;
+use App\Modules\Contractors\src\Jobs\ConfirmContractor;
 use App\Modules\Contractors\src\Models\Contract;
 use App\Modules\Contractors\src\Models\Contractor;
 use App\Modules\Contractors\src\Request\StoreLawyerContractRequest;
@@ -56,11 +57,14 @@ class ContractController extends Controller
     {
         try {
             DB::connection('mysql_contractors')->beginTransaction();
+            $contractor->modifiable = true;
+            $contractor->saveOrFail();
             $contractor->contracts()
                 ->create(array_merge(
                     $request->validated(),
                     ['lawyer_id' => auth()->user()->id]
                 ));
+            $this->dispatch(new ConfirmContractor($contractor));
             DB::connection('mysql_contractors')->commit();
             return $this->success_message(__('validation.handler.success'), Response::HTTP_CREATED);
         } catch (\Throwable $e) {
