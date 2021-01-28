@@ -142,7 +142,7 @@ class Contract extends Model implements Auditable
 
     public function contractor()
     {
-        return $this->belongsTo(Contractor::class);
+        return $this->belongsTo(Contractor::class, 'id', 'contractor_id');
     }
 
     public function contract_type()
