@@ -34,7 +34,7 @@ class UpdateContractRequest extends FormRequest
             'contract' =>  'required|string',
             'start_date'    =>  'required|date|date_format:Y-m-d|before:final_date',
             'final_date'    =>  'required|date|date_format:Y-m-d|after:start_date',
-            'day'   =>  'nullable|required|array',
+            'day'   =>  'nullable|array',
             'transport' =>  'nullable|boolean',
             'position'  =>  'nullable|string',
             'total' =>  'nullable|numeric',
