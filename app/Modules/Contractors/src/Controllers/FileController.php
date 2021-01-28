@@ -5,6 +5,8 @@ namespace App\Modules\Contractors\src\Controllers;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\Security\User;
+use App\Modules\Contractors\src\Constants\Roles;
 use App\Modules\Contractors\src\Jobs\ConfirmArlContractor;
 use App\Modules\Contractors\src\Jobs\SendArlContractor;
 use App\Modules\Contractors\src\Mail\ContractorLegalMail;
@@ -13,6 +15,7 @@ use App\Modules\Contractors\src\Models\Contractor;
 use App\Modules\Contractors\src\Models\ContractType;
 use App\Modules\Contractors\src\Models\File;
 use App\Modules\Contractors\src\Models\FileType;
+use App\Modules\Contractors\src\Notifications\LegalNotification;
 use App\Modules\Contractors\src\Request\StoreFileRequest;
 use App\Modules\Contractors\src\Resources\ContractorResource;
 use App\Modules\Contractors\src\Resources\ContractTypeResource;
@@ -22,6 +25,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
@@ -64,6 +68,7 @@ class FileController extends Controller
             if ($request->get('file_type_id') == 1) {
                 $this->dispatch(new ConfirmArlContractor($contract->contractor, $contract));
                 $this->dispatch(new SendArlContractor($contract->contractor, $contract));
+                Notification::send( User::whereIs(Roles::ROLE_LEGAL)->get(), new LegalNotification($contract->contractor, $contract) );
             }
             return $this->success_message(__('validation.handler.success'));
         }
