@@ -106,7 +106,7 @@ class ContractorsExport implements FromQuery, WithMapping, WithHeadings
             'start_date'                        =>  isset($contract->start_date) ? $contract->start_date->format('Y-m-d') : null,
             'final_date'                        =>  isset($contract->final_date) ? $contract->final_date->format('Y-m-d') : null,
             'total'                             =>  isset($contract->total) ? (int) $contract->total : null,
-            'day'                               =>  isset($contract->day) ? $contract->day : null,
+            'day'                               =>  isset($contract->day) ? $contract->getOriginal('day') : null,
             'risk'                              =>  isset($contract->risk) ? $contract->risk : null,
             'subdirectorate'                    =>  isset($contract->subdirectorate->name) ? $contract->subdirectorate->name : null,
             'dependency'                        =>  isset($contract->dependency->name) ? $contract->dependency->name : null,
