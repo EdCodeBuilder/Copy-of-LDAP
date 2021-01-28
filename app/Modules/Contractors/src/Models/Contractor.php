@@ -249,17 +249,17 @@ class Contractor extends Model implements Auditable
 
     public function residence_country()
     {
-        return $this->hasOne(CountryLDAP::class, 'id','country_id');
+        return $this->hasOne(CountryLDAP::class, 'id','residence_country_id');
     }
 
     public function residence_state()
     {
-        return $this->hasOne(StateLDAP::class, 'id','state_id');
+        return $this->hasOne(StateLDAP::class, 'id','residence_state_id');
     }
 
     public function residence_city()
     {
-        return $this->hasOne(CityLDAP::class, 'id','city_id');
+        return $this->hasOne(CityLDAP::class, 'id','residence_city_id');
     }
 
     public function locality()
