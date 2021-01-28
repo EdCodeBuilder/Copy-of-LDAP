@@ -83,4 +83,15 @@ class FileController extends Controller
         }
         abort(Response::HTTP_NOT_FOUND);
     }
+
+    public function destroy(File $file)
+    {
+        $name = isset($file->name) ? $file->name : null;
+        $file->delete();
+        if (Storage::disk('local')->exists("arl/{$name}")) {
+            Storage::disk('local')->delete("arl/{$name}");
+            return $this->success_message(__('validation.handler.deleted'));
+        }
+        return $this->error_response(__('validation.handler.unexpected_failure'));
+    }
 }

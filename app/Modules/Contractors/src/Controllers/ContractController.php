@@ -11,6 +11,7 @@ use App\Modules\Contractors\src\Models\Contractor;
 use App\Modules\Contractors\src\Request\StoreLawyerContractRequest;
 use App\Modules\Contractors\src\Request\StoreLawyerRequest;
 use App\Modules\Contractors\src\Request\UpdateContractorRequest;
+use App\Modules\Contractors\src\Request\UpdateContractRequest;
 use App\Modules\Contractors\src\Resources\ContractorResource;
 use App\Modules\Contractors\src\Resources\ContractResource;
 use Illuminate\Http\JsonResponse;
@@ -80,19 +81,18 @@ class ContractController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateContractorRequest $request
-     * @param $contractor
+     * @param UpdateContractRequest $request
+     * @param Contractor $contractor
      * @return JsonResponse
      */
-    public function update(UpdateContractorRequest $request, $contractor)
+    public function update(UpdateContractRequest $request, Contractor $contractor)
     {
         try {
-            $id = Crypt::decrypt($contractor);
-            $form = Contractor::findOrFail($id);
             DB::connection('mysql_contractors')->beginTransaction();
-            $form->contracts()
-                ->where('id', $request->get('contract_id'))
-                ->update($request->validated());
+            $contract = $contractor->contracts()
+                            ->where('id', $request->get('contract_id'))
+                            ->first();
+            $contract->update($request->validated());
             DB::connection('mysql_contractors')->commit();
             return $this->success_message(__('validation.handler.updated'));
         } catch (\Throwable $e) {

@@ -31,7 +31,7 @@ Route::prefix('contractors-portal')->group(function () {
     ])->middleware('auth:api');
     Route::get('storage/file/{file}-{name?}', [FileController::class, 'file'])->name('file.resource');
     Route::resource('contracts.files', FileController::class, [
-        'only'     =>     ['index', 'store'],
+        'only'     =>     ['index', 'store', 'destroy'],
         'parameters' =>     ['contracts' => 'contract', 'files' => 'file'],
     ])->middleware('auth:api');
     Route::resource('contractors.contracts', ContractController::class, [
