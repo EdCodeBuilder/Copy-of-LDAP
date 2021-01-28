@@ -53,7 +53,7 @@ class ContractorLegalMail extends Mailable
         $name = "$first $second";
         $number = isset($this->contract->contract) ? $this->contract->contract : '000';
         $type = isset($this->contract->contract_type->name) ? $this->contract->contract_type->name : '';
-        $file = $this->contract->files()->where('file_type_id', 1)->first();
+        $file = $this->contract->files()->where('file_type_id', 1)->latest()->first();
         $user = isset($file->user->full_name) ? $file->user->full_name : 'SYSTEM';
 
         $subject = "{$name} / {$type} / {$number}";

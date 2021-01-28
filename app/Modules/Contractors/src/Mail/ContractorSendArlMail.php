@@ -52,7 +52,7 @@ class ContractorSendArlMail extends Mailable
         $name = "$first $second";
         $number = isset($this->contract->contract) ? $this->contract->contract : '000';
         $type = isset($this->contract->contract_type->name) ? $this->contract->contract_type->name : '';
-        $file = $this->contract->files()->where('file_type_id', 1)->first();
+        $file = $this->contract->files()->where('file_type_id', 1)->latest()->first();
 
         $id_file = isset($file->id) ? $file->id : null;
         $file_name = isset($file->name) ? $file->name : null;

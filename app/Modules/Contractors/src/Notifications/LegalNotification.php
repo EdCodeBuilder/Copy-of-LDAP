@@ -58,7 +58,7 @@ class LegalNotification extends Notification
         $first = isset( $this->contractor->name ) ? $this->contractor->name : '';
         $second = isset( $this->contractor->surname ) ? $this->contractor->surname : '';
         $number = isset($this->contract->contract) ? $this->contract->contract : '000';
-        $file = $this->contract->files()->where('file_type_id', 1)->first();
+        $file = $this->contract->files()->where('file_type_id', 1)->latest()->first();
         $type = isset($this->contract->contract_type->name) ? $this->contract->contract_type->name : '';
         $user = isset($file->user->full_name) ? $file->user->full_name : 'SYSTEM';
         $name = "$first $second";
