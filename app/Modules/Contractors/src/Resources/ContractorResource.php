@@ -45,7 +45,7 @@ class ContractorResource extends JsonResource
             'other_dependency_subdirectorate'   =>  isset($contract->other_dependency_subdirectorate) ? $contract->other_dependency_subdirectorate : null,
             'supervisor_email'                  =>  isset($contract->supervisor_email) ? $contract->supervisor_email : null,
             'lawyer'                            =>  isset($contract->lawyer->full_name) ? $contract->lawyer->full_name : null,
-            'files'                             => FileResource::collection( $contract->files ),
+            'files'                             =>  isset($contract->files) ? FileResource::collection( $contract->files ) : [],
             'secop_file'                        => $contract->files->where('file_type_id', 2)->count(),
             'arl_file'                          => $contract->files->where('file_type_id', 1)->count(),
             // End Contract Data
