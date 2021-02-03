@@ -35,6 +35,13 @@ class Location extends Model
      */
     protected $fillable = ['Localidad'];
 
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
     /*
      * ---------------------------------------------------------
      * Accessors and Mutator

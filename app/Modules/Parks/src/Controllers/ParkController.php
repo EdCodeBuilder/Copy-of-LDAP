@@ -3,6 +3,7 @@
 namespace App\Modules\Parks\src\Controllers;
 
 
+use App\Modules\Parks\src\Exports\ParkExport;
 use App\Modules\Parks\src\Models\EconomicUsePark;
 use App\Modules\Parks\src\Models\Park;
 use App\Modules\Parks\src\Models\ParkEndowment;
@@ -16,7 +17,10 @@ use App\Modules\Parks\src\Resources\ParkFinderResource;
 use App\Modules\Parks\src\Resources\ParkResource;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Maatwebsite\Excel\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ParkController extends Controller
 {
@@ -26,6 +30,7 @@ class ParkController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->middleware(['can:manage-parks', 'auth:api'], ['only' => 'store', 'update', 'destroy']);
     }
 
     /**
@@ -47,12 +52,38 @@ class ParkController extends Controller
                 });
             })
             ->when(request()->has('locality_id'), function ($query) use ($request) {
-                return $query->where('Id_Localidad', $request->get('locality_id'));
+                $localities = $request->get('locality_id');
+                return is_array($localities)
+                    ? $query->whereIn('Id_Localidad', $localities)
+                    : $query->where('Id_Localidad', $localities);
             })
             ->when(request()->has('type_id'), function ($query) use ($request) {
-                return $query->where('Id_Tipo', $request->get('type_id'));
-            })->paginate($this->per_page);
+                $types = $request->get('type_id');
+                return is_array($types)
+                    ? $query->whereIn('Id_Tipo', $types)
+                    : $query->where('Id_Tipo', $types);
+            })
+            ->when(request()->has('vigilance'), function ($query) use ($request) {
+                return $query->where('Vigilancia', $request->get('vigilance'));
+            })
+            ->when(request()->has('enclosure'), function ($query) use ($request) {
+                $types = $request->get('enclosure');
+                return is_array($types)
+                    ? $query->whereIn('Cerramiento', $types)
+                    : $query->where('Cerramiento', $types);
+            })
+
+            ->paginate($this->per_page);
         return $this->success_response( ParkFinderResource::collection( $parks ) );
+    }
+
+    /**
+     * @param Request $request
+     * @return Response|BinaryFileResponse
+     */
+    public function excel(Request $request)
+    {
+        return (new ParkExport($request))->download('REPORTE_PARQUES.xlsx', Excel::XLSX);
     }
 
     /**
@@ -69,15 +100,7 @@ class ParkController extends Controller
                     ->first();
         if ( $data ) {
             return $this->success_response(
-                new ParkResource( $data ),
-                Response::HTTP_OK,
-                [
-                    'permissions' => [
-                        'create' => true,
-                        'update' => true,
-                        'delete' => true,
-                    ],
-                ]
+                new ParkResource( $data )
             );
         }
 

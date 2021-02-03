@@ -36,11 +36,38 @@ class Upz extends Model
      */
     protected $fillable = ['Upz', 'cod_upz', 'IdLocalidad'];
 
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
     /*
      * ---------------------------------------------------------
      * Accessors and Mutator
      * ---------------------------------------------------------
      */
+
+    /**
+     * Get name in uppercase
+     *
+     * @return int
+     */
+    public function getIdAttribute()
+    {
+        return (int) $this->Id_Upz;
+    }
+
+    /**
+     * Get name in uppercase
+     *
+     * @return string
+     */
+    public function getCodeAttribute()
+    {
+        return $this->cod_upz;
+    }
 
     /**
      * Get name in uppercase

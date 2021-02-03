@@ -6,14 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Modules\Parks\src\Models\Location;
 use App\Modules\Parks\src\Models\Upz;
 use App\Modules\Parks\src\Request\LocationRequest;
+use App\Modules\Parks\src\Request\UpdateUpzRequest;
 use App\Modules\Parks\src\Request\UpzRequest;
 use App\Modules\Parks\src\Resources\LocationResource;
 use App\Modules\Parks\src\Resources\NeighborhoodResource;
 use App\Modules\Parks\src\Resources\UpzResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class LocationController extends Controller
+class UpzController extends Controller
 {
     /**
      * Initialise common request params
@@ -26,25 +28,27 @@ class LocationController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Location $location
      * @return JsonResponse
      */
-    public function index()
+    public function index(Location $location)
     {
-        return $this->success_response( LocationResource::collection( Location::all() ) );
+        return $this->success_response(UpzResource::collection($location->upz));
     }
 
     /**
-     * @param LocationRequest $request
+     * @param UpzRequest $request
+     * @param Location $location
      * @return JsonResponse
      */
-    public function store(LocationRequest $request)
+    public function store(UpzRequest $request, Location $location)
     {
         try {
-            $form = new Location();
-            $form->fill([
-                'Localidad' => toUpper($request->get('name'))
-            ]);
-            $form->saveOrFail();
+            $location->upz()
+                ->create([
+                    'Upz'       =>  $request->get('name'),
+                    'cod_upz'   =>  $request->get('upz_code')
+                ]);
             return $this->success_message(
                 __('validation.handler.success'),
                 Response::HTTP_CREATED
@@ -58,13 +62,21 @@ class LocationController extends Controller
         }
     }
 
-    public function update(LocationRequest $request, Location $location)
+    /**
+     * @param Request $request
+     * @param $location
+     * @param Upz $upz
+     * @return JsonResponse
+     */
+    public function update(UpdateUpzRequest $request, $location, Upz $upz)
     {
         try {
-            $location->fill([
-                'Localidad' => toUpper($request->get('name'))
+            $upz->fill([
+                'Upz'           =>  $request->get('name'),
+                'cod_upz'       =>  $request->get('upz_code'),
+                'IdLocalidad'   =>  $request->get('locality_id'),
             ]);
-            $location->saveOrFail();
+            $upz->saveOrFail();
             return $this->success_message(
                 __('validation.handler.updated')
             );

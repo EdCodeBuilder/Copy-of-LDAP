@@ -25,6 +25,7 @@ class ParkFinderResource extends JsonResource
             'upz_code'  =>  isset( $this->Upz ) ? (int) $this->Upz : null,
             'upz'       =>  isset( $this->upz_name->Upz ) ? toUpper($this->upz_name->Upz) : null,
             'color'     =>  isset( $this->Id_Tipo ) ? $this->getColor((int) $this->Id_Tipo) : 'grey',
+            'status_id' =>  isset( $this->Estado ) ? (bool) $this->Estado : false,
             'sectors'   =>  SectorResource::collection( $this->whenLoaded('sectors') )
         ];
     }

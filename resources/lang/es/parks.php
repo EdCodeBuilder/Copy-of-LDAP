@@ -15,7 +15,9 @@ return [
         'users'     =>  'Usuarios',
         'dashboard' =>  'Tablero',
         'finder'    =>  'Buscador de Parques',
+        'manage'     => 'Gestión Parques',
         'parks'     =>  'Crear Parque',
+        'locality'  =>  'Gestionar Localidades',
         'map'       =>  'Mapa',
     ],
     'handler'    => [

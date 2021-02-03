@@ -15,7 +15,9 @@ return [
         'users'     =>  'Users',
         'dashboard' =>  'Dashboard',
         'finder'    =>  'Park Finder',
+        'manage'     => 'Manage Parks',
         'parks'     =>  'Create Park',
+        'locality'  =>  'Manage Locality',
         'map'       =>  'Map',
     ],
 ];

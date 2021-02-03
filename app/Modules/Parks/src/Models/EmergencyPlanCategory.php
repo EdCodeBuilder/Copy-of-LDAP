@@ -5,9 +5,8 @@ namespace App\Modules\Parks\src\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class EmergencyPlanFile extends Model
+class EmergencyPlanCategory extends Model
 {
     /**
      * The connection name for the model.
@@ -21,7 +20,7 @@ class EmergencyPlanFile extends Model
      *
      * @var string
      */
-    protected $table = 'ArchivoPlanEmergencia';
+    protected $table = 'CategoriaPlanEmergencia';
 
     /**
      * The primary key for the model.
@@ -35,14 +34,7 @@ class EmergencyPlanFile extends Model
      *
      * @var array
      */
-    protected $fillable = ['descripcionArchivo', 'idCategoria', 'nombreArchivo', 'orden', 'fecha', 'usuario'];
-
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = [ 'fecha' ];
+    protected $fillable = ['categoria'];
 
     /**
      * Indicates if the model should be timestamped.
@@ -60,10 +52,10 @@ class EmergencyPlanFile extends Model
     /**
      * An emergency plan belongs to park
      *
-     * @return HasOne
+     * @return HasMany
      */
-    public function category()
+    public function files()
     {
-        return $this->hasOne(EmergencyPlanCategory::class, 'id', 'idCategoria');
+        return $this->hasMany(EmergencyPlanFile::class, 'id', 'idCategoria');
     }
 }

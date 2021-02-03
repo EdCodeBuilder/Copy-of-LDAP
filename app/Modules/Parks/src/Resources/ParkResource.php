@@ -63,7 +63,6 @@ class ParkResource extends JsonResource
             'capacity' =>  isset( $this->Aforo ) ? (float) $this->Aforo : null,
             'stage_type_id'    => isset( $this->Id_Tipo_Escenario ) ? (int) $this->Id_Tipo_Escenario : null,
             'stage_type'    => isset( $this->stage_type->tipo ) ? toUpper($this->stage_type->tipo) : null,
-
             'pqrs'      =>  'atencionalcliente@idrd.gov.co',
             'email'     =>  isset( $this->Email ) ? $this->Email : null,
             'schedule_service'  =>  'Lunes a Viernes: 6:00 AM - 6:00 PM / Sábados y Domingos: 5:00 AM - 6:00 PM',
@@ -84,9 +83,6 @@ class ParkResource extends JsonResource
             'visited_at' => isset($this->FechaVisita) ? $this->checkDate($this->FechaVisita) : null,
             'rupis'      => $this->whenLoaded('rupis', RupiResource::collection($this->rupis)),
             'story'      => $this->whenLoaded('story', StoryResource::collection($this->story)),
-
-
-
             'color'      =>  isset( $this->Id_Tipo ) ? $this->getColor((int) $this->Id_Tipo) : 'grey',
             'green_area'    =>  isset( $this->AreaZVerde ) ? (int) $this->AreaZVerde : 0,
             'grey_area'    =>  isset( $this->AreaZDura ) ? (int) $this->AreaZDura : 0,
@@ -100,6 +96,7 @@ class ParkResource extends JsonResource
                 ]
             ],
             'map'   =>  $this->setMap(),
+            'plans' =>  EmergencyPlanResource::collection($this->emergency_plans),
             'audit' => AuditResource::collection($this->audits()->with('user:id,name,surname')->latest()->get())
         ];
     }

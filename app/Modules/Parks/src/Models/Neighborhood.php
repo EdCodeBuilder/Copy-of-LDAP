@@ -35,6 +35,13 @@ class Neighborhood extends Model
      */
     protected $fillable = ['Barrio', 'CodUpz'];
 
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
     /*
      * ---------------------------------------------------------
      * Accessors and Mutator
@@ -49,6 +56,17 @@ class Neighborhood extends Model
     public function getNameAttribute()
     {
         return toUpper($this->Barrio);
+    }
+
+    /**
+     * Set name in uppercase
+     *
+     * @param $value
+     * @return void
+     */
+    public function setBarrioAttribute($value)
+    {
+        $this->attributes['Barrio'] = toUpper($value);
     }
 
     /*

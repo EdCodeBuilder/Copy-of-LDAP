@@ -4,16 +4,19 @@ namespace App\Modules\Parks\src\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Parks\src\Models\Location;
+use App\Modules\Parks\src\Models\Neighborhood;
 use App\Modules\Parks\src\Models\Upz;
 use App\Modules\Parks\src\Request\LocationRequest;
+use App\Modules\Parks\src\Request\NeighborhoodRequest;
 use App\Modules\Parks\src\Request\UpzRequest;
 use App\Modules\Parks\src\Resources\LocationResource;
 use App\Modules\Parks\src\Resources\NeighborhoodResource;
 use App\Modules\Parks\src\Resources\UpzResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class LocationController extends Controller
+class NeighborhoodController extends Controller
 {
     /**
      * Initialise common request params
@@ -26,25 +29,29 @@ class LocationController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Location $location
+     * @param Upz $upz
      * @return JsonResponse
      */
-    public function index()
+    public function index($location, Upz $upz)
     {
-        return $this->success_response( LocationResource::collection( Location::all() ) );
+        return $this->success_response(NeighborhoodResource::collection($upz->neighborhoods));
     }
 
     /**
-     * @param LocationRequest $request
+     * @param NeighborhoodRequest $request
+     * @param $location
+     * @param Upz $upz
      * @return JsonResponse
      */
-    public function store(LocationRequest $request)
+    public function store(NeighborhoodRequest $request, $location, Upz $upz)
     {
         try {
-            $form = new Location();
-            $form->fill([
-                'Localidad' => toUpper($request->get('name'))
-            ]);
-            $form->saveOrFail();
+            $upz->neighborhoods()
+                ->create([
+                    'Barrio'       =>  $request->get('name'),
+                    'CodUpz'   =>  $request->get('upz_code')
+                ]);
             return $this->success_message(
                 __('validation.handler.success'),
                 Response::HTTP_CREATED
@@ -58,13 +65,21 @@ class LocationController extends Controller
         }
     }
 
-    public function update(LocationRequest $request, Location $location)
+    /**
+     * @param NeighborhoodRequest $request
+     * @param $location
+     * @param $upz
+     * @param Neighborhood $neighborhood
+     * @return JsonResponse
+     */
+    public function update(NeighborhoodRequest $request, $location, $upz, Neighborhood $neighborhood)
     {
         try {
-            $location->fill([
-                'Localidad' => toUpper($request->get('name'))
+            $neighborhood->fill([
+                'Barrio'       =>  $request->get('name'),
+                'CodUpz'  =>  $request->get('upz_code')
             ]);
-            $location->saveOrFail();
+            $neighborhood->saveOrFail();
             return $this->success_message(
                 __('validation.handler.updated')
             );

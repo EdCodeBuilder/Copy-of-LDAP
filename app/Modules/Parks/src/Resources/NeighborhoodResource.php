@@ -17,7 +17,9 @@ class NeighborhoodResource extends JsonResource
         return [
             'id'    =>  isset( $this->IdBarrio ) ? (int) $this->IdBarrio : null,
             'name'  =>  isset( $this->Barrio ) ? toUpper($this->Barrio) : null,
-            'upz'   =>  isset( $this->CodUpz ) ? $this->CodUpz : null,
+            'upz_code'   =>  isset( $this->CodUpz ) ? $this->CodUpz : null,
+            'upz_id'=>  isset($this->upz->Id_Upz) ? (int) $this->upz->Id_Upz : null,
+            'locality_id'=>  isset($this->upz->IdLocalidad) ? (int) $this->upz->IdLocalidad : null,
         ];
     }
 }

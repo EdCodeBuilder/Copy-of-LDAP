@@ -43,6 +43,13 @@ class EmergencyPlan extends Model
      */
     protected $dates = [ 'Fecha_Version' ];
 
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
     /*
     * ---------------------------------------------------------
     * Eloquent Relations
@@ -57,5 +64,10 @@ class EmergencyPlan extends Model
     public function parks()
     {
         return $this->belongsTo(Park::class, 'Id', 'idParque');
+    }
+
+    public function file()
+    {
+        return $this->hasOne(EmergencyPlanFile::class, 'id', 'idArchivo')->orderBy('orden');
     }
 }

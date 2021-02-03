@@ -2,9 +2,16 @@
 
 namespace App\Modules\Parks\src\Controllers;
 
+use App\Http\Resources\Auth\RoleResource;
+use App\Http\Resources\Auth\UserResource;
+use App\Models\Security\User;
+use App\Modules\Parks\src\Constants\Roles;
+use App\Modules\Parks\src\Request\RoleRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Response;
+use Silber\Bouncer\Database\Role;
 
 class UserController extends Controller
 {
@@ -26,7 +33,7 @@ class UserController extends Controller
                 'title' =>  __('parks.menu.users'),
                 'to'    =>  [ 'name' => 'parks-users' ],
                 'exact' =>  true,
-                'can'   =>  true,
+                'can'   =>  auth()->check() && auth()->user()->can('manage-parks-users'),
             ],
             [
                 'icon'  =>  'mdi-view-dashboard',
@@ -44,10 +51,21 @@ class UserController extends Controller
             ],
             [
                 'icon'  =>  'mdi-clipboard-list-outline',
-                'title' =>  __('parks.menu.parks'),
-                'to'    =>  [ 'name' => 'parks-create' ],
-                'exact' =>  true,
-                'can'   =>  true,
+                'title' =>  __('parks.menu.manage'),
+                'exact' =>  false,
+                'can'   =>  auth()->check() && auth()->user()->can('manage-parks'),
+                'children' => [
+                    [
+                        'title' =>  __('parks.menu.parks'),
+                        'to'    =>  [ 'name' => 'parks-create' ],
+                        'exact' =>  auth()->check() && auth()->user()->can('manage-parks'),
+                    ],
+                    [
+                        'title' =>  __('parks.menu.locality'),
+                        'to'    =>  [ 'name' => 'parks-locations' ],
+                        'exact' =>  auth()->check() && auth()->user()->can('manage-parks'),
+                    ],
+                ]
             ],
             [
                 'icon'  =>  'mdi-map',
@@ -61,79 +79,71 @@ class UserController extends Controller
         return $this->success_message( array_values( $menu->where('can', true)->toArray() ) );
     }
 
+    public function permissions()
+    {
+        return $this->success_message(
+            Roles::permissions()
+        );
+    }
+
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function index()
     {
-        //
+        $users = User::whereIs(...Roles::roles())
+            ->with([
+                'roles' => function ($query) {
+                    return $query->whereIn('name', Roles::roles());
+                }
+            ])
+            ->get();
+        return $this->success_response(
+            UserResource::collection( $users )
+        );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function roles()
     {
-        //
+        return $this->success_response(
+            RoleResource::collection( Role::whereIn('name', Roles::roles())->get() )
+        );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function findUsers(Request $request)
     {
-        //
+        $users = User::query()
+            ->when($request->has('username'), function ($query) use ($request) {
+                $username = toLower( $request->get('username') );
+                return $query->where('username', 'like', "%{$username}%")
+                    ->orWhere('name', 'like', "%{$username}%")
+                    ->orWhere('surname', 'like', "%{$username}%")
+                    ->orWhere('document', 'like', "%{$username}%");
+            })
+            ->take(50)
+            ->get();
+        return $this->success_response(
+            UserResource::collection( $users )
+        );
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function store(RoleRequest $request, User $user)
     {
-        //
+        $user->assign( $request->get('roles') );
+        return $this->success_message(
+            __('validation.handler.success'),
+            Response::HTTP_CREATED
+        );
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function destroy(RoleRequest $request, User $user)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        $user->retract( $request->get('roles') );
+        return $this->success_message(
+            __('validation.handler.success'),
+            Response::HTTP_CREATED
+        );
     }
 }

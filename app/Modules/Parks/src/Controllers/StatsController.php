@@ -61,7 +61,7 @@ class StatsController extends Controller
             ->get()
             ->map(function ($model) {
                 return [
-                    'name'     => isset($model->enclosure) ? toUpper($model->enclosure) : null,
+                    'name'     => isset($model->enclosure) ? toUpper($model->enclosure) : '',
                     'parks_count'   => isset($model->parks_count) ? (int) $model->parks_count : 0,
                 ];
             });
