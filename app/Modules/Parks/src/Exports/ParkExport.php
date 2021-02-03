@@ -53,7 +53,9 @@ class ParkExport implements FromQuery, WithMapping, WithHeadings
                         });
                     })
                     ->when($this->request->has('vigilance'), function ($query) {
-                        return $query->where('Vigilancia', $this->request->get('vigilance'));
+                        if ($this->request->get('vigilance') != null)
+                            return $query->where('Vigilancia', $this->request->get('vigilance'));
+                        return $query;
                     })
                     ->when($this->request->has('enclosure'), function ($query) {
                         $types = $this->request->get('enclosure');
@@ -127,7 +129,11 @@ class ParkExport implements FromQuery, WithMapping, WithHeadings
             'stratum'   =>  isset( $row->Estrato ) ? (int) $row->Estrato : null,
             'latitude' =>  isset( $row->Latitud ) ? $row->Latitud : null,
             'longitude' =>  isset( $row->Longitud ) ? $row->Longitud : null,
-            'rupis'      => isset($row->rupis) ? $row->rupis->map(function ($rupi) { return isset($rupi->Rupi); }) : null,
+            'rupis'      => isset($row->rupis)
+                ? $row->rupis->map(function ($rupi) {
+                    return isset($rupi->Rupi) ? $rupi->Rupi : null;
+                  })->implode(', ')
+                : null,
             'area'     =>  isset( $row->Area ) ? (float) $row->Area : null,
             'green_area'    =>  isset( $row->AreaZVerde ) ? (int) $row->AreaZVerde : 0,
             'grey_area'    =>  isset( $row->AreaZDura ) ? (int) $row->AreaZDura : 0,
