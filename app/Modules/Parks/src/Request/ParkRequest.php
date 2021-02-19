@@ -30,7 +30,7 @@ class ParkRequest extends FormRequest
             'address'               =>  'required|string|min:3|max:120',
             'stratum'               =>  'required|numeric|min:1|max:10',
             'locality_id'           =>  'required|numeric|exists:mysql_parks.localidad,Id_Localidad',
-            'upz_code'              =>  'required|numeric|exists:mysql_parks.upz,cod_upz',
+            'upz_code'              =>  'required|exists:mysql_parks.upz,cod_upz',
             'neighborhood_id'       =>  'required|numeric|exists:mysql_parks.Barrios,IdBarrio',
             'urbanization'          =>  'required|string|min:3',
             'latitude'              =>  ['nullable','regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
@@ -62,6 +62,7 @@ class ParkRequest extends FormRequest
             'admin_name'            =>  'nullable|string|min:3|max:500',
             'vigilance'             =>  'nullable|string',
             'received'              =>  'nullable|string',
+            'vocation_id'           =>  'nullable|numeric|exists:mysql_parks.Inventario_TIPOVOCACION,id',
         ];
     }
 
@@ -110,6 +111,7 @@ class ParkRequest extends FormRequest
             'admin_name'            =>  __('parks.attributes.admin_name'),
             'vigilance'             =>  __('parks.attributes.vigilance'),
             'received'              =>  __('parks.attributes.received'),
+            'vocation_id'           =>  __('parks.attributes.vocation_id'),
         ];
     }
 }

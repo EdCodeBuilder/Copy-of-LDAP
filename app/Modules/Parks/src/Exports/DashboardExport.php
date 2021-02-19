@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class ParkExport implements FromQuery, WithMapping, WithHeadings
+class DashboardExport implements FromQuery, WithMapping, WithHeadings
 {
     use Exportable;
 
@@ -39,29 +39,43 @@ class ParkExport implements FromQuery, WithMapping, WithHeadings
 
                         return $query;
                     })
-                    ->when($this->request->has('park_type'), function ($query) {
-                        if (count($this->request->get('park_type')) > 0)
-                            return $query->whereIn('Id_Tipo', $this->request->get('park_type'));
+                    ->when($this->request->has('certified'), function ($query) {
+                        if ($this->request->get('certified') == 'certified')
+                            return $query->where('EstadoCertificado', 1);
+                        if ($this->request->get('certified') == 'not_certified')
+                            return $query->where('EstadoCertificado', '!=', 1);
 
-                        return $query;
-                    })->when($this->request->has('query'), function ($query) {
-                        $query->where(function ($query) {
-                            return $query
-                                ->where('Id_IDRD', 'LIKE', "%{$this->request->get('query')}%")
-                                ->orWhere('Nombre', 'LIKE', "%{$this->request->get('query')}%")
-                                ->orWhere('Direccion', 'LIKE', "%{$this->request->get('query')}%");
-                        });
-                    })
-                    ->when($this->request->has('vigilance'), function ($query) {
-                        if ($this->request->get('vigilance') != null)
-                            return $query->where('Vigilancia', $this->request->get('vigilance'));
                         return $query;
                     })
                     ->when($this->request->has('enclosure'), function ($query) {
                         $types = $this->request->get('enclosure');
-                        if (count($types) > 0)
+                        if (is_array($types) && count($types) > 0)
                             return $query->whereIn('Cerramiento', $types);
 
+                        return $query;
+                    })
+                    ->when($this->request->has('park_type'), function ($query) {
+                        if (is_array($this->request->get('park_type')) && count($this->request->get('park_type')) > 0)
+                            return $query->whereIn('Id_Tipo', $this->request->get('park_type'));
+                        return $query;
+                    })
+                    ->when($this->request->has('location'), function ($query) {
+                        if (count($this->request->get('location')) > 0)
+                            return $query->whereIn('Id_Localidad', $this->request->get('location'));
+
+                        return $query;
+                    })
+                    ->when($this->request->has('upz'), function ($query) {
+                        if (count($this->request->get('upz')) > 0)
+                            return $query->whereIn('Upz', $this->request->get('upz'));
+
+                        return $query;
+                    })
+                    ->when($this->request->has('admin'), function ($query) {
+                        if ($this->request->get('admin') == 'admin')
+                            return $query->where('Administracion', 'IDRD');
+                        if ($this->request->get('admin') == 'is_not_admin')
+                            return $query->where('Administracion', '!=', 'IDRD');
                         return $query;
                     });
     }

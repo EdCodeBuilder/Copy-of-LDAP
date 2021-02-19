@@ -4,9 +4,11 @@ namespace App\Modules\Parks\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Neighborhood extends Model
+class Neighborhood extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     /**
      * The connection name for the model.
      *
@@ -41,6 +43,31 @@ class Neighborhood extends Model
      * @var bool
      */
     public $timestamps = false;
+
+    /*
+   * ---------------------------------------------------------
+   * Data Change Auditor
+   * ---------------------------------------------------------
+   */
+
+    /**
+     * Attributes to include in the Audit.
+     *
+     * @var array
+     */
+    protected $auditInclude = [
+        'Barrio', 'CodUpz'
+    ];
+
+    /**
+     * Generating tags for each model audited.
+     *
+     * @return array
+     */
+    public function generateTags(): array
+    {
+        return ['park_neighborhood'];
+    }
 
     /*
      * ---------------------------------------------------------

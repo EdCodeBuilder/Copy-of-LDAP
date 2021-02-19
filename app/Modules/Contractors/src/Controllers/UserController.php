@@ -121,6 +121,9 @@ class UserController extends LoginController
         return $this->success_message( array_values( $menu->where('can', true)->toArray() ) );
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function permissions()
     {
         return $this->success_message([

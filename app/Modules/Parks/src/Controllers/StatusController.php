@@ -37,7 +37,7 @@ class StatusController extends Controller
      */
     public function type_zones()
     {
-        $data = [
+        return $this->success_message([
             [
                 'id'    =>  'RESIDENCIAL',
                 'name'  =>  'RESIDENCIAL',
@@ -102,8 +102,7 @@ class StatusController extends Controller
                 'id'    =>  'REGULAR',
                 'name'  =>  'REGULAR',
             ],
-        ];
-        return $this->success_message($data);
+        ]);
     }
 
     /**
@@ -113,11 +112,7 @@ class StatusController extends Controller
      */
     public function concerns()
     {
-        $data = [
-            [
-                'id'    =>  'SI',
-                'name'  =>  'SI'
-            ],
+        return $this->success_message([
             [
                 'id'    =>  'IDRD',
                 'name'  =>  'IDRD'
@@ -127,16 +122,8 @@ class StatusController extends Controller
                 'name'  =>  'Junta Administradora Local'
             ],
             [
-                'id'    =>  'NO',
-                'name'  =>  'NO'
-            ],
-            [
                 'id'    =>  'Alcaldía Local',
                 'name'  =>  'Alcaldía Local'
-            ],
-            [
-                'id'    =>  'Otros',
-                'name'  =>  'Otros'
             ],
             [
                 'id'    =>  'Alianza Público Privada',
@@ -146,8 +133,19 @@ class StatusController extends Controller
                 'id'    =>  'Indefinido',
                 'name'  =>  'Indefinido'
             ],
-        ];
-        return $this->success_message($data);
+            [
+                'id'    =>  'Otros',
+                'name'  =>  'Otros'
+            ],
+            [
+                'id'    =>  'SI',
+                'name'  =>  'SI'
+            ],
+            [
+                'id'    =>  'NO',
+                'name'  =>  'NO'
+            ],
+        ]);
     }
 
     /**

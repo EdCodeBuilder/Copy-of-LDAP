@@ -25,7 +25,7 @@ class NeighborhoodRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'          => 'required|string',
+            'name'          => 'required|string|max:500',
             'upz_code'      =>  'required|exists:mysql_parks.upz,cod_upz',
         ];
     }

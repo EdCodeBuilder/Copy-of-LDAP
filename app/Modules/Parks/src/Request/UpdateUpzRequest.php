@@ -25,8 +25,8 @@ class UpdateUpzRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'      => 'required|string',
-            'upz_code'  =>  'required|unique:mysql_parks.upz,cod_upz,'.$this->route('upz')->id.',Id_Upz',
+            'name'      => 'required|string|max:50',
+            'upz_code'  =>  'required|max:20|unique:mysql_parks.upz,cod_upz,'.$this->route('upz')->id.',Id_Upz',
             'locality_id'   =>  'required|numeric|exists:mysql_parks.localidad,Id_Localidad',
         ];
     }

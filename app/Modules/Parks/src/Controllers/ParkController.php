@@ -3,10 +3,13 @@
 namespace App\Modules\Parks\src\Controllers;
 
 
+use App\Models\Security\User;
 use App\Modules\Parks\src\Exports\ParkExport;
+use App\Modules\Parks\src\Models\AssignedPark;
 use App\Modules\Parks\src\Models\EconomicUsePark;
 use App\Modules\Parks\src\Models\Park;
 use App\Modules\Parks\src\Models\ParkEndowment;
+use App\Modules\Parks\src\Request\AssignParkRequest;
 use App\Modules\Parks\src\Request\ParkFinderRequest;
 use App\Modules\Parks\src\Request\ParkRequest;
 use App\Modules\Parks\src\Request\UpdateParkRequest;
@@ -30,7 +33,7 @@ class ParkController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware(['can:manage-parks', 'auth:api'], ['only' => 'store', 'update', 'destroy']);
+        $this->middleware(['auth:api'], ['only' => 'store', 'update', 'destroy', 'ownedKeys', 'owned', 'assignParks']);
     }
 
     /**
@@ -95,8 +98,12 @@ class ParkController extends Controller
     public function show($park)
     {
         $data = Park::with('rupis', 'story')
-                    ->where('Id_IDRD', $park)
-                    ->orWhere('Id', $park)
+                    ->when(strpos($park, '-'), function ($query) use ($park) {
+                        return $query->where('Id_IDRD', $park);
+                    })
+                    ->when(!strpos($park, '-'), function ($query) use ($park) {
+                        return $query->where('Id', $park);
+                    })
                     ->first();
         if ( $data ) {
             return $this->success_response(
@@ -112,9 +119,11 @@ class ParkController extends Controller
      *
      * @param ParkRequest $request
      * @return JsonResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function store(ParkRequest $request)
     {
+        $this->authorize('manage-parks', Park::class);
         $park = new Park();
         $filled = $park->transformRequest( $request->validated() );
         $park->fill($filled);
@@ -131,13 +140,170 @@ class ParkController extends Controller
      * @param UpdateParkRequest $request
      * @param Park $park
      * @return JsonResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function update(UpdateParkRequest $request, Park $park)
     {
         $filled = $park->transformRequest( $request->validated() );
         $park->fill($filled);
-        $park->save();
-        return $this->success_message(__('validation.handler.updated'));
+        if (auth('api')->user()->can('manage-parks', Park::class)) {
+            $park->save();
+            return $this->success_message(__('validation.handler.updated'));
+        }
+        if (auth('api')->user()->can('manage-assigned-parks', $park)) {
+            $owned = AssignedPark::where('user_id', auth('api')->user()->id)
+                                    ->where('park_id', $park->Id)
+                                    ->count();
+            abort_unless($owned > 1, Response::HTTP_FORBIDDEN, __('validation.handler.unauthorized'));
+            $park->save();
+            return $this->success_message(__('validation.handler.updated'));
+        }
+        return $this->error_response(__('validation.handler.unauthorized'), Response::HTTP_FORBIDDEN);
+    }
+
+    public function ownedKeys()
+    {
+        $owned = AssignedPark::where('user_id', auth()->user()->id)
+                             ->get()->pluck('park_id')
+                             ->map(function ($model) {
+                                 return (int) $model;
+                             })
+                             ->toArray();
+        return $this->success_message($owned);
+    }
+
+    public function owned(ParkFinderRequest $request)
+    {
+        $owned = AssignedPark::where('user_id', auth()->user()->id)
+                ->get()->pluck('park_id')->toArray();
+        $parks = Park::query()
+                ->whereKey($owned)
+                ->select( ['Id', 'Id_IDRD', 'Nombre', 'Direccion', 'Upz', 'Id_Localidad', 'Id_Tipo'] )
+                ->when($this->query, function ($query) {
+                    $query->where(function ($query) {
+                        return $query
+                            ->where('Id_IDRD', 'LIKE', "%{$this->query}%")
+                            ->orWhere('Nombre', 'LIKE', "%{$this->query}%")
+                            ->orWhere('Direccion', 'LIKE', "%{$this->query}%");
+                    });
+                })
+                ->when(request()->has('locality_id'), function ($query) use ($request) {
+                    $localities = $request->get('locality_id');
+                    return is_array($localities)
+                        ? $query->whereIn('Id_Localidad', $localities)
+                        : $query->where('Id_Localidad', $localities);
+                })
+                ->when(request()->has('type_id'), function ($query) use ($request) {
+                    $types = $request->get('type_id');
+                    return is_array($types)
+                        ? $query->whereIn('Id_Tipo', $types)
+                        : $query->where('Id_Tipo', $types);
+                })
+                ->when(request()->has('vigilance'), function ($query) use ($request) {
+                    return $query->where('Vigilancia', $request->get('vigilance'));
+                })
+                ->when(request()->has('enclosure'), function ($query) use ($request) {
+                    $types = $request->get('enclosure');
+                    return is_array($types)
+                        ? $query->whereIn('Cerramiento', $types)
+                        : $query->where('Cerramiento', $types);
+                })
+                ->paginate($this->per_page);
+
+        return $this->success_response( ParkFinderResource::collection( $parks ) );
+    }
+
+    public function showOwned(User $user)
+    {
+        $owned = AssignedPark::where('user_id', $user->id)
+            ->get()->pluck('park_id')->toArray();
+        $parks = Park::query()
+            ->whereKey($owned)
+            ->select( ['Id', 'Id_IDRD', 'Nombre', 'Direccion', 'Upz', 'Id_Localidad', 'Id_Tipo'] )
+            ->paginate($this->per_page);
+
+        return $this->success_response( ParkFinderResource::collection( $parks ) );
+    }
+
+    public function destroyOwned(User $user, Park $park)
+    {
+        AssignedPark::where('user_id', $user->id)
+                    ->where('park_id', $park->Id)->delete();
+        $user->disallow('manage-assigned-parks', $park);
+
+        return $this->success_message(__('validation.handler.deleted'));
+    }
+
+    public function destroyAllOwned(User $user)
+    {
+        $parks = AssignedPark::where('user_id', $user->id)->get();
+        foreach ($parks as $park) {
+            $p = Park::find($park->park_id);
+            $user->disallow('manage-assigned-parks', $p);
+        }
+        AssignedPark::where('user_id', $user->id)->delete();
+        return $this->success_message(__('validation.handler.deleted'));
+    }
+
+    public function assignParks(AssignParkRequest $request)
+    {
+        $form = AssignedPark::query();
+        $user = User::query()->find($request->get('user_id'));
+        switch ($request->get('type_assignment')) {
+            case 'locality':
+                $parks = Park::query()
+                            ->select(['Id', 'Id_Localidad'])
+                            ->where('Id_Localidad', $request->get('locality_id'))
+                            ->get();
+                foreach ($parks as $park) {
+                    $user->allow('manage-assigned-parks', $park);
+                    $form->updateOrCreate([
+                        'user_id'   => $request->get('user_id'),
+                        'park_id'   =>  $park->Id,
+                    ]);
+                }
+                break;
+            case 'upz':
+                $parks = Park::query()
+                    ->select(['Id', 'Upz'])
+                    ->where('Upz', $request->get('upz_code'))
+                    ->get();
+                foreach ($parks as $park) {
+                    $user->allow('manage-assigned-parks', $park);
+                    $form->updateOrCreate([
+                        'user_id'   => $request->get('user_id'),
+                        'park_id'   =>  $park->Id,
+                    ]);
+                }
+                break;
+            case 'neighborhood':
+                $parks = Park::query()
+                    ->select(['Id', 'Id_Barrio'])
+                    ->where('Id_Barrio', $request->get('neighborhood_id'))
+                    ->get();
+                foreach ($parks as $park) {
+                    $user->allow('manage-assigned-parks', $park);
+                    $form->updateOrCreate([
+                        'user_id'   => $request->get('user_id'),
+                        'park_id'   =>  $park->Id,
+                    ]);
+                }
+                break;
+            case 'manual':
+                foreach ($request->get('park_id') as $id) {
+                    $park = Park::find($id);
+                    $user->allow('manage-assigned-parks', $park);
+                    $form->updateOrCreate([
+                        'user_id'   => $request->get('user_id'),
+                        'park_id'   =>  $id,
+                    ]);
+                }
+                break;
+        }
+        return $this->success_message(
+            __('validation.handler.success'),
+            Response::HTTP_CREATED
+        );
     }
 
     public function synthetic()

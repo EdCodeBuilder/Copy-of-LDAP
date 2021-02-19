@@ -2,6 +2,7 @@
 
 namespace App\Modules\Parks\src\Resources;
 
+use App\Modules\Parks\src\Constants\Roles;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -83,6 +84,8 @@ class ParkResource extends JsonResource
             'visited_at' => isset($this->FechaVisita) ? $this->checkDate($this->FechaVisita) : null,
             'rupis'      => $this->whenLoaded('rupis', RupiResource::collection($this->rupis)),
             'story'      => $this->whenLoaded('story', StoryResource::collection($this->story)),
+            'vocation_id'  => isset( $this->Id_Vocacion ) ? (int) $this->Id_Vocacion : null,
+            'vocation'  => isset( $this->vocation->name ) ? $this->vocation->name : null,
             'color'      =>  isset( $this->Id_Tipo ) ? $this->getColor((int) $this->Id_Tipo) : 'grey',
             'green_area'    =>  isset( $this->AreaZVerde ) ? (int) $this->AreaZVerde : 0,
             'grey_area'    =>  isset( $this->AreaZDura ) ? (int) $this->AreaZDura : 0,
@@ -97,7 +100,10 @@ class ParkResource extends JsonResource
             ],
             'map'   =>  $this->setMap(),
             'plans' =>  EmergencyPlanResource::collection($this->emergency_plans),
-            'audit' => AuditResource::collection($this->audits()->with('user:id,name,surname')->latest()->get())
+            'audit'     =>  $this->when(
+                auth('api')->check() && auth('api')->user()->isA(Roles::ROLE_ADMIN, Roles::ROLE_ASSIGNED),
+                AuditResource::collection($this->audits()->with('user:id,name,surname')->latest()->get())
+            )
         ];
     }
 

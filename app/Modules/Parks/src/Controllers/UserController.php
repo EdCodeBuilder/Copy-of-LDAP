@@ -6,11 +6,19 @@ use App\Http\Resources\Auth\RoleResource;
 use App\Http\Resources\Auth\UserResource;
 use App\Models\Security\User;
 use App\Modules\Parks\src\Constants\Roles;
+use App\Modules\Parks\src\Models\AssignedPark;
+use App\Modules\Parks\src\Models\Enclosure;
+use App\Modules\Parks\src\Models\Location;
+use App\Modules\Parks\src\Models\Park;
+use App\Modules\Parks\src\Models\Scale;
+use App\Modules\Parks\src\Models\StageType;
+use App\Modules\Parks\src\Models\Vocation;
 use App\Modules\Parks\src\Request\RoleRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
+use Silber\Bouncer\BouncerFacade;
 use Silber\Bouncer\Database\Role;
 
 class UserController extends Controller
@@ -29,11 +37,18 @@ class UserController extends Controller
     {
         $menu = collect([
             [
+                'icon'  =>  'mdi-security',
+                'title' =>  __('parks.menu.roles'),
+                'to'    =>  [ 'name' => 'parks-roles-and-permissions' ],
+                'exact' =>  true,
+                'can'   =>  auth('api')->check() && auth('api')->user()->can('manage-users-parks', Park::class),
+            ],
+            [
                 'icon'  =>  'mdi-account-multiple-plus',
                 'title' =>  __('parks.menu.users'),
                 'to'    =>  [ 'name' => 'parks-users' ],
                 'exact' =>  true,
-                'can'   =>  auth()->check() && auth()->user()->can('manage-parks-users'),
+                'can'   =>  auth('api')->check() && auth('api')->user()->can('manage-users-parks', Park::class),
             ],
             [
                 'icon'  =>  'mdi-view-dashboard',
@@ -53,19 +68,53 @@ class UserController extends Controller
                 'icon'  =>  'mdi-clipboard-list-outline',
                 'title' =>  __('parks.menu.manage'),
                 'exact' =>  false,
-                'can'   =>  auth()->check() && auth()->user()->can('manage-parks'),
-                'children' => [
+                'can'   => auth('api')->check() && (auth('api')->user()->can('manage-parks', Park::class) || auth('api')->user()->isA('park-assigned-parks')),
+                'children' => array_values( collect([
+                    [
+                        'title' =>  __('parks.menu.owned'),
+                        'to'    =>  [ 'name' => 'parks-owned' ],
+                        'exact' =>  true,
+                        'can' =>  auth('api')->check() && auth('api')->user()->isA('park-assigned-parks'),
+                    ],
                     [
                         'title' =>  __('parks.menu.parks'),
                         'to'    =>  [ 'name' => 'parks-create' ],
-                        'exact' =>  auth()->check() && auth()->user()->can('manage-parks'),
+                        'exact' =>  true,
+                        'can' =>  auth('api')->check() && auth('api')->user()->can('manage-parks', Park::class),
                     ],
                     [
                         'title' =>  __('parks.menu.locality'),
-                        'to'    =>  [ 'name' => 'parks-locations' ],
-                        'exact' =>  auth()->check() && auth()->user()->can('manage-parks'),
+                        'to'    =>  [ 'name' => 'parks-manage-locations' ],
+                        'exact' =>  true,
+                        'can' =>  auth('api')->check() && auth('api')->user()->can('manage-localities-parks', Location::class),
                     ],
-                ]
+
+
+                    [
+                        'title' =>  __('parks.menu.enclosure'),
+                        'to'    =>  [ 'name' => 'parks-manage-enclosure' ],
+                        'exact' =>  true,
+                        'can' =>  auth('api')->check() && auth('api')->user()->can('manage-enclosures-parks', Enclosure::class),
+                    ],
+                    [
+                        'title' =>  __('parks.menu.scales'),
+                        'to'    =>  [ 'name' => 'parks-manage-scales' ],
+                        'exact' =>  true,
+                        'can' =>  auth('api')->check() && auth('api')->user()->can('manage-scales-parks', Scale::class),
+                    ],
+                    [
+                        'title' =>  __('parks.menu.stages'),
+                        'to'    =>  [ 'name' => 'parks-manage-stages' ],
+                        'exact' =>  true,
+                        'can' =>  auth('api')->check() && auth('api')->user()->can('manage-stages-parks', StageType::class),
+                    ],
+                    [
+                        'title' =>  __('parks.menu.vocation'),
+                        'to'    =>  [ 'name' => 'parks-manage-vocations' ],
+                        'exact' =>  true,
+                        'can' =>  auth('api')->check() && auth('api')->user()->can('manage-vocations-parks', Vocation::class),
+                    ],
+                ])->where('can', true)->toArray())
             ],
             [
                 'icon'  =>  'mdi-map',
@@ -73,6 +122,13 @@ class UserController extends Controller
                 'to'    =>  [ 'name' => 'parks-map' ],
                 'exact' =>  true,
                 'can'   =>  true,
+            ],
+            [
+                'icon'  =>  'mdi-magnify',
+                'title' =>  __('parks.menu.audit'),
+                'to'    =>  [ 'name' => 'parks-audit' ],
+                'exact' =>  true,
+                'can'   =>  auth('api')->check() && auth()->user()->isA(...['park-administrator', 'superadmin']),
             ],
         ]);
 
@@ -114,8 +170,7 @@ class UserController extends Controller
 
     public function findUsers(Request $request)
     {
-        $users = User::query()
-            ->when($request->has('username'), function ($query) use ($request) {
+        $users = User::when($request->has('username'), function ($query) use ($request) {
                 $username = toLower( $request->get('username') );
                 return $query->where('username', 'like', "%{$username}%")
                     ->orWhere('name', 'like', "%{$username}%")
@@ -141,9 +196,16 @@ class UserController extends Controller
     public function destroy(RoleRequest $request, User $user)
     {
         $user->retract( $request->get('roles') );
+        if (in_array(Roles::ROLE_ASSIGNED, $request->get('roles'))) {
+            $parks = AssignedPark::where('user_id', $user->id)->get();
+            foreach ($parks as $park) {
+                $p = Park::find($park->park_id);
+                $user->disallow('manage-assigned-parks', $p);
+            }
+            AssignedPark::where('user_id', $user->id)->delete();
+        }
         return $this->success_message(
-            __('validation.handler.success'),
-            Response::HTTP_CREATED
+            __('validation.handler.deleted')
         );
     }
 }

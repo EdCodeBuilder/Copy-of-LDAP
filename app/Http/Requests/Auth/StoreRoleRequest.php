@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Modules\Parks\src\Request;
+namespace App\Http\Requests\Auth;
 
-use App\Modules\Parks\src\Rules\ParkFinderRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpzRequest extends FormRequest
+class StoreRoleRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +13,7 @@ class UpzRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return auth()->user()->isA('superadmin');
     }
 
     /**
@@ -25,9 +24,8 @@ class UpzRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'          => 'required|string|max:50',
-            'upz_code'      =>  'required|max:20|unique:mysql_parks.upz,cod_upz',
-            'locality_id'   =>  'required|numeric|exists:mysql_parks.localidad,Id_Localidad',
+            'name'  =>  'required|string|max:191|unique:mysql_ldap.roles,name',
+            'title' =>  'required|string|max:191',
         ];
     }
 }

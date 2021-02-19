@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
-class Upz extends Model implements Auditable
+class Vocation extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
 
@@ -23,21 +23,21 @@ class Upz extends Model implements Auditable
      *
      * @var string
      */
-    protected $table = 'upz';
+    protected $table = 'Inventario_TIPOVOCACION';
 
     /**
      * The primary key for the model.
      *
      * @var string
      */
-    protected $primaryKey = 'Id_Upz';
+    protected $primaryKey = 'id';
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['Upz', 'cod_upz', 'IdLocalidad'];
+    protected $fillable = ['vocacion'];
 
     /**
      * Indicates if the model should be timestamped.
@@ -58,7 +58,7 @@ class Upz extends Model implements Auditable
      * @var array
      */
     protected $auditInclude = [
-        'Upz', 'cod_upz', 'IdLocalidad',
+        'vocacion'
     ];
 
     /**
@@ -68,7 +68,7 @@ class Upz extends Model implements Auditable
      */
     public function generateTags(): array
     {
-        return ['park_upz'];
+        return ['park_vocation'];
     }
 
     /*
@@ -80,56 +80,10 @@ class Upz extends Model implements Auditable
     /**
      * Get name in uppercase
      *
-     * @return int
-     */
-    public function getIdAttribute()
-    {
-        return (int) $this->Id_Upz;
-    }
-
-    /**
-     * Get name in uppercase
-     *
-     * @return string
-     */
-    public function getCodeAttribute()
-    {
-        return $this->cod_upz;
-    }
-
-    /**
-     * Get name in uppercase
-     *
      * @return string
      */
     public function getNameAttribute()
     {
-        return toUpper($this->Upz);
-    }
-
-   /*
-   * ---------------------------------------------------------
-   * Eloquent Relations
-   * ---------------------------------------------------------
-   */
-
-    /**
-     * Upz has many neighborhoods
-     *
-     * @return HasMany
-     */
-    public function neighborhoods()
-    {
-        return $this->hasMany(Neighborhood::class, 'CodUpz','cod_upz');
-    }
-
-    /**
-     * A Neighborhood Belongs To UPZ
-     *
-     * @return BelongsTo
-     */
-    public function locality()
-    {
-        return $this->belongsTo(Location::class, 'IdLocalidad', 'Id_Localidad');
+        return toUpper($this->vocacion);
     }
 }

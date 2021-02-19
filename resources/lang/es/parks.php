@@ -12,13 +12,20 @@ return [
     |
     */
     'menu'  =>  [
+        'roles'     =>  'Roles y Permisos',
         'users'     =>  'Usuarios',
         'dashboard' =>  'Tablero',
         'finder'    =>  'Buscador de Parques',
         'manage'     => 'Gestión Parques',
         'parks'     =>  'Crear Parque',
+        'owned'     =>  'Mis Parques',
         'locality'  =>  'Gestionar Localidades',
+        'enclosure' =>  'Gestionar Cerramientos',
+        'scales'    =>  'Gestionar Escalas',
+        'stages'    =>  'Gestionar Escenarios',
+        'vocation'  =>  'Gestionar Vocaciones',
         'map'       =>  'Mapa',
+        'audit'     =>  'Auditoria',
     ],
     'handler'    => [
         'park_does_not_exist'   => 'No se encontró ningún parque relacionado al código o id :code',
@@ -61,5 +68,32 @@ return [
         'admin_name'            =>  'nombre administrador',
         'vigilance'             =>  'vigilancia',
         'received'              =>  'recibido IDRD',
+        'vocation_id'           =>  'vocación',
     ],
+    'classes' => [
+        "App\Modules\Parks\src\Models\AssignedPark" => '',
+        "App\Modules\Parks\src\Models\Certified"    => '',
+        "App\Modules\Parks\src\Models\EconomicUse"  => '',
+        "App\Modules\Parks\src\Models\EconomicUsePark"  => '',
+        "App\Modules\Parks\src\Models\EmergencyPlan"    => '',
+        "App\Modules\Parks\src\Models\EmergencyPlanCategory"    => '',
+        "App\Modules\Parks\src\Models\EmergencyPlanFile"    => '',
+        "App\Modules\Parks\src\Models\Endowment"    => '',
+        "App\Modules\Parks\src\Models\Equipment"    => '',
+        "App\Modules\Parks\src\Models\Material" => '',
+        "App\Modules\Parks\src\Models\ParkEndowment"    => '',
+        "App\Modules\Parks\src\Models\Sector"   => '',
+
+        "App\Modules\Parks\src\Models\Park" => 'Parques',
+        "App\Modules\Parks\src\Models\Location" => '',
+        "App\Modules\Parks\src\Models\Upz"  => 'Upz',
+        "App\Modules\Parks\src\Models\Neighborhood" => 'Barrios',
+        "App\Modules\Parks\src\Models\Rupi" => 'Rupis',
+        "App\Modules\Parks\src\Models\Scale"    => 'Escalas',
+        "App\Modules\Parks\src\Models\Enclosure"    => 'Cerramientos',
+        "App\Modules\Parks\src\Models\StageType"    => 'Tipos de Escenarios',
+        "App\Modules\Parks\src\Models\Status"   => 'Estados',
+        "App\Modules\Parks\src\Models\Story"    => 'Historias de Parque',
+        "App\Modules\Parks\src\Models\Vocation" => 'Vocaciones',
+    ]
 ];

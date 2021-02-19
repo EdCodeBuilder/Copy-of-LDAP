@@ -34,6 +34,25 @@ if ( !function_exists('isAValidDate') ) {
     }
 }
 
+if ( !function_exists('validateDate') ) {
+    /**
+     * The method to return upper string including spanish chars
+     *
+     * @param $date
+     * @param string $format
+     * @return bool
+     */
+    function valiateDate( $date, $format = 'Y-m-d' )
+    {
+        try {
+            Carbon::parse($date)->format($format);
+            return true;
+        } catch (Exception $exception) {
+            return false;
+        }
+    }
+}
+
 if ( ! function_exists('toLower') ) {
     /**
      * The method to return lower string including spanish chars

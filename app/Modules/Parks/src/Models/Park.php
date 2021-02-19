@@ -2,6 +2,7 @@
 
 namespace App\Modules\Parks\src\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -82,6 +83,7 @@ class Park extends Model implements Auditable
         'Aforo',
         'RecibidoIdrd',
         'Id_Tipo_Escenario',
+        'Id_Vocacion',
     ];
 
     /**
@@ -144,6 +146,7 @@ class Park extends Model implements Auditable
         'Aforo',
         'RecibidoIdrd',
         'Id_Tipo_Escenario',
+        'Id_Vocacion',
     ];
 
     /**
@@ -180,6 +183,18 @@ class Park extends Model implements Auditable
     public function setDireccionAttribute($value)
     {
         $this->attributes['Direccion'] = toUpper($value);
+    }
+
+    /**
+     * Set value in uppercase
+     *
+     * @param $value
+     */
+    public function getFechaVisitaAttribute($value)
+    {
+        return valiateDate($value)
+            ? Carbon::parse($value)->format('Y-m-d')
+            : $value;
     }
 
     /*
@@ -328,6 +343,16 @@ class Park extends Model implements Auditable
     }
 
     /**
+     * Park has one vovation
+     *
+     * @return HasOne
+     */
+    public function vocation()
+    {
+        return $this->hasOne(Vocation::class, 'id','Id_Vocacion');
+    }
+
+    /**
      * Park has many stories
      *
      * @return HasMany
@@ -391,6 +416,7 @@ class Park extends Model implements Auditable
             'NomAdministrador'      =>  toUpper(Arr::get($request, 'admin_name', null)),
             'Vigilancia'            =>  Arr::get($request, 'vigilance', null),
             'RecibidoIdrd'          =>  Arr::get($request, 'received', null),
+            'Id_Vocacion'           =>  Arr::get($request, 'vocation_id', null),
             // 'Mapa'                  =>  Arr::get($request, '', null),
             // 'Imagen'                =>  Arr::get($request, '', null),
             // 'EstadoCertificado'     =>  Arr::get($request, '', null),

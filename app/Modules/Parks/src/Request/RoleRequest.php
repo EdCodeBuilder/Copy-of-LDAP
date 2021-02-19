@@ -16,7 +16,7 @@ class RoleRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check() && auth()->user()->can('manage-parks-users');
+        return auth()->check() && auth()->user()->can('manage-users-parks');
     }
 
     /**
