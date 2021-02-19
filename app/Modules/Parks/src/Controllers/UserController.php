@@ -41,7 +41,7 @@ class UserController extends Controller
                 'title' =>  __('parks.menu.roles'),
                 'to'    =>  [ 'name' => 'parks-roles-and-permissions' ],
                 'exact' =>  true,
-                'can'   =>  auth('api')->check() && auth('api')->user()->can('manage-users-parks', Park::class),
+                'can'   =>  auth('api')->check() && auth('api')->user()->isA('superadmin'),
             ],
             [
                 'icon'  =>  'mdi-account-multiple-plus',
