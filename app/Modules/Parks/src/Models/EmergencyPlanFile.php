@@ -21,7 +21,7 @@ class EmergencyPlanFile extends Model
      *
      * @var string
      */
-    protected $table = 'ArchivoPlanEmergencia';
+    protected $table = 'PlanEmergencia_Archivo';
 
     /**
      * The primary key for the model.

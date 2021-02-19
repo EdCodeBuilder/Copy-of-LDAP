@@ -20,7 +20,7 @@ class EmergencyPlanCategory extends Model
      *
      * @var string
      */
-    protected $table = 'CategoriaPlanEmergencia';
+    protected $table = 'PlanEmergencia_Categoria';
 
     /**
      * The primary key for the model.
