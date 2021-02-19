@@ -4,6 +4,7 @@
 namespace App\Modules\Parks\src\Request;
 
 
+use App\Modules\Parks\src\Models\Park;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -16,7 +17,7 @@ class RoleRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check() && auth()->user()->can('manage-users-parks');
+        return auth()->check() && auth()->user()->can('manage-users-parks', Park::class);
     }
 
     /**
