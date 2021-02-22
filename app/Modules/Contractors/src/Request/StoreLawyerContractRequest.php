@@ -39,6 +39,8 @@ class StoreLawyerContractRequest extends FormRequest
             ],
             'start_date'    =>  'required|date|date_format:Y-m-d|before:final_date',
             'final_date'    =>  'required|date|date_format:Y-m-d|after:start_date',
+            'start_suspension_date'    =>  'required_if:contract_type_id,3|date|date_format:Y-m-d|before:final_suspension_date',
+            'final_suspension_date'    =>  'required_if:contract_type_id,3|date|date_format:Y-m-d|after:start_suspension_date',
             'total' =>  'required|numeric',
         ];
     }
@@ -60,6 +62,8 @@ class StoreLawyerContractRequest extends FormRequest
             'contract'    =>  'contrato',
             'start_date'    =>  'fecha tentativa de inicio del contrato',
             'final_date'    =>  'fecha tentativa de terminación del contrato',
+            'start_suspension_date'    =>  'fecha de inicio de suspención',
+            'final_suspension_date'    =>  'fecha de terminación de suspención',
             'total' =>  'valor del contrato o adición',
         ];
     }

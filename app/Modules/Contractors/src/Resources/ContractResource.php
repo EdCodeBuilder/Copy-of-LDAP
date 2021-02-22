@@ -30,6 +30,8 @@ class ContractResource extends JsonResource
             'position'                          =>  isset($this->position) ? $this->position : null,
             'start_date'                        =>  isset($this->start_date) ? $this->start_date->format('Y-m-d') : null,
             'final_date'                        =>  isset($this->final_date) ? $this->final_date->format('Y-m-d') : null,
+            'start_suspension_date'             =>  isset($this->start_suspension_date) ? $this->start_suspension_date->format('Y-m-d') : null,
+            'final_suspension_date'             =>  isset($this->final_suspension_date) ? $this->final_suspension_date->format('Y-m-d') : null,
             'total'                             =>  isset($this->total) ? (int) $this->total : null,
             'day'                               =>  isset($this->day) ? $this->day : [],
             'day_string'                        =>  isset($this->day) ? $this->getOriginal('day') : null,
@@ -87,6 +89,16 @@ class ContractResource extends JsonResource
             [
                 'text'  => 'Fecha fin contrato',
                 'value'  => 'final_date',
+                'icon'   => 'mdi-calendar',
+            ],
+            [
+                'text'  => 'Fecha inicio suspención',
+                'value'  => 'start_suspension_date',
+                'icon'   => 'mdi-calendar',
+            ],
+            [
+                'text'  => 'Fecha fin suspención',
+                'value'  => 'final_suspension_date',
                 'icon'   => 'mdi-calendar',
             ],
             [

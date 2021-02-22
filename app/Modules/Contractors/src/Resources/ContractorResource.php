@@ -36,6 +36,8 @@ class ContractorResource extends JsonResource
             'position'                          =>  isset($contract->position) ? $contract->position : null,
             'start_date'                        =>  isset($contract->start_date) ? $contract->start_date->format('Y-m-d') : null,
             'final_date'                        =>  isset($contract->final_date) ? $contract->final_date->format('Y-m-d') : null,
+            'start_suspension_date'             =>  isset($contract->start_suspension_date) ? $contract->start_suspension_date->format('Y-m-d') : null,
+            'final_suspension_date'             =>  isset($contract->final_suspension_date) ? $contract->final_suspension_date->format('Y-m-d') : null,
             'total'                             =>  isset($contract->total) ? (int) $contract->total : null,
             'day'                               =>  isset($contract->day) ? $contract->day : [],
             'day_string'                        =>  isset($contract->day) ? $contract->getOriginal('day') : null,
@@ -54,14 +56,14 @@ class ContractorResource extends JsonResource
             'document'              =>  isset($this->document) ? $this->document : null,
             'name'                  =>  isset($this->name) ? $this->name : null,
             'surname'               =>  isset($this->surname) ? $this->surname : null,
+            'email'                 =>  isset($this->email) ? $this->email : null,
+            'phone'                 =>  isset($this->phone) ? $this->phone : null,
             $this->mergeWhen(auth()->user()->isA(Roles::ROLE_ARL, Roles::ROLE_ADMIN), [
                 'birthdate'             =>  isset($this->birthdate) ? $this->birthdate->format('Y-m-d') : null,
                 'age'                   =>  isset($this->birthdate) ? $this->birthdate->age : null,
                 'sex_id'                =>  isset($this->sex_id) ? $this->sex_id : null,
                 'sex'                   =>  isset($this->sex->name) ? $this->sex->name : null,
-                'email'                 =>  isset($this->email) ? $this->email : null,
                 'institutional_email'   =>  isset($this->institutional_email) ? $this->institutional_email : null,
-                'phone'                 =>  isset($this->phone) ? $this->phone : null,
                 'eps_id'                =>  isset($this->eps_id) ? (int) $this->eps_id : null,
                 'eps_name'              =>  isset($this->eps_name->name) ? $this->eps_name->name : null,
                 'eps'                   =>  isset($this->eps) ? $this->eps : null,
@@ -259,6 +261,16 @@ class ContractorResource extends JsonResource
                     // 'icon'   => 'mdi-calendar',
                 ],
                 [
+                    'label'  => 'Fecha inicio suspención',
+                    'field'  => 'start_suspension_date',
+                    // 'icon'   => 'mdi-calendar',
+                ],
+                [
+                    'label'  => 'Fecha fin suspención',
+                    'field'  => 'final_suspension_date',
+                    // 'icon'   => 'mdi-calendar',
+                ],
+                [
                     'label'  => 'Valor total del contrato',
                     'field'  => 'total',
                     // 'icon'   => 'mdi-currency-usd',
@@ -309,7 +321,23 @@ class ContractorResource extends JsonResource
                     'icon'   => 'mdi-calendar',
                 ],
             ]
-            : [];
+            : [
+                [
+                    'label'   =>  'Creado por',
+                    'field'   =>  'user',
+                    'icon'   => 'mdi-account',
+                ],
+                [
+                    'label'  => 'Fecha de Registro',
+                    'field'  => 'created_at',
+                    'icon'   => 'mdi-calendar',
+                ],
+                [
+                    'label'  => 'Fecha de Actualización',
+                    'field'  => 'updated_at',
+                    'icon'   => 'mdi-calendar',
+                ],
+            ];
     }
 
     public function setNeighborhoodId()

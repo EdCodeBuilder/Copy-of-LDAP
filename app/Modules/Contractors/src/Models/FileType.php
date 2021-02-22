@@ -37,6 +37,8 @@ class FileType extends Model implements Auditable
      */
     protected $fillable = [
         'name',
+        'mimes',
+        'can',
     ];
 
     /*

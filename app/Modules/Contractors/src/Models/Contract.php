@@ -44,6 +44,8 @@ class Contract extends Model implements Auditable
         'position',
         'start_date',
         'final_date',
+        'start_suspension_date',
+        'final_suspension_date',
         'total',
         'day',
         'risk',
@@ -76,7 +78,7 @@ class Contract extends Model implements Auditable
      *
      * @var array
      */
-    protected $dates = [ 'start_date', 'final_date' ];
+    protected $dates = [ 'start_date', 'final_date', 'start_suspension_date', 'final_suspension_date' ];
 
     /*
      * ---------------------------------------------------------
