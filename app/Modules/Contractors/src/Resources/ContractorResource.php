@@ -301,8 +301,8 @@ class ContractorResource extends JsonResource
                     // 'icon'   => 'mdi-domain',
                 ],
                 [
-                    'label'  => 'Correo Institucional',
-                    'field'  => 'institutional_email',
+                    'label'  => 'Correo Supervisor',
+                    'field'  => 'supervisor_email',
                     'icon'   => 'mdi-mail',
                 ],
                 [
