@@ -15,6 +15,7 @@ use App\Modules\Contractors\src\Models\Contractor;
 use App\Modules\Contractors\src\Notifications\ArlNotification;
 use App\Modules\Contractors\src\Request\FinderRequest;
 use App\Modules\Contractors\src\Request\StoreLawyerRequest;
+use App\Modules\Contractors\src\Request\UpdateContractorLawyerRequest;
 use App\Modules\Contractors\src\Request\UpdateContractorRequest;
 use App\Modules\Contractors\src\Resources\ContractorResource;
 use App\Modules\Contractors\src\Resources\UserContractorResource;
@@ -175,14 +176,26 @@ class ContractorController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param UpdateContractorLawyerRequest $request
      * @param Contractor $contractor
      * @return JsonResponse
      */
-    public function updateBasicData(Request $request, Contractor $contractor)
+    public function updateBasicData(UpdateContractorLawyerRequest $request, Contractor $contractor)
     {
-        // $this->dispatch(new ConfirmContractor($contractor));
-        return $this->success_message(__('validation.handler.success'));
+        try {
+            $contractor->forceFill($request->validated());
+            $contractor->saveOrFail();
+            if ($request->has('notify')) {
+                $this->dispatch(new ConfirmContractor($contractor));
+            }
+            return $this->success_message(__('validation.handler.success'));
+        } catch (\Throwable $e) {
+            return $this->error_response(
+                __('validation.handler.unexpected_failure'),
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                $e->getMessage()
+            );
+        }
     }
 
 
