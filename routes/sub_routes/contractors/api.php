@@ -26,6 +26,7 @@ Route::prefix('contractors-portal')->group(function () {
     Route::get('/user/contract/{payload}', [ContractorController::class, 'user']);
     Route::put('contractors/{contractor}', [ContractorController::class, 'update']);
     Route::get('resend-notification/{contractor}', [ContractorController::class, 'resendNotification'])->middleware('auth:api');
+    Route::put('basic-data/{contractor}', [ContractorController::class, 'updateBasicData'])->middleware('auth:api');
     Route::resource('contractors', ContractorController::class, [
         'only'     =>     ['index', 'show', 'store'],
         'parameters' =>     ['contractors' => 'contractor']

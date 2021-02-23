@@ -174,6 +174,17 @@ class ContractorController extends Controller
         return $this->success_message(__('validation.handler.success'));
     }
 
+    /**
+     * @param Request $request
+     * @param Contractor $contractor
+     * @return JsonResponse
+     */
+    public function updateBasicData(Request $request, Contractor $contractor)
+    {
+        // $this->dispatch(new ConfirmContractor($contractor));
+        return $this->success_message(__('validation.handler.success'));
+    }
+
 
     public function user($contractor)
     {
