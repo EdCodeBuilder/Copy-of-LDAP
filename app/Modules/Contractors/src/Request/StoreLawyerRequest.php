@@ -44,8 +44,8 @@ class StoreLawyerRequest extends FormRequest
             ],
             'start_date'    =>  'required|date|date_format:Y-m-d|before:final_date',
             'final_date'    =>  'required|date|date_format:Y-m-d|after:start_date',
-            'start_suspension_date'    =>  'required_if:contract_type_id,3|date|date_format:Y-m-d|before:final_suspension_date',
-            'final_suspension_date'    =>  'required_if:contract_type_id,3|date|date_format:Y-m-d|after:start_suspension_date',
+            'start_suspension_date'    =>  'nullable|required_if:contract_type_id,3|date|date_format:Y-m-d|before:final_suspension_date',
+            'final_suspension_date'    =>  'nullable|required_if:contract_type_id,3|date|date_format:Y-m-d|after:start_suspension_date',
             'total' =>  'required|numeric',
         ];
     }

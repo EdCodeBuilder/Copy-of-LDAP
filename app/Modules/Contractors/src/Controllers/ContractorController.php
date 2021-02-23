@@ -164,6 +164,16 @@ class ContractorController extends Controller
         }
     }
 
+    /**
+     * @param Contractor $contractor
+     * @return JsonResponse
+     */
+    public function resendNotification(Contractor $contractor)
+    {
+        $this->dispatch(new ConfirmContractor($contractor));
+        return $this->success_message(__('validation.handler.success'));
+    }
+
 
     public function user($contractor)
     {
