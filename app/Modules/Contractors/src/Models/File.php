@@ -44,6 +44,34 @@ class File extends Model implements Auditable
     ];
 
     /*
+    * ---------------------------------------------------------
+    * Data Change Auditor
+    * ---------------------------------------------------------
+    */
+
+    /**
+     * Attributes to include in the Audit.
+     *
+     * @var array
+     */
+    protected $auditInclude = [
+        'name',
+        'file_type_id',
+        'user_id',
+        'contract_id',
+    ];
+
+    /**
+     * Generating tags for each model audited.
+     *
+     * @return array
+     */
+    public function generateTags(): array
+    {
+        return ['contractors_contract_files'];
+    }
+
+    /*
      * ---------------------------------------------------------
      * Accessors and Mutator
      * ---------------------------------------------------------

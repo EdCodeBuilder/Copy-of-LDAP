@@ -81,6 +81,47 @@ class Contract extends Model implements Auditable
     protected $dates = [ 'start_date', 'final_date', 'start_suspension_date', 'final_suspension_date' ];
 
     /*
+    * ---------------------------------------------------------
+    * Data Change Auditor
+    * ---------------------------------------------------------
+    */
+
+    /**
+     * Attributes to include in the Audit.
+     *
+     * @var array
+     */
+    protected $auditInclude = [
+        'contract',
+        'transport',
+        'position',
+        'start_date',
+        'final_date',
+        'start_suspension_date',
+        'final_suspension_date',
+        'total',
+        'day',
+        'risk',
+        'subdirectorate_id',
+        'dependency_id',
+        'other_dependency_subdirectorate',
+        'supervisor_email',
+        'contractor_id',
+        'contract_type_id',
+        'lawyer_id',
+    ];
+
+    /**
+     * Generating tags for each model audited.
+     *
+     * @return array
+     */
+    public function generateTags(): array
+    {
+        return ['contractors_contract'];
+    }
+
+    /*
      * ---------------------------------------------------------
      * Accessors and Mutator
      * ---------------------------------------------------------

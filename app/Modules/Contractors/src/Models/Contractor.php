@@ -101,6 +101,53 @@ class Contractor extends Model implements Auditable
     protected $dates = [ 'birthdate' ];
 
     /*
+    * ---------------------------------------------------------
+    * Data Change Auditor
+    * ---------------------------------------------------------
+    */
+
+    /**
+     * Attributes to include in the Audit.
+     *
+     * @var array
+     */
+    protected $auditInclude = [
+        'document_type_id',
+        'document',
+        'name',
+        'surname',
+        'birthdate',
+        'sex_id',
+        'email',
+        'institutional_email',
+        'phone',
+        'eps_id',
+        'eps',
+        'afp_id',
+        'afp',
+        'residence_country_id',
+        'residence_state_id',
+        'residence_city_id',
+        'locality_id',
+        'upz_id',
+        'neighborhood_id',
+        'neighborhood',
+        'address',
+        'user_id',
+        'modifiable',
+    ];
+
+    /**
+     * Generating tags for each model audited.
+     *
+     * @return array
+     */
+    public function generateTags(): array
+    {
+        return ['contractors'];
+    }
+
+    /*
      * ---------------------------------------------------------
      * Accessors and Mutator
      * ---------------------------------------------------------
