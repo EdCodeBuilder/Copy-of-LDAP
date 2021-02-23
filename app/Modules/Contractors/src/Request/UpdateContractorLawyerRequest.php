@@ -28,7 +28,7 @@ class UpdateContractorLawyerRequest extends FormRequest
     {
         return [
             'document_type_id'  =>  'required|numeric|exists:mysql_ldap.document_types,id',
-            'document'  =>  'required|numeric|unique:mysql_contractors.contractors,document,id,'.$this->route('contractor')->id,
+            'document'  =>  'required|numeric|unique:mysql_contractors.contractors,document,'.$this->route('contractor')->id.',id',
             'name'  =>  'required|string|min:3|max:191',
             'surname'   =>  'required|string|min:3|max:191',
             'email' =>  'required|email',

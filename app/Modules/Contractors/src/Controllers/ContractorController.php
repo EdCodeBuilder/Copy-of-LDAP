@@ -138,7 +138,7 @@ class ContractorController extends Controller
             $form = new Contractor();
             $form->fill($request->validated());
             $form->user_id = auth()->user()->id;
-            $form->modifiable = true;
+            $form->modifiable = now()->format('Y-m-d H:i:s');
             $form->saveOrFail();
             $form->contracts()
                 ->create(array_merge(
@@ -171,8 +171,18 @@ class ContractorController extends Controller
      */
     public function resendNotification(Contractor $contractor)
     {
-        $this->dispatch(new ConfirmContractor($contractor));
-        return $this->success_message(__('validation.handler.success'));
+        try {
+            $contractor->modifiable = now()->format('Y-m-d H:i:s');
+            $contractor->saveOrFail();
+            $this->dispatch(new ConfirmContractor($contractor));
+            return $this->success_message(__('validation.handler.success'));
+        } catch (\Throwable $e) {
+            return $this->error_response(
+                __('validation.handler.unexpected_failure'),
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                $e->getMessage()
+            );
+        }
     }
 
     /**
@@ -183,9 +193,11 @@ class ContractorController extends Controller
     public function updateBasicData(UpdateContractorLawyerRequest $request, Contractor $contractor)
     {
         try {
-            $contractor->forceFill($request->validated());
+            $contractor->fill($request->validated());
             $contractor->saveOrFail();
-            if ($request->has('notify')) {
+            if ($request->has('notify') && $request->get('notify')) {
+                $contractor->modifiable = now()->format('Y-m-d H:i:s');
+                $contractor->saveOrFail();
                 $this->dispatch(new ConfirmContractor($contractor));
             }
             return $this->success_message(__('validation.handler.success'));
@@ -203,7 +215,7 @@ class ContractorController extends Controller
     {
         $document = Crypt::decrypt($contractor);
         $form = Contractor::query()->where('document', $document)->firstOrFail();
-        abort_unless($form->modifiable, Response::HTTP_UNPROCESSABLE_ENTITY, __('validation.handler.unauthorized'));
+        abort_unless(!is_null($form->modifiable), Response::HTTP_UNPROCESSABLE_ENTITY, __('validation.handler.unauthorized'));
         return $this->success_response(
             new UserContractorResource($form)
         );
@@ -221,10 +233,10 @@ class ContractorController extends Controller
         try {
             $document = Crypt::decrypt($contractor);
             $form = Contractor::where('document', $document)->firstOrFail();
-            abort_unless($form->modifiable, Response::HTTP_UNPROCESSABLE_ENTITY, __('validation.handler.unauthorized'));
+            abort_unless(!is_null($form->modifiable), Response::HTTP_UNPROCESSABLE_ENTITY, __('validation.handler.unauthorized'));
             DB::connection('mysql_contractors')->beginTransaction();
             $form->fill($request->validated());
-            $form->modifiable = false;
+            $form->modifiable = null;
             $form->saveOrFail();
             $contract = Contract::findOrFail($request->get('contract_id'));
             $contract->update($request->validated());

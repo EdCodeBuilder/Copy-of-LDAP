@@ -58,7 +58,7 @@ class ContractController extends Controller
     {
         try {
             DB::connection('mysql_contractors')->beginTransaction();
-            $contractor->modifiable = true;
+            $contractor->modifiable = now()->format('Y-m-d H:i:s');
             $contractor->saveOrFail();
             $contractor->contracts()
                 ->create(array_merge(
