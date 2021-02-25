@@ -135,7 +135,7 @@ return [
 
             'locate_users_by' => 'samaccountname',
 
-            'bind_users_by' => 'distinguishedname',
+            'bind_users_by' => 'samaccountname',
 
         ],
 

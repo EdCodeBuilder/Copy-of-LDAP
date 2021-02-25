@@ -175,6 +175,14 @@ return [
         'logout'                    => 'Se ha cerrado la sesión correctamente.',
         'locked'                    => 'Se ha bloqueado la sesión correctamente.',
         'unlocked'                  => 'Se ha desbloqueado la sesión correctamente.',
+        'ldap_fail'                 => 'No se pudo conectar al servidor LDAP'
+    ],
+
+    'events' => [
+        'created'   =>  'Creado',
+        'updated'   =>  'Actualizado',
+        'deleted'   =>  'Eliminado',
+        'restored'  =>  'Restablecido',
     ],
 
 
@@ -221,5 +229,6 @@ return [
         'subject'               => 'asunto',
         'message'               => 'mensaje',
         'document'              => 'documento',
+        'old_password'          => 'contraseña anterior'
     ],
 ];

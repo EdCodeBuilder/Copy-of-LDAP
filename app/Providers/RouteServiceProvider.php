@@ -39,7 +39,11 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
-        //
+        $this->mapOrfeoRoutes();
+
+        $this->mapParksRoutes();
+
+        $this->mapContractorsRoutes();
     }
 
     /**
@@ -68,5 +72,24 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware('api')
              ->namespace($this->namespace)
              ->group(base_path('routes/api.php'));
+    }
+
+    public function mapOrfeoRoutes()
+    {
+        Route::middleware('api')
+            ->group(base_path('routes/sub_routes/orfeo/orfeo.php'));
+    }
+
+    public function mapParksRoutes()
+    {
+        Route::middleware('api')
+            ->group(base_path('routes/sub_routes/parks/parks.php'));
+    }
+
+    public function mapContractorsRoutes()
+    {
+        Route::middleware('api')
+            ->prefix('api')
+            ->group(base_path('routes/sub_routes/contractors/api.php'));
     }
 }

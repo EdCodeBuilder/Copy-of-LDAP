@@ -5,6 +5,7 @@ namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Response;
 
 trait ApiResponse
 {
@@ -62,9 +63,12 @@ trait ApiResponse
         $this->order    =  ( $this->order ) ? 'asc' : 'desc';
     }
 
-    public function validation_errors($errors, $code = 422)
+    public function validation_errors($errors, $code = Response::HTTP_UNPROCESSABLE_ENTITY)
     {
-        return response()->json($errors, $code);
+        return response()->json([
+            'message'   => __('validation.handler.validation_failed'),
+            'errors'    => $errors,
+        ], $code);
     }
 
     /**
@@ -73,31 +77,38 @@ trait ApiResponse
      * @param null $details
      * @return JsonResponse
      */
-    protected function error_response($message, $code = 422, $details = null )
+    protected function error_response($message, $code = Response::HTTP_UNPROCESSABLE_ENTITY, $details = null )
     {
         return response()->json([
             'message' =>  $message,
             'details' => $details,
-            'code'  =>  $code
+            'code'  =>  $code,
+            'requested_at'  =>  now()->toIso8601String()
         ], $code);
     }
 
     /**
      * @param JsonResource $collection
      * @param int $code
+     * @param null $additional
      * @return JsonResponse
      */
-    protected function success_response(JsonResource $collection, int $code = 200 )
+    protected function success_response(JsonResource $collection, int $code = Response::HTTP_OK, $additional = null )
     {
-        return $collection->response()->setStatusCode( $code );
+        return $collection->additional([
+            'code' => $code,
+            'details'   => $additional,
+            'requested_at'  =>  now()->toIso8601String()
+        ])->response()->setStatusCode( $code );
     }
 
-    protected function success_message($message, $code = 200, $overrideCode = null, $details = null)
+    protected function success_message($message, $code = Response::HTTP_OK, $overrideCode = null, $details = null)
     {
         return response()->json([
-            'data'    =>  $message,
-            'details' =>  $details,
-            'code'    =>  $overrideCode ? $overrideCode : $code
+            'data'          =>  $message,
+            'details'       =>  $details,
+            'code'          =>  $overrideCode ? $overrideCode : $code,
+            'requested_at'  =>  now()->toIso8601String()
         ], $code);
     }
 }

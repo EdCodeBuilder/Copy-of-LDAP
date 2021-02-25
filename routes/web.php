@@ -13,4 +13,6 @@
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
+
+Route::get('/csfr-cookie', [ \App\Http\Controllers\Auth\CsrfCookieController::class, 'show' ])->middleware('web')->name('csfr.cookie');

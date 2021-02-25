@@ -14,12 +14,12 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
+        \Fruitcake\Cors\HandleCors::class,
         \App\Http\Middleware\TrustProxies::class,
         \App\Http\Middleware\CheckForMaintenanceMode::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
-        \Fruitcake\Cors\HandleCors::class,
         \Adldap\Laravel\Middleware\WindowsAuthenticate::class,
     ];
 
@@ -37,11 +37,19 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            'bouncer',
+            'signature',
+            'localization',
+            'json.response'
         ],
 
         'api' => [
-            'throttle:60,1',
+            'bouncer',
+            'api.throttle:60,1',
             'bindings',
+            'signature',
+            'localization',
+            'json.response',
         ],
     ];
 
@@ -69,6 +77,7 @@ class Kernel extends HttpKernel
         'signature' => \App\Http\Middleware\Signature::class,
         'api.throttle' => \App\Http\Middleware\ApiThrottleRequest::class,
         'json.response' => \App\Http\Middleware\ForceJsonResponse::class,
+        'bouncer'       => \App\Http\Middleware\ScopeBouncer::class,
     ];
 
     /**

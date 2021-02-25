@@ -169,12 +169,14 @@ return [
         Adldap\Laravel\AdldapServiceProvider::class,
         Adldap\Laravel\AdldapAuthServiceProvider::class,
         Silber\Bouncer\BouncerServiceProvider::class,
+        FruitCake\Cors\CorsServiceProvider::class,
 
         /*
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
@@ -234,7 +236,7 @@ return [
          */
         'Adldap' => Adldap\Laravel\Facades\Adldap::class,
         'Bouncer' => Silber\Bouncer\BouncerFacade::class,
-
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ],
 
 ];

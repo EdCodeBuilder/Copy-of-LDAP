@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use Adldap\Laravel\Events\AuthenticatedWithCredentials;
+use Adldap\Laravel\Events\Authenticating;
+use Adldap\Laravel\Events\DiscoveredWithCredentials;
+use App\Listeners\Security\PasswordExpiredListener;
 use App\Listeners\Security\PruneOldTokens;
 use App\Listeners\Security\RevokeOldTokens;
 use Illuminate\Support\Facades\Event;
@@ -21,7 +25,16 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
-        ]
+        ],
+        AccessTokenCreated::class => [
+            RevokeOldTokens::class,
+        ],
+        RefreshTokenCreated::class => [
+            PruneOldTokens::class,
+        ],
+        Authenticating::class => [
+            PasswordExpiredListener::class,
+        ],
     ];
 
     /**

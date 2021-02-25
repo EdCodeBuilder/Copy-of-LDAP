@@ -24,7 +24,7 @@ class ApiThrottleRequest extends ThrottleRequests
             $retryAfter
         );
         return new ThrottleRequestsException(
-            trans('validation.handler.max_attempts', ['min' => $retryAfter]), null, $headers
+            __('validation.handler.max_attempts', ['sec' => $retryAfter]), null, $headers
         );
     }
 }

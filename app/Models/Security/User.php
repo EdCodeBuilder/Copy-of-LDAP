@@ -7,6 +7,9 @@ use Adldap\Auth\PasswordRequiredException;
 use Adldap\Auth\UsernameRequiredException;
 use Adldap\Laravel\Facades\Adldap;
 use Adldap\Laravel\Traits\HasLdapUser;
+use App\Notifications\Auth\ResetPassword;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Notifications\Notifiable;
@@ -18,7 +21,7 @@ use Silber\Bouncer\Database\HasRolesAndAbilities;
 
 class User extends Authenticatable implements Auditable
 {
-    use Notifiable, HasApiTokens, SoftDeletes, HasLdapUser, HasRolesAndAbilities, \OwenIt\Auditing\Auditable;
+    use Notifiable, HasApiTokens, SoftDeletes, HasLdapUser, HasRolesAndAbilities, \OwenIt\Auditing\Auditable, CanResetPassword;
 
     /**
      * The connection name for the model.
@@ -45,7 +48,12 @@ class User extends Authenticatable implements Auditable
         'phone',
         'ext',
         'password',
+        'password_expired',
+        'is_locked',
+        'vacation_start_date',
+        'vacation_final_date',
         'expires_at',
+        'sim_id',
     ];
 
     /**
@@ -62,7 +70,7 @@ class User extends Authenticatable implements Auditable
      *
      * @var array
      */
-    protected $dates = [ 'expires_at' ];
+    protected $dates = [ 'expires_at', 'vacation_start_date', 'vacation_final_date' ];
 
     /**
      * The attributes that should be cast to native types.
@@ -70,8 +78,34 @@ class User extends Authenticatable implements Auditable
      * @var array
      */
     protected $casts = [
+        'password_expired' => 'boolean',
+        'is_locked' => 'boolean',
         'expires_at' => 'datetime',
+        'vacation_start_date' => 'datetime',
+        'vacation_final_date' => 'datetime',
     ];
+
+    /*
+     * ---------------------------------------------------------
+     * Accessors and Mutator
+     * ---------------------------------------------------------
+     */
+
+    /**
+     * Get the user's full name.
+     *
+     * @return string
+     */
+    public function getFullNameAttribute()
+    {
+        return toUpper( "{$this->name} {$this->surname}" );
+    }
+
+    /*
+    * ---------------------------------------------------------
+    * Data Change Auditor
+    * ---------------------------------------------------------
+    */
 
     /**
      * Attributes to include in the Audit.
@@ -90,7 +124,12 @@ class User extends Authenticatable implements Auditable
         'company',
         'phone',
         'ext',
+        'vacation_start_date',
+        'vacation_final_date',
+        'password_expired',
+        'is_locked',
         'expires_at',
+        'sim_id',
     ];
 
     /**
@@ -112,6 +151,12 @@ class User extends Authenticatable implements Auditable
         return ['user'];
     }
 
+    /*
+    * ---------------------------------------------------------
+    * Query Scopes
+    * ---------------------------------------------------------
+    */
+
     /**
      * Check if user is active
      *
@@ -124,6 +169,34 @@ class User extends Authenticatable implements Auditable
     }
 
     /**
+     * Check if user is not locked
+     *
+     * @param $query
+     * @return Builder
+     */
+    public function scopeUnlocked($query)
+    {
+        return $query->where('is_locked', '!=', true);
+    }
+
+    /**
+     * Check if user is not locked
+     *
+     * @param $query
+     * @return Builder
+     */
+    public function scopePasswordNotExpired($query)
+    {
+        return $query->where('password_expired', '!=', true);
+    }
+
+    /*
+    * ---------------------------------------------------------
+    * Passport Validations
+    * ---------------------------------------------------------
+    */
+
+    /**
      * Find the user instance for the given username.
      *
      * @param string $username
@@ -131,7 +204,7 @@ class User extends Authenticatable implements Auditable
      */
     public function findForPassport( string $username )
     {
-        return $this->active()->where('username', $username)->first();
+        return $this->where('username', $username)->first();
     }
 
     /**
@@ -139,13 +212,15 @@ class User extends Authenticatable implements Auditable
      *
      * @param string $password
      * @return bool
-     * @throws PasswordRequiredException
-     * @throws UsernameRequiredException
      */
     public function validateForPassportPasswordGrant(string $password)
     {
         try {
-            if ( Adldap::auth()->attempt($this->username, $password, $bindAsUser = true) ) {
+            $credentials = [
+                'username'  =>  $this->username,
+                'password'  =>  $password,
+            ];
+            if ( auth()->attempt($credentials) ) {
                 if ( ! Hash::check($password, $this->password) ) {
                     $this->password = Hash::make( $password );
                     $this->save();
@@ -156,5 +231,38 @@ class User extends Authenticatable implements Auditable
         } catch (BindException $e) {
             return Hash::check($password, $this->password);
         }
+    }
+
+    /*
+    * ---------------------------------------------------------
+    * Password Reset Notification
+    * ---------------------------------------------------------
+    */
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification( $token )
+    {
+        $this->notify( new ResetPassword( $token, request()->get('email'), $this, request()->ip() ) );
+    }
+
+    /*
+    * ---------------------------------------------------------
+    * Eloquent Relations
+    * ---------------------------------------------------------
+    */
+
+    /**
+     *  User has profile
+     *
+     * @return HasOne
+     */
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
     }
 }

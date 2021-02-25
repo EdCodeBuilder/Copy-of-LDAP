@@ -34,6 +34,25 @@ if ( !function_exists('isAValidDate') ) {
     }
 }
 
+if ( !function_exists('validateDate') ) {
+    /**
+     * The method to return upper string including spanish chars
+     *
+     * @param $date
+     * @param string $format
+     * @return bool
+     */
+    function valiateDate( $date, $format = 'Y-m-d' )
+    {
+        try {
+            Carbon::parse($date)->format($format);
+            return true;
+        } catch (Exception $exception) {
+            return false;
+        }
+    }
+}
+
 if ( ! function_exists('toLower') ) {
     /**
      * The method to return lower string including spanish chars
@@ -99,10 +118,14 @@ if ( ! function_exists('ldapDateToCarbon') ) {
      * @return string
      */
     function ldapDateToCarbon($date) {
-        $winSecs       = (int)($date / 10000000); // divide by 10 000 000 to get seconds
-        $unixTimestamp = ($winSecs - 11644473600); // 1.1.1600 -> 1.1.1970 difference in seconds
-        $date = date(DateTime::RFC822, $unixTimestamp);
-        return Carbon::parse( $date )->format('Y-m-d H:i:s');
+        if ( $date == "0" || $date == 0 ) {
+            return now()->addYears(2)->format('Y-m-d H:i:s');
+        } else {
+            $winSecs       = (int)($date / 10000000); // divide by 10 000 000 to get seconds
+            $unixTimestamp = ($winSecs - 11644473600); // 1.1.1600 -> 1.1.1970 difference in seconds
+            $date = date(DateTime::RFC822, $unixTimestamp);
+            return Carbon::parse( $date )->format('Y-m-d H:i:s');
+        }
     }
 }
 
@@ -131,5 +154,53 @@ if ( ! function_exists('ldapFormatDate') ) {
             $new_date = isset($new_date[0]) ? $new_date[0] : '0000-00-00 00:00:00';
             return Carbon::parse( $new_date )->format('Y-m-d H:i:s');
         }
+    }
+}
+
+if ( ! function_exists('isJson') ) {
+    function isJson($string) {
+        // decode the JSON data
+        $result = is_array($string)
+            ? json_encode($string)
+            : json_decode($string);
+
+        // switch and check possible JSON errors
+        switch (json_last_error()) {
+            case JSON_ERROR_NONE:
+                $error = ''; // JSON is valid // No error has occurred
+                break;
+            case JSON_ERROR_DEPTH:
+                $error = 'The maximum stack depth has been exceeded.';
+                break;
+            case JSON_ERROR_STATE_MISMATCH:
+                $error = 'Invalid or malformed JSON.';
+                break;
+            case JSON_ERROR_CTRL_CHAR:
+                $error = 'Control character error, possibly incorrectly encoded.';
+                break;
+            case JSON_ERROR_SYNTAX:
+                $error = 'Syntax error, malformed JSON.';
+                break;
+            // PHP >= 5.3.3
+            case JSON_ERROR_UTF8:
+                $error = 'Malformed UTF-8 characters, possibly incorrectly encoded.';
+                break;
+            // PHP >= 5.5.0
+            case JSON_ERROR_RECURSION:
+                $error = 'One or more recursive references in the value to be encoded.';
+                break;
+            // PHP >= 5.5.0
+            case JSON_ERROR_INF_OR_NAN:
+                $error = 'One or more NAN or INF values in the value to be encoded.';
+                break;
+            case JSON_ERROR_UNSUPPORTED_TYPE:
+                $error = 'A value of a type that cannot be encoded was given.';
+                break;
+            default:
+                $error = 'Unknown JSON error occured.';
+                break;
+        }
+
+        return $error !== '';
     }
 }

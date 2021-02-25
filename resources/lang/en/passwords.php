@@ -14,9 +14,10 @@ return [
     */
 
     'password' => 'Passwords must be at least six characters and match the confirmation.',
-    'reset' => 'Your password has been reset!',
-    'sent' => 'We have e-mailed your password reset link!',
+    'reset' => 'Your password has been reset, please wait a few minutes while the data synchronization takes place on all your accounts!',
+    'sent' => 'We have e-mailed your password reset link, verify in spam!',
     'token' => 'This password reset token is invalid.',
     'user' => "We can't find a user with that e-mail address.",
-
+    'expired'  => 'Your password has expired, please change it and try again later.',
+    'inactive' => 'Your account is inactive, please contact the systems area to reactivate it.',
 ];
