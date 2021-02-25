@@ -132,6 +132,16 @@ class Contract extends Model implements Auditable
      *
      * @param $value
      */
+    public function setContractAttribute($value)
+    {
+        $this->attributes['contract'] = toUpper($value);
+    }
+
+    /**
+     * Set value in uppercase
+     *
+     * @param $value
+     */
     public function setPositionAttribute($value)
     {
         $this->attributes['position'] = toUpper($value);
