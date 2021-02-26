@@ -47,6 +47,10 @@ class ContractorMail extends Mailable
 
         $document = Crypt::encrypt($document);
 
+        $path = env('APP_ENV') == 'local'
+            ? env('APP_PATH_DEV')
+            : env('APP_PATH_PROD');
+
         return $this->view('mail.mail')
             ->subject('Creación de Usuario Portal Contratista')
             ->with([
@@ -59,8 +63,7 @@ class ContractorMail extends Mailable
                         <p>Fecha de Registro: {$created_at}</p>
                         ",
                 // 'hide_btn'  => true,
-                // 'url'       =>  "https://sim.idrd.gov.co/portal-contratista/es/contracts?payload=$document",
-                'url'       =>  "http://localhost:3000/portal-contratista-dev/es/contracts?payload=$document",
+                'url'       =>  "https://sim.idrd.gov.co/{$path}/es/contracts?payload=$document",
                 'info'      =>  "Será notificado a este correo electrónico una vez se haya expedido su certificado de afiliación a la ARL Positiva.",
                 'year'      =>  Carbon::now()->year
             ]);

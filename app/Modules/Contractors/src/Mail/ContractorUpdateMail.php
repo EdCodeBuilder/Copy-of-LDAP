@@ -50,6 +50,10 @@ class ContractorUpdateMail extends Mailable
 
         $subject = "{$name} / {$type} / {$number}";
 
+        $path = env('APP_ENV') == 'local'
+            ? env('APP_PATH_DEV')
+            : env('APP_PATH_PROD');
+
         return $this->view('mail.mail')
             ->subject($subject)
             ->with([
@@ -63,7 +67,7 @@ class ContractorUpdateMail extends Mailable
                         <p>Fecha de Actualización: {$created_at}</p>
                         ",
                 // 'hide_btn'  => true,
-                'url'       =>  "https://sim.idrd.gov.co/portal-contratista-dev/es/user/{$id}/contractor",
+                'url'       =>  "https://sim.idrd.gov.co/{$path}/es/user/{$id}/contractor",
                 'info'      =>  "Ingrese al Portal para continuar con el trámite.",
                 'year'      =>  Carbon::now()->year
             ]);
