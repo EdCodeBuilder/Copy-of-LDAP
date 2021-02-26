@@ -30,6 +30,7 @@ class UpdateContractRequest extends FormRequest
         return [
             // Contract
             'contract_id' =>  'required|numeric|exists:mysql_contractors.contracts,id',
+            'font_type_id' =>  'required|numeric|exists:mysql_contractors.fonts,id',
             'contract_type_id' =>  'required|numeric',
             'contract' =>  'required|string',
             'start_date'    =>  'required|date|date_format:Y-m-d|before:final_date',
@@ -59,6 +60,7 @@ class UpdateContractRequest extends FormRequest
     public function attributes()
     {
         return [
+            'font_type_id'  =>  'tipo de fuente',
             'document_type_id'  =>  'tipo de documento',
             'document'  =>  'número de documento',
             'name'  =>  'required|string|min:3|max:191',

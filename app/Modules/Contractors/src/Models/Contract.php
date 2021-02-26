@@ -39,6 +39,7 @@ class Contract extends Model implements Auditable
      * @var array
      */
     protected $fillable = [
+        'font_type_id',
         'contract',
         'transport',
         'position',
@@ -65,6 +66,7 @@ class Contract extends Model implements Auditable
      */
     protected $casts = [
         'transport'  => 'boolean',
+        'font_type_id'  => 'int',
         'risk'      => 'int',
         'subdirectorate_id'      => 'int',
         'dependency_id'      => 'int',
@@ -92,6 +94,7 @@ class Contract extends Model implements Auditable
      * @var array
      */
     protected $auditInclude = [
+        'font_type_id',
         'contract',
         'transport',
         'position',
@@ -212,5 +215,10 @@ class Contract extends Model implements Auditable
     public function files()
     {
         return $this->hasMany(File::class, 'contract_id');
+    }
+
+    public function font()
+    {
+        return $this->belongsTo(Font::class, 'font_type_id');
     }
 }

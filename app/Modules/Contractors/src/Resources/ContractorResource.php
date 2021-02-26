@@ -30,6 +30,8 @@ class ContractorResource extends JsonResource
             // Start Contract Data
             'contract_id'           =>  isset($contract->id) ? (int) $contract->id : null,
             'contract_type'         =>  isset($contract->contract_type->name) ? $contract->contract_type->name : null,
+            'font_type_id'           =>  isset($contract->font_type_id) ? (int) $contract->font_type_id : null,
+            'font_type'         =>  isset($contract->font->name) ? $contract->font->name : null,
             'contract'              =>  isset($contract->contract) ? $contract->contract : null,
             'transport'                         =>  $transport,
             'transport_text'                    =>  $transport ? 'SI' : 'NO',
@@ -115,6 +117,11 @@ class ContractorResource extends JsonResource
             [
                 'text' => 'Tipo de trámite',
                 'value'  =>  'contract_type',
+                // 'icon'  =>  'mdi-clipboard-text-outline',
+            ],
+            [
+                'text' => 'Tipo de fuente',
+                'value'  =>  'font_type',
                 // 'icon'  =>  'mdi-clipboard-text-outline',
             ],
             [
