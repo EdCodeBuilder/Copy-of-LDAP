@@ -70,6 +70,8 @@ class UpdateContractorRequest extends FormRequest
                 'string',
             ],
             'supervisor_email'  =>  'nullable|email',
+            'rut'   =>  'required|file|mimes:pdf',
+            'bank'  =>  'required|file|mimes:pdf',
             // 'contract_type_id' =>  'required|numeric',
         ];
     }
@@ -118,6 +120,8 @@ class UpdateContractorRequest extends FormRequest
             'dependency_id'    =>  'dependencia',
             'other_dependency_subdirectorate'  =>  'otra dependencia o subdirección',
             'supervisor_email'  =>  'correo del supervisor',
+            'rut'  =>  'certificado rut',
+            'bank'  =>  'certificación bancaria',
         ];
     }
 

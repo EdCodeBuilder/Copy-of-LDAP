@@ -58,7 +58,7 @@ class ContractorResource extends JsonResource
             'surname'               =>  isset($this->surname) ? $this->surname : null,
             'email'                 =>  isset($this->email) ? $this->email : null,
             'phone'                 =>  isset($this->phone) ? $this->phone : null,
-            $this->mergeWhen(auth()->user()->isA(Roles::ROLE_ARL, Roles::ROLE_ADMIN), [
+            $this->mergeWhen(auth()->user()->isA(Roles::ROLE_ARL, Roles::ROLE_ADMIN, Roles::ROLE_THIRD_PARTY), [
                 'birthdate'             =>  isset($this->birthdate) ? $this->birthdate->format('Y-m-d') : null,
                 'age'                   =>  isset($this->birthdate) ? $this->birthdate->age : null,
                 'sex_id'                =>  isset($this->sex_id) ? $this->sex_id : null,
@@ -85,6 +85,12 @@ class ContractorResource extends JsonResource
                 'neighborhood'          =>  isset($this->neighborhood) ? $this->neighborhood : null,
                 'address'               =>  isset($this->address) ? $this->address : null,
             ]),
+            'rut'                   =>  isset($this->rut) ? $this->getOriginal('rut') : null,
+            'rut_file'              =>  isset($this->rut) ? $this->rut : null,
+            'bank'                  =>  isset($this->bank) ? $this->getOriginal('bank') : null,
+            'bank_file'             =>  isset($this->bank) ? $this->bank: null,
+            'third_party'           =>  isset($this->third_party) ? (bool) $this->third_party: null,
+            'third_party_text'      =>  $this->setThirdParty(),
             'contracts'             =>  ContractResource::collection($this->whenLoaded('contracts')),
             'contract_headers'      =>  ContractResource::headers(),
             'user_id'               =>  isset($this->user_id) ? (int) $this->user_id : null,
@@ -125,6 +131,10 @@ class ContractorResource extends JsonResource
                 'value'  =>  "arl_file",
             ],
             [
+                'text'   =>  'Terceros',
+                'value'   =>  'third_party_text',
+            ],
+            [
                 'text' => "Nombres",
                 'value'  =>  "name",
                 'icon'  =>  'mdi-face',
@@ -162,7 +172,7 @@ class ContractorResource extends JsonResource
 
     public static function additionalData()
     {
-        return auth()->user()->isA(Roles::ROLE_ARL, Roles::ROLE_ADMIN)
+        return auth()->user()->isA(Roles::ROLE_ARL, Roles::ROLE_ADMIN, Roles::ROLE_THIRD_PARTY)
             ? [
                 [
                     'align' => "right",
@@ -306,6 +316,21 @@ class ContractorResource extends JsonResource
                     'icon'   => 'mdi-mail',
                 ],
                 [
+                    'label'   =>  'RUT',
+                    'field'   =>  'rut',
+                    'icon'   => 'mdi-file',
+                ],
+                [
+                    'label'   =>  'Certificación Bancaria',
+                    'field'   =>  'bank',
+                    'icon'    => 'mdi-currency-usd',
+                ],
+                [
+                    'label'   =>  'Terceros creados',
+                    'field'   =>  'third_party_text',
+                    'icon'   =>   'mdi-archive-arrow-up',
+                ],
+                [
                     'label'   =>  'Creado por',
                     'field'   =>  'user',
                     'icon'   => 'mdi-account',
@@ -340,6 +365,12 @@ class ContractorResource extends JsonResource
             ];
     }
 
+    public function setThirdParty()
+    {
+        $tp = isset($this->third_party) ? (bool) $this->third_party: null;
+        return $tp ? 'CON TERCERO' : 'SIN TERCERO';
+    }
+
     public function setNeighborhoodId()
     {
         $id = isset($this->neighborhood_id) ? $this->neighborhood_id : null;
@@ -348,35 +379,34 @@ class ContractorResource extends JsonResource
 
     public function setNeighborhoodName()
     {
-        $state = isset($this->residence_city_id) ? (int) $this->residence_city_id : null;
         $neighborhood = isset($this->neighborhood_name->name) ? $this->neighborhood_name->name : null;
-        return !is_null($state) && $state != 12688 && is_null($neighborhood) ? 'OTRO' : $neighborhood;
+        return is_null($neighborhood) ? 'OTRO' : $neighborhood;
     }
 
     public function setLocalityId() {
         $state = isset($this->residence_city_id) ? (int) $this->residence_city_id : null;
         $locality = isset($this->locality_id) ? (int) $this->locality_id : null;
-        return !is_null($state) && $state != 12688 && is_null($locality) ? 9999 : $locality;
+        return !is_null($state) && is_null($locality) ? 9999 : $locality;
     }
 
     public function setUpzId()
     {
         $state = isset($this->residence_city_id) ? (int) $this->residence_city_id : null;
         $upz = isset($this->upz_id) ? (int) $this->upz_id : null;
-        return !is_null($state) && $state != 12688 && is_null($upz) ? 9999 : $upz;
+        return !is_null($state) && is_null($upz) ? 9999 : $upz;
     }
 
     public function setLocalityName()
     {
         $state = isset($this->residence_city_id) ? (int) $this->residence_city_id : null;
         $locality = isset($this->locality->name) ? $this->locality->name : null;
-        return !is_null($state) && $state != 12688 && is_null($locality) ? 'OTRO' : $locality;
+        return !is_null($state) && is_null($locality) ? 'OTRO' : $locality;
     }
 
     public function setUpzName()
     {
         $state = isset($this->residence_city_id) ? (int) $this->residence_city_id : null;
         $upz = isset($this->upz->name) ? $this->upz->name : null;
-        return !is_null($state) && $state != 12688 && is_null($upz) ? 'OTRO' : $upz;
+        return !is_null($state) && is_null($upz) ? 'OTRO' : $upz;
     }
 }

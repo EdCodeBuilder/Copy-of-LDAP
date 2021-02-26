@@ -32,6 +32,9 @@ Route::prefix('contractors-portal')->group(function () {
         'parameters' =>     ['contractors' => 'contractor']
     ])->middleware('auth:api');
     Route::get('storage/file/{file}-{name?}', [FileController::class, 'file'])->name('file.resource');
+    Route::get('contractors/rut/{contractor}-{name?}', [ContractorController::class, 'rut'])->name('file.contractors.rut');
+    Route::get('contractors/bank/{contractor}-{name?}', [ContractorController::class, 'bank'])->name('file.contractors.bank');
+    Route::put('contractors/third-party/{contractor}', [ContractorController::class, 'thirdParty'])->name('file.contractors.third.party')->middleware('auth:api');
     Route::resource('contracts.files', FileController::class, [
         'only'     =>     ['index', 'store', 'destroy'],
         'parameters' =>     ['contracts' => 'contract', 'files' => 'file'],

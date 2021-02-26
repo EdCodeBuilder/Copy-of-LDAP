@@ -11,6 +11,7 @@ class Roles
     const ROLE_HIRING = 'contractors-portal-hiring';
     const ROLE_LEGAL = 'contractors-portal-legal';
     const ROLE_RP = 'contractors-portal-rp';
+    const ROLE_THIRD_PARTY = 'contractors-portal-third-party';
     const ROLE_OBSERVER = 'contractors-portal-observer';
 
     /**
@@ -25,6 +26,7 @@ class Roles
             self::ROLE_LEGAL,
             self::ROLE_RP,
             self::ROLE_OBSERVER,
+            self::ROLE_THIRD_PARTY,
         ];
     }
 
@@ -39,7 +41,8 @@ class Roles
             self::ROLE_HIRING   => self::ROLE_HIRING,
             self::ROLE_LEGAL    => self::ROLE_LEGAL,
             self::ROLE_RP       => self::ROLE_RP,
-            self::ROLE_OBSERVER       => self::ROLE_OBSERVER,
+            self::ROLE_OBSERVER => self::ROLE_OBSERVER,
+            self::ROLE_THIRD_PARTY => self::ROLE_THIRD_PARTY,
         ];
     }
 

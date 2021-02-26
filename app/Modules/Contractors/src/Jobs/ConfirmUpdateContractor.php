@@ -44,5 +44,8 @@ class ConfirmUpdateContractor implements ShouldQueue
         if ( env('ARL_EMAIL_NOTIFICATION')  && filter_var( env('ARL_EMAIL_NOTIFICATION'), FILTER_VALIDATE_EMAIL) ) {
             $mailer->to(env('ARL_EMAIL_NOTIFICATION'))->send( new ContractorUpdateMail( $this->user ) );
         }
+        if ( env('THIRD_PARTY_EMAIL_NOTIFICATION')  && filter_var( env('THIRD_PARTY_EMAIL_NOTIFICATION'), FILTER_VALIDATE_EMAIL) ) {
+            $mailer->to(env('THIRD_PARTY_EMAIL_NOTIFICATION'))->send( new ContractorUpdateMail( $this->user ) );
+        }
     }
 }

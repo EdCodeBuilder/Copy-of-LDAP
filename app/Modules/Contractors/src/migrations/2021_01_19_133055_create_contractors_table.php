@@ -36,7 +36,10 @@ class CreateContractorsTable extends Migration
             $table->integer('neighborhood_id')->nullable()->comment('Barrio de residencia');
             $table->string('neighborhood', 191)->nullable()->comment('Otro nombre del barrio de residencia');
             $table->string('address', 191)->nullable()->comment('Dirección de residencia');
-            $table->boolean('modifiable')->default(false)->comment('Puede Modificar Datos');
+            $table->timestamp('modifiable')->nullable()->comment('El contratista puede modificar datos si el campo contiene una fecha');
+            $table->text('rut')->nullable()->comment('Certificado RUT');
+            $table->text('bank')->nullable()->comment('Certificado Cuenta Bancaria');
+            $table->boolean('third_party')->default(false)->comment('Tiene terceros creados (BogData, Seven, etc)');
             $table->unsignedBigInteger('user_id')->nullable()->comment('Usuario que crea el registro en el sistema');
             $table->timestamps();
             $sim_database = env('DB_SIM_DATABASE');

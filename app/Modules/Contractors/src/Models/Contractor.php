@@ -15,6 +15,7 @@ use App\Modules\Parks\src\Models\Neighborhood;
 use App\Modules\Parks\src\Models\Upz;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Contractor extends Model implements Auditable
@@ -71,7 +72,16 @@ class Contractor extends Model implements Auditable
         'address',
         'user_id',
         'modifiable',
+        'rut',
+        'bank',
     ];
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
+    protected $guarded = [ 'third_party' ];
 
     /**
      * The attributes that should be cast to native types.
@@ -91,6 +101,7 @@ class Contractor extends Model implements Auditable
         'locality_id'       => 'int',
         'upz_id'            => 'int',
         'neighborhood_id'   => 'int',
+        'third_party'   => 'bool',
     ];
 
     /**
@@ -135,6 +146,9 @@ class Contractor extends Model implements Auditable
         'address',
         'user_id',
         'modifiable',
+        'rut',
+        'bank',
+        'third_party',
     ];
 
     /**
@@ -261,6 +275,32 @@ class Contractor extends Model implements Auditable
     public function setNeighborhoodIdAttribute($value)
     {
         $this->attributes['neighborhood_id'] = $value == 9999 ? null : $value;
+    }
+
+    /**
+     * Get file url
+     *
+     * @param $value
+     * @return string|null
+     */
+    public function getRutAttribute($value)
+    {
+        return Storage::disk('contractor')->exists($value)
+            ? route('file.contractors.rut', ['contractor' => $this->id, 'name' => $value])
+            : null;
+    }
+
+    /**
+     * Get value in uppercase
+     *
+     * @param $value
+     * @return string|null
+     */
+    public function getBankAttribute($value)
+    {
+        return Storage::disk('contractor')->exists($value)
+            ? route('file.contractors.bank', ['contractor' => $this->id, 'name' => $value])
+            : null;
     }
 
     /*

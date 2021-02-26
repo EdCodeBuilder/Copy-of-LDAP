@@ -17,8 +17,10 @@ use App\Modules\Contractors\src\Request\FinderRequest;
 use App\Modules\Contractors\src\Request\StoreLawyerRequest;
 use App\Modules\Contractors\src\Request\UpdateContractorLawyerRequest;
 use App\Modules\Contractors\src\Request\UpdateContractorRequest;
+use App\Modules\Contractors\src\Request\UpdateThirdPartyRequest;
 use App\Modules\Contractors\src\Resources\ContractorResource;
 use App\Modules\Contractors\src\Resources\UserContractorResource;
+use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,6 +28,10 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Throwable;
 
 class ContractorController extends Controller
 {
@@ -76,6 +82,11 @@ class ContractorController extends Controller
         );
     }
 
+    /**
+     * @param Request $request
+     * @param Builder $builder
+     * @return BuildsQueries|Builder|mixed
+     */
     public function query(Request $request, Builder $builder)
     {
         $is_hiring_and_not_admin = !auth()->user()->isAll( Roles::ROLE_ADMIN, Roles::ROLE_HIRING );
@@ -102,9 +113,13 @@ class ContractorController extends Controller
                 });
     }
 
+    /**
+     * @param Request $request
+     * @return Response|BinaryFileResponse
+     */
     public function excel(Request $request)
     {
-        return (new ContractorsExport($request))->download('PORTAL_CONTRATISTA.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        return (new ContractorsExport($request))->download('PORTAL_CONTRATISTA.xlsx', Excel::XLSX);
     }
 
     /**
@@ -129,7 +144,7 @@ class ContractorController extends Controller
      *
      * @param StoreLawyerRequest $request
      * @return JsonResponse
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function store(StoreLawyerRequest $request)
     {
@@ -155,7 +170,7 @@ class ContractorController extends Controller
                     'id'    => $form->id
                 ]
             );
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             DB::connection('mysql_contractors')->rollBack();
             return $this->error_response(
                 __('validation.handler.unexpected_failure'),
@@ -176,7 +191,7 @@ class ContractorController extends Controller
             $contractor->saveOrFail();
             $this->dispatch(new ConfirmContractor($contractor));
             return $this->success_message(__('validation.handler.success'));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $this->error_response(
                 __('validation.handler.unexpected_failure'),
                 Response::HTTP_UNPROCESSABLE_ENTITY,
@@ -201,7 +216,7 @@ class ContractorController extends Controller
                 $this->dispatch(new ConfirmContractor($contractor));
             }
             return $this->success_message(__('validation.handler.success'));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $this->error_response(
                 __('validation.handler.unexpected_failure'),
                 Response::HTTP_UNPROCESSABLE_ENTITY,
@@ -210,7 +225,10 @@ class ContractorController extends Controller
         }
     }
 
-
+    /**
+     * @param $contractor
+     * @return JsonResponse
+     */
     public function user($contractor)
     {
         $document = Crypt::decrypt($contractor);
@@ -235,16 +253,32 @@ class ContractorController extends Controller
             $form = Contractor::where('document', $document)->firstOrFail();
             abort_unless(!is_null($form->modifiable), Response::HTTP_UNPROCESSABLE_ENTITY, __('validation.handler.unauthorized'));
             DB::connection('mysql_contractors')->beginTransaction();
+            if ($form->getOriginal('rut') && Storage::disk('contractor')->exists($form->getOriginal('rut'))) {
+                Storage::disk('contractor')->delete($form->getOriginal('rut'));
+            }
+            if ($form->getOriginal('bank') && Storage::disk('contractor')->exists($form->getOriginal('bank'))) {
+                Storage::disk('contractor')->delete($form->getOriginal('bank'));
+            }
+            $ext = $request->file('rut')->getClientOriginalExtension();
+            $now = now()->format('YmdHis');
+            $rut = "RUT_{$document}_{$now}.$ext";
+            $request->file('rut')->storeAs('contractor', $rut, [ 'disk' => 'local' ]);
+            $ext = $request->file('bank')->getClientOriginalExtension();
+            $now = now()->format('YmdHis');
+            $bank = "CERTIFICADO_BANCARIO_{$document}_{$now}.$ext";
+            $request->file('bank')->storeAs('contractor', $bank, [ 'disk' => 'local' ]);
             $form->fill($request->validated());
+            $form->rut = $rut;
+            $form->bank = $bank;
             $form->modifiable = null;
             $form->saveOrFail();
             $contract = Contract::findOrFail($request->get('contract_id'));
             $contract->update($request->validated());
-            Notification::send( User::whereIs(Roles::ROLE_ARL)->get(), new ArlNotification($form, $contract) );
+            Notification::send( User::whereIs(Roles::ROLE_ARL, Roles::ROLE_THIRD_PARTY)->get(), new ArlNotification($form, $contract) );
             $this->dispatch(new ConfirmUpdateContractor($form));
             DB::connection('mysql_contractors')->commit();
             return $this->success_message(__('validation.handler.updated'));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             DB::connection('mysql_contractors')->rollBack();
             return $this->error_response(
                 __('validation.handler.unexpected_failure'),
@@ -254,11 +288,65 @@ class ContractorController extends Controller
         }
     }
 
+    /**
+     * @param FinderRequest $request
+     * @return JsonResponse
+     */
     public function find(FinderRequest $request)
     {
         $contractor =  Contractor::query()->where('document', $request->get('document'))->firstOrFail();
         return $this->success_response(
             new ContractorResource($contractor)
         );
+    }
+
+    /**
+     * @param Contractor $contractor
+     * @param $name
+     * @return BinaryFileResponse
+     */
+    public function rut(Contractor $contractor, $name)
+    {
+        if ($contractor->getOriginal('rut') == $name) {
+            if (Storage::disk('contractor')->exists($name)) {
+                return response()->file(storage_path("app/contractor/{$name}"));
+            }
+        }
+        abort(Response::HTTP_NOT_FOUND, __('validation.handler.resource_not_found_url'));
+    }
+
+    /**
+     * @param Contractor $contractor
+     * @param $name
+     * @return BinaryFileResponse
+     */
+    public function bank(Contractor $contractor, $name)
+    {
+        if ($contractor->getOriginal('bank') == $name) {
+            if (Storage::disk('contractor')->exists($name)) {
+                return response()->file(storage_path("app/contractor/{$name}"));
+            }
+        }
+        abort(Response::HTTP_NOT_FOUND, __('validation.handler.resource_not_found_url'));
+    }
+
+    /**
+     * @param UpdateThirdPartyRequest $request
+     * @param Contractor $contractor
+     * @return JsonResponse
+     */
+    public function thirdParty(UpdateThirdPartyRequest $request, Contractor $contractor)
+    {
+        try {
+            $contractor->third_party = $request->get('third_party');
+            $contractor->saveOrFail();
+            return $this->success_message(__('validation.handler.updated'));
+        } catch (Throwable $e) {
+            return $this->error_response(
+                __('validation.handler.unexpected_failure'),
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                $e->getMessage()
+            );
+        }
     }
 }

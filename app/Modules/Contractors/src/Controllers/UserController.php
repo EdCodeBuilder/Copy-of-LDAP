@@ -132,6 +132,7 @@ class UserController extends LoginController
             ['name'  =>  'contractors-portal-hiring'     , 'can' => auth('api')->user()->isA(Roles::ROLE_HIRING)],
             ['name'  =>  'contractors-portal-legal'      , 'can' => auth('api')->user()->isA(Roles::ROLE_LEGAL)],
             ['name'  =>  'contractors-portal-rp'         , 'can' => auth('api')->user()->isA(Roles::ROLE_RP)],
+            ['name'  =>  'contractors-portal-third-party', 'can' => auth('api')->user()->isA(Roles::ROLE_THIRD_PARTY)],
             ['name'  =>  'contractors-portal-observer'   , 'can' => auth('api')->user()->isA(Roles::ROLE_OBSERVER)],
         ]);
     }
