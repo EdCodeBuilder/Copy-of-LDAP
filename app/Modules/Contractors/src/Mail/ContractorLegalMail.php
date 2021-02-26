@@ -71,7 +71,7 @@ class ContractorLegalMail extends Mailable
                         <p>Fecha de Actualización: {$created_at}</p>
                         ",
                 // 'hide_btn'  => true,
-                'url'       =>  "https://sim.idrd.gov.co/portal-contratista/es/user/{$id}/contractor",
+                'url'       =>  "https://sim.idrd.gov.co/portal-contratista-dev/es/user/{$id}/contractor",
                 'info'      =>  "Ingrese al Portal para continuar con el trámite.",
                 'year'      =>  Carbon::now()->year
             ]);

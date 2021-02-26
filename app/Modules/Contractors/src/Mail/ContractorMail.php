@@ -60,7 +60,7 @@ class ContractorMail extends Mailable
                         ",
                 // 'hide_btn'  => true,
                 // 'url'       =>  "https://sim.idrd.gov.co/portal-contratista/es/contracts?payload=$document",
-                'url'       =>  "http://localhost:3000/portal-contratista/es/contracts?payload=$document",
+                'url'       =>  "http://localhost:3000/portal-contratista-dev/es/contracts?payload=$document",
                 'info'      =>  "Será notificado a este correo electrónico una vez se haya expedido su certificado de afiliación a la ARL Positiva.",
                 'year'      =>  Carbon::now()->year
             ]);
