@@ -24,6 +24,8 @@ class ContractResource extends JsonResource
         $transport = isset($this->transport) ? $this->transport : null;
         return [
             'contract_id'                       =>  isset($this->id) ? (int) $this->id : null,
+            'font_type_id'                      =>  isset($this->font_type_id) ? (int) $this->font_type_id : null,
+            'font_type'                         =>  isset($this->font->name) ? $this->font->name : null,
             'contract'                          =>  isset($this->contract) ? $this->contract : null,
             'transport'                         =>  $transport,
             'transport_text'                    =>  $transport ? 'SI' : 'NO',
@@ -69,6 +71,11 @@ class ContractResource extends JsonResource
             [
                 'text' => 'Tipo de trámite',
                 'value'  =>  'contract_type',
+                'icon'  =>  'mdi-clipboard-text-outline',
+            ],
+            [
+                'text' => 'Tipo de fuente',
+                'value'  =>  'font_type',
                 'icon'  =>  'mdi-clipboard-text-outline',
             ],
             [
