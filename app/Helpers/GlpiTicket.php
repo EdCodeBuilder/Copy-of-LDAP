@@ -22,6 +22,7 @@ class GlpiTicket
     ];
 
     const STATUS = [
+        'ASSIGNED'   =>  2,
         'IN_PROGRESS'   =>  3,
         'CLOSED'   =>  6,
     ];
@@ -152,7 +153,7 @@ class GlpiTicket
                             <p>Usuario: {$this->user->full_name} </p><br>
                             <p>Nombre de Usuario: {$this->user->username} </p><br>
                             <p>Correo Aletarnativo: {$this->email} </p><br>
-                            <p>Url de restauración: {$this->url} </p><br>
+                            <p>Url de restauración: <a href='{$this->url}' target='_blank'>{$this->url}</a> </p><br>
                             <p>IP solicitante: {$ip} </p><br>
                             <p>La url caducará en {$expire} minutos</p><br>
                         ",
