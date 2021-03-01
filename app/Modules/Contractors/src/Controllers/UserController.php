@@ -15,6 +15,7 @@ use App\Modules\Contractors\src\Request\LoginRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\Http\Controllers\AccessTokenController;
 use Silber\Bouncer\Database\Role;
@@ -139,6 +140,6 @@ class UserController extends LoginController
 
     public function oracle()
     {
-        return 'OK';
+        return DB::connection('oracle')->getDatabaseName();
     }
 }
