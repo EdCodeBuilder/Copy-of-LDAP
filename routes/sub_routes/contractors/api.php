@@ -11,7 +11,7 @@ use App\Modules\Contractors\src\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('contractors-portal')->group(function () {
-    Route::post('/oracle', [UserController::class, 'oracle']);
+    Route::get('/oracle', [UserController::class, 'oracle']);
     Route::post('/login', [UserController::class, 'login']);
     Route::get('/users', [AdminController::class, 'index'])->middleware('auth:api');
     Route::get('/excel', [ContractorController::class, 'excel'])->middleware('auth:api');
