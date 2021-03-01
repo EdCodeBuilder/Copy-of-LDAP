@@ -136,4 +136,9 @@ class UserController extends LoginController
             ['name'  =>  'contractors-portal-observer'   , 'can' => auth('api')->user()->isA(Roles::ROLE_OBSERVER)],
         ]);
     }
+
+    public function oracle()
+    {
+        return 'OK';
+    }
 }

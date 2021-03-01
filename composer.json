@@ -20,7 +20,8 @@
         "lcobucci/jwt": "3.3.3",
         "maatwebsite/excel": "3.0",
         "owen-it/laravel-auditing": "9.2",
-        "silber/bouncer": "v1.0.0-rc.6"
+        "silber/bouncer": "v1.0.0-rc.6",
+        "yajra/laravel-oci8": "^5"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
