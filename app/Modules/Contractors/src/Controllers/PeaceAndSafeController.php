@@ -109,11 +109,12 @@ class PeaceAndSafeController extends Controller
                     return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
                 }
                 if ($this->accountIsActive()) {
+                    $this->user->ldap = $this->user;
                     return $this->error_response(
                         "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
                         Response::HTTP_UNPROCESSABLE_ENTITY,
                         [
-                            'user'  =>  new ActiveRecordResource($this->user)
+                            'user'  =>  $this->user
                         ]
                     );
                 }
@@ -126,7 +127,7 @@ class PeaceAndSafeController extends Controller
                     "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
                     Response::HTTP_UNPROCESSABLE_ENTITY,
                     [
-                        'user'  =>  new ActiveRecordResource($this->user)
+                        'user'  =>  $this->user
                     ]
                 );
             }
