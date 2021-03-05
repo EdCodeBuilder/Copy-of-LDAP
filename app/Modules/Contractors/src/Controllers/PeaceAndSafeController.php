@@ -102,8 +102,9 @@ class PeaceAndSafeController extends Controller
             $year = now()->format('Y');
             if (!isset($user->usua_login)) {
                 if ($this->doesntHaveLDAP($request->get('document'), 'postalcode')) {
+                    $name = toUpper($request->get('name'));
                     $text = "<p>Que, dando cumplimiento a lo estipulado en el memorando con número de radicado <b>20203000123583</b> de febrero 24 de 2020, expedido por la <b>Subdirección Administrativa y Financiera</b> e informado a todas las dependencias, se debe verificar que el <b>Sistema de Gestión Documental - Orfeo -</b> no tenga radicados pendientes de trámite y esté al día al momento de finalizar contrato para contratistas y/o desvinculación, traslado ó encargo para los servidores públicos del <b>IDRD</b>.</p>";
-                    $text.= "<p>Por lo anterior y una vez verificado en el Sistema de Gestión Documental - Orfeo - a cargo del(la) funcionario(a) <b>{$user->name}</b>, identificado(a) con cédula de ciudadanía No. <b>{$user->document}</b>, número de contrato: <b>{$request->get('contract')}</b> y número de expediente: <b>{$request->get('virtual_file')}</b>, se certifica que no se creó cuenta de acceso en aplicativo Orfeo durante el término su contrato.</p>";
+                    $text.= "<p>Por lo anterior y una vez verificado en el Sistema de Gestión Documental - Orfeo - a cargo del(la) funcionario(a) <b>{$name}</b>, identificado(a) con cédula de ciudadanía No. <b>{$request->get('document')}</b>, número de contrato: <b>{$request->get('contract')}</b> y número de expediente: <b>{$request->get('virtual_file')}</b>, se certifica que no se creó cuenta de acceso en aplicativo Orfeo durante el término su contrato.</p>";
                     $text.= "<p>Se expide certificado de paz y salvo por solicitud del usuario {$day} del mes de {$m} del año {$year} debido a: <b>TERMINACIÓN DE CONTRATO.</b></p>";
                     return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
                 }
