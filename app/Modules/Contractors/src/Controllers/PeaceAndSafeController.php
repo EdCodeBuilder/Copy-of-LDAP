@@ -66,7 +66,7 @@ class PeaceAndSafeController extends Controller
         $text = "<p>Que, dando cumplimiento a lo estipulado en el memorando con número de radicado <b>20203000123583</b> de febrero 24 de 2020, expedido por la <b>Subdirección Administrativa y Financiera</b> e informado a todas las dependencias, se debe verificar que el <b>Sistema de Gestión Documental - Orfeo -</b> no tenga radicados pendientes de trámite y esté al día al momento de finalizar contrato para contratistas y/o desvinculación, traslado ó encargo para los servidores públicos del <b>IDRD</b>.</p>";
         $text.= "<p>Por lo anterior y una vez verificado en el Sistema de Gestión Documental - Orfeo - a cargo del(la) funcionario(a) <b>{$user->full_name}</b>, identificado(a) con cédula de ciudadanía No. <b>{$user->document}</b>, número de contrato: <b>068/2019</b> y número de expediente: <b>201980020110014E</b>, se certifica que <b>NO</b> se creó cuenta de acceso en aplicativo Orfeo durante el término su contrato.</p>";
         $text.= "<p>Se expide certificado de paz y salvo por solicitud del usuario {$day} del mes de {$m} del año {$year} debido a: <b>TERMINACIÓN DE CONTRATO.</b></p>";
-        return $this->getPDF('PAZ_Y_SALVO.pdf', $text)->Output();
+        return $this->getPDF('PAZ_Y_SALVO.pdf', $text, new Certification)->Output();
     }
 
     /**

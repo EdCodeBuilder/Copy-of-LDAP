@@ -33,4 +33,18 @@ class PeaceAndSafeRequest extends FormRequest
             'virtual_file'  => 'required|string',
         ];
     }
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array
+     */
+    public function attributes()
+    {
+        return [
+            'document'  =>  'número de documento',
+            'name'  =>  'nombres',
+            'contract'    =>  'contrato',
+            'virtual_file'    =>  'expediente virtual',
+        ];
+    }
 }
