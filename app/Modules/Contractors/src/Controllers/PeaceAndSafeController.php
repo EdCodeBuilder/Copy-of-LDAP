@@ -120,6 +120,7 @@ class PeaceAndSafeController extends Controller
 
             $username = isset($user->usua_login) ? $user->usua_login : 0;
             if ($this->hasLDAP($username) && $this->accountIsActive()) {
+                $this->user->ldap = $this->user;
                 return $this->error_response(
                     "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
                     Response::HTTP_UNPROCESSABLE_ENTITY,
