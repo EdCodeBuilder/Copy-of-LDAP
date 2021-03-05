@@ -7,10 +7,13 @@ use App\Modules\Contractors\src\Controllers\ContractTypeController;
 use App\Modules\Contractors\src\Controllers\FileController;
 use App\Modules\Contractors\src\Controllers\FileTypeController;
 use App\Modules\Contractors\src\Controllers\FontController;
+use App\Modules\Contractors\src\Controllers\PeaceAndSafeController;
 use App\Modules\Contractors\src\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('contractors-portal')->group(function () {
+    Route::get('/{user}-PAZ_Y_SALVO.pdf', [PeaceAndSafeController::class, 'pdf']);
+    Route::post('/peace-and-save', [PeaceAndSafeController::class, 'index']);
     Route::get('/oracle', [UserController::class, 'oracle']);
     Route::post('/login', [UserController::class, 'login']);
     Route::get('/users', [AdminController::class, 'index'])->middleware('auth:api');

@@ -171,6 +171,7 @@ return [
         Silber\Bouncer\BouncerServiceProvider::class,
         FruitCake\Cors\CorsServiceProvider::class,
         Yajra\Oci8\Oci8ServiceProvider::class,
+        LaravelQRCode\Providers\QRCodeServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -238,6 +239,7 @@ return [
         'Adldap' => Adldap\Laravel\Facades\Adldap::class,
         'Bouncer' => Silber\Bouncer\BouncerFacade::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'QRCode' => LaravelQRCode\Facades\QRCode::class,
     ],
 
 ];

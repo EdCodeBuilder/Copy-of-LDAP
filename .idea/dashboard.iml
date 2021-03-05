@@ -122,6 +122,10 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/cache" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/yajra/laravel-oci8" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/yajra/laravel-pdo-via-oci8" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/setasign/fpdi" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/setasign/fpdf" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/werneckbh/qr-code" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/werneckbh/laravel-qr-code" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

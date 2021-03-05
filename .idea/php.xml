@@ -121,6 +121,10 @@
       <path value="$PROJECT_DIR$/vendor/doctrine/cache" />
       <path value="$PROJECT_DIR$/vendor/yajra/laravel-oci8" />
       <path value="$PROJECT_DIR$/vendor/yajra/laravel-pdo-via-oci8" />
+      <path value="$PROJECT_DIR$/vendor/setasign/fpdi" />
+      <path value="$PROJECT_DIR$/vendor/setasign/fpdf" />
+      <path value="$PROJECT_DIR$/vendor/werneckbh/qr-code" />
+      <path value="$PROJECT_DIR$/vendor/werneckbh/laravel-qr-code" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.1" />
