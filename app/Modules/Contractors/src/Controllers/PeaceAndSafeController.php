@@ -72,7 +72,7 @@ class PeaceAndSafeController extends Controller
                     return $this->error_response(
                         "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
                         Response::HTTP_UNPROCESSABLE_ENTITY,
-                        $this->user
+                        'Usuario sin cuenta de ORFEO pero con LDAP'
                     );
                 }
                 if ($this->hasLDAP($document, 'postalcode')) {
@@ -93,11 +93,12 @@ class PeaceAndSafeController extends Controller
                 return $this->error_response(
                     "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
                     Response::HTTP_UNPROCESSABLE_ENTITY,
-                    $this->user
+                    'Usuario con cuenta de ORFEO y LDAP'
                 );
             }
 
-            if ( $this->hasUnprocessedData($user->usua_codi) ) {
+            $total = $this->hasUnprocessedData($user->usua_codi);
+            if ( $total > 0 ) {
                 return $this->error_response("Para generar el paz y salvo de sistemas debe tener sus bandejas de Orfeo en cero, actualmente cuenta con {$total} radicado(s) sin procesar.");
             }
             /*
@@ -169,8 +170,7 @@ class PeaceAndSafeController extends Controller
     {
         $filed = Filed::query()->where('radi_usua_actu', $id)->count();
         $informed = Informed::query()->where('usua_codi', $id)->count();
-        $total = (int) $filed + (int) $informed;
-        return $total > 0;
+        return (int) $filed + (int) $informed;
     }
 
     /**
