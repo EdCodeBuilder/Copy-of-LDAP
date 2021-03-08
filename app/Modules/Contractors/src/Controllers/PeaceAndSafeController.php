@@ -233,7 +233,7 @@ class PeaceAndSafeController extends Controller
         $year = now()->format('Y');
 
         $text = "<p>Que, dando cumplimiento a lo estipulado en el memorando con número de radicado <b>20203000123583</b> de febrero 24 de 2020, expedido por la <b>Subdirección Administrativa y Financiera</b> e informado a todas las dependencias, se debe verificar que el <b>Sistema de Gestión Documental - Orfeo -</b> no tenga radicados pendientes de trámite y esté al día al momento de finalizar contrato para contratistas y/o desvinculación, traslado ó encargo para los servidores públicos del <b>IDRD</b>.</p>";
-        $text.= "<p>Por lo anterior y una vez verificado en el Sistema de Gestión Documental - Orfeo - a cargo del(la) funcionario(a) <b>{$name}</b>, identificado(a) con cédula de ciudadanía No. <b>{$document}</b> {$contract_info}, ";
+        $text.= "<p>Por lo anterior y una vez verificado en el Sistema de Gestión Documental - Orfeo - a cargo del(la) funcionario(a) <b>{$name}</b>, identificado(a) con cédula de ciudadanía No. <b>{$document}</b>{$contract_info}, ";
         if ($username && $hasOrfeo) {
             $text.= "a la fecha <b>NO</b> tiene radicados pendientes de trámite y se procede a inactivar el usuario: <b>{$username}</b>.</p>";
         } elseif ($username && !$hasOrfeo) {
