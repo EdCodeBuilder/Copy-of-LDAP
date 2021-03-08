@@ -12,7 +12,6 @@ use App\Modules\Contractors\src\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('contractors-portal')->group(function () {
-    Route::get('/{user}-PAZ_Y_SALVO.pdf', [PeaceAndSafeController::class, 'pdf']);
     Route::post('/peace-and-save', [PeaceAndSafeController::class, 'index']);
     Route::get('/oracle', [UserController::class, 'oracle']);
     Route::post('/login', [UserController::class, 'login']);

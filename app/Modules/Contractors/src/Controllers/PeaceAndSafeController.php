@@ -42,38 +42,11 @@ class PeaceAndSafeController extends Controller
         $this->ldap = $ldap;
     }
 
-    public function pdf(\App\Models\Security\User $user)
-    {
-        $day = intval(now()->format('d'));
-        $day = $day > 1 ? "a los {$day} días" : "al primer día";
-        $month = intval(now()->format('m'));
-        $months = [
-            1 => 'enero',
-            2 => 'febrero',
-            3 => 'marzo',
-            4 => 'abril',
-            5 => 'mayo',
-            6 => 'junio',
-            7 => 'julio',
-            8 => 'agosto',
-            9 => 'septiembre',
-            10 => 'octubre',
-            11 => 'noviembre',
-            12 => 'diciembre',
-        ];
-        $m = isset($months[$month]) ? $months[$month] : toLower(now()->format('M'));
-        $year = now()->format('Y');
-        $text = "<p>Que, dando cumplimiento a lo estipulado en el memorando con número de radicado <b>20203000123583</b> de febrero 24 de 2020, expedido por la <b>Subdirección Administrativa y Financiera</b> e informado a todas las dependencias, se debe verificar que el <b>Sistema de Gestión Documental - Orfeo -</b> no tenga radicados pendientes de trámite y esté al día al momento de finalizar contrato para contratistas y/o desvinculación, traslado ó encargo para los servidores públicos del <b>IDRD</b>.</p>";
-        $text.= "<p>Por lo anterior y una vez verificado en el Sistema de Gestión Documental - Orfeo - a cargo del(la) funcionario(a) <b>{$user->full_name}</b>, identificado(a) con cédula de ciudadanía No. <b>{$user->document}</b>, número de contrato: <b>068/2019</b> y número de expediente: <b>201980020110014E</b>, se certifica que <b>NO</b> se creó cuenta de acceso en aplicativo Orfeo durante el término su contrato.</p>";
-        $text.= "<p>Se expide certificado de paz y salvo por solicitud del usuario {$day} del mes de {$m} del año {$year} debido a: <b>TERMINACIÓN DE CONTRATO.</b></p>";
-        return $this->getPDF('PAZ_Y_SALVO.pdf', $text, new Certification)->Output();
-    }
-
     /**
      * Display a listing of the resource.
      *
      * @param PeaceAndSafeRequest $request
-     * @return JsonResponse
+     * @return JsonResponse|string
      */
     public function index(PeaceAndSafeRequest $request)
     {
@@ -81,31 +54,18 @@ class PeaceAndSafeController extends Controller
             $certification = new Certification;
             $certification->fill($request->validated());
             $user = User::where('usua_doc', $request->get('document'))->first();
-            $day = intval(now()->format('d'));
-            $day = $day > 1 ? "a los {$day} días" : "al primer día";
-            $month = intval(now()->format('m'));
-            $months = [
-                1 => 'enero',
-                2 => 'febrero',
-                3 => 'marzo',
-                4 => 'abril',
-                5 => 'mayo',
-                6 => 'junio',
-                7 => 'julio',
-                8 => 'agosto',
-                9 => 'septiembre',
-                10 => 'octubre',
-                11 => 'noviembre',
-                12 => 'diciembre',
-            ];
-            $m = isset($months[$month]) ? $months[$month] : toLower(now()->format('M'));
-            $year = now()->format('Y');
-            if (!isset($user->usua_login)) {
-                if ($this->doesntHaveLDAP($request->get('document'), 'postalcode')) {
-                    $name = toUpper($request->get('name'));
-                    $text = "<p>Que, dando cumplimiento a lo estipulado en el memorando con número de radicado <b>20203000123583</b> de febrero 24 de 2020, expedido por la <b>Subdirección Administrativa y Financiera</b> e informado a todas las dependencias, se debe verificar que el <b>Sistema de Gestión Documental - Orfeo -</b> no tenga radicados pendientes de trámite y esté al día al momento de finalizar contrato para contratistas y/o desvinculación, traslado ó encargo para los servidores públicos del <b>IDRD</b>.</p>";
-                    $text.= "<p>Por lo anterior y una vez verificado en el Sistema de Gestión Documental - Orfeo - a cargo del(la) funcionario(a) <b>{$name}</b>, identificado(a) con cédula de ciudadanía No. <b>{$request->get('document')}</b>, número de contrato: <b>{$request->get('contract')}</b> y número de expediente: <b>{$request->get('virtual_file')}</b>, se certifica que no se creó cuenta de acceso en aplicativo Orfeo durante el término su contrato.</p>";
-                    $text.= "<p>Se expide certificado de paz y salvo por solicitud del usuario {$day} del mes de {$m} del año {$year} debido a: <b>TERMINACIÓN DE CONTRATO.</b></p>";
+
+            $name = toUpper($request->get('name'));
+            $document = $request->get('document');
+            $contract = toUpper($request->get('contract'));
+            $virtual_file = toUpper($request->get('virtual_file'));
+            $complete_text = $virtual_file
+                ? ", número de contrato: {$contract} y número de expediente: {$virtual_file}"
+                : " y número de contrato: {$contract}";
+
+            if ($this->doesntHaveOrfeo($user)) {
+                if ($this->doesntHaveLDAP($document, 'postalcode')) {
+                    $text = $this->createText($name, $document, $complete_text);
                     return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
                 }
                 if ($this->accountIsActive()) {
@@ -114,6 +74,17 @@ class PeaceAndSafeController extends Controller
                         Response::HTTP_UNPROCESSABLE_ENTITY,
                         $this->user
                     );
+                }
+                if ($this->hasLDAP($document, 'postalcode')) {
+                    $this->disableLDAP();
+                    $text = $this->createText(
+                        $name,
+                        $document,
+                        $complete_text,
+                        toUpper($this->user->getFirstAttribute('samaccountname')),
+                        false
+                    );
+                    return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
                 }
             }
 
@@ -126,25 +97,21 @@ class PeaceAndSafeController extends Controller
                 );
             }
 
-            $filed = Filed::query()->where('radi_usua_actu', $user->usua_codi)->count();
-            $informed = Informed::query()->where('usua_codi', $user->usua_codi)->count();
-            $total = (int) $filed + (int) $informed;
-            if ( $total > 0 ) {
+            if ( $this->hasUnprocessedData($user->usua_codi) ) {
                 return $this->error_response("Para generar el paz y salvo de sistemas debe tener sus bandejas de Orfeo en cero, actualmente cuenta con {$total} radicado(s) sin procesar.");
             }
             /*
-            $ou = 'OU=INACTIVOS,OU=ORGANIZACION IDRD,DC=adidrd,DC=local';
-            $this->user->setAccountControl('514');
-            if ($this->user->move($ou)) {
-                $text = "<p>Que, dando cumplimiento a lo estipulado en el memorando con número de radicado <b>20203000123583</b> de febrero 24 de 2020, expedido por la <b>Subdirección Administrativa y Financiera</b> e informado a todas las dependencias, se debe verificar que el <b>Sistema de Gestión Documental - Orfeo -</b> no tenga radicados pendientes de trámite y esté al día al momento de finalizar contrato para contratistas y/o desvinculación, traslado ó encargo para los servidores públicos del <b>IDRD</b>.</p>";
-                $text.= "<p>Por lo anterior y una vez verificado en el Sistema de Gestión Documental - Orfeo - a cargo del(la) funcionario(a) <b>{$user->full_name}</b>, identificado(a) con cédula de ciudadanía No. <b>{$user->document}</b>, número de contrato: <b>068/2019</b> y número de expediente: <b>201980020110014E</b>, a la fecha no tiene radicados pendientes de trámite y se procede a inactivar el usuario: <b>{$user->username}</b>.</p>";
-                $text.= "<p>Se expide certificado de paz y salvo por solicitud del usuario {$day} del mes de {$m} del año {$year} debido a: <b>TERMINACIÓN DE CONTRATO.</b></p>";
-                return $this->getPDF('PAZ_Y_SALVO.pdf', $text)->Output();
-            }
+             * Disable Orfeo and LDAP Account
+                $user->usua_esta = 0;
+                $user->saveOrFail();
             */
-            $text = "<p>Que, dando cumplimiento a lo estipulado en el memorando con número de radicado <b>20203000123583</b> de febrero 24 de 2020, expedido por la <b>Subdirección Administrativa y Financiera</b> e informado a todas las dependencias, se debe verificar que el <b>Sistema de Gestión Documental - Orfeo -</b> no tenga radicados pendientes de trámite y esté al día al momento de finalizar contrato para contratistas y/o desvinculación, traslado ó encargo para los servidores públicos del <b>IDRD</b>.</p>";
-            $text.= "<p>Por lo anterior y una vez verificado en el Sistema de Gestión Documental - Orfeo - a cargo del(la) funcionario(a) <b>{$user->name}</b>, identificado(a) con cédula de ciudadanía No. <b>{$user->document}</b>, número de contrato: <b>{$request->get('contract')}</b> y número de expediente: <b>{$request->get('virtual_file')}</b>, a la fecha no tiene radicados pendientes de trámite y se procede a inactivar el usuario: <b>{$user->usua_login}</b>.</p>";
-            $text.= "<p>Se expide certificado de paz y salvo por solicitud del usuario {$day} del mes de {$m} del año {$year} debido a: <b>TERMINACIÓN DE CONTRATO.</b></p>";
+            $this->disableLDAP();
+            $text = $this->createText(
+                $name,
+                $document,
+                $complete_text,
+                toUpper($username)
+            );
             return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
         } catch (\Exception $e) {
             return $this->error_response(
@@ -177,6 +144,36 @@ class PeaceAndSafeController extends Controller
     }
 
     /**
+     * @param $user
+     * @return bool
+     */
+    public function hasOrfeo($user)
+    {
+        return isset($user->usua_login);
+    }
+
+    /**
+     * @param $user
+     * @return bool
+     */
+    public function doesntHaveOrfeo($user)
+    {
+        return !isset($user->usua_login);
+    }
+
+    /**
+     * @param $id
+     * @return bool
+     */
+    public function hasUnprocessedData($id)
+    {
+        $filed = Filed::query()->where('radi_usua_actu', $id)->count();
+        $informed = Informed::query()->where('usua_codi', $id)->count();
+        $total = (int) $filed + (int) $informed;
+        return $total > 0;
+    }
+
+    /**
      * @return bool
      */
     public function accountIsExpired()
@@ -185,9 +182,67 @@ class PeaceAndSafeController extends Controller
         return now()->isAfter($expiration_date);
     }
 
+    /**
+     * @return bool
+     */
     public function accountIsActive()
     {
         return ! $this->accountIsExpired();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function disableLDAP()
+    {
+        /*
+        $ou = 'OU=INACTIVOS,OU=ORGANIZACION IDRD,DC=adidrd,DC=local';
+        $this->user->setAccountControl('514');
+        return $this->user->move($ou);
+        */
+    }
+
+    /**
+     * @param $name
+     * @param $document
+     * @param $contract_info
+     * @param null $username
+     * @param bool $hasOrfeo
+     * @return string
+     */
+    public function createText($name, $document, $contract_info, $username = null, $hasOrfeo = true)
+    {
+        $day = intval(now()->format('d'));
+        $day = $day > 1 ? "a los {$day} días" : "al primer día";
+        $month = intval(now()->format('m'));
+        $months = [
+            1 => 'enero',
+            2 => 'febrero',
+            3 => 'marzo',
+            4 => 'abril',
+            5 => 'mayo',
+            6 => 'junio',
+            7 => 'julio',
+            8 => 'agosto',
+            9 => 'septiembre',
+            10 => 'octubre',
+            11 => 'noviembre',
+            12 => 'diciembre',
+        ];
+        $m = isset($months[$month]) ? $months[$month] : toLower(now()->format('M'));
+        $year = now()->format('Y');
+
+        $text = "<p>Que, dando cumplimiento a lo estipulado en el memorando con número de radicado <b>20203000123583</b> de febrero 24 de 2020, expedido por la <b>Subdirección Administrativa y Financiera</b> e informado a todas las dependencias, se debe verificar que el <b>Sistema de Gestión Documental - Orfeo -</b> no tenga radicados pendientes de trámite y esté al día al momento de finalizar contrato para contratistas y/o desvinculación, traslado ó encargo para los servidores públicos del <b>IDRD</b>.</p>";
+        $text.= "<p>Por lo anterior y una vez verificado en el Sistema de Gestión Documental - Orfeo - a cargo del(la) funcionario(a) <b>{$name}</b>, identificado(a) con cédula de ciudadanía No. <b>{$document}</b> {$contract_info}, ";
+        if ($username && $hasOrfeo) {
+            $text.= "a la fecha <b>NO</b> tiene radicados pendientes de trámite y se procede a inactivar el usuario: <b>{$username}</b>.</p>";
+        } elseif ($username && !$hasOrfeo) {
+            $text.= "se certifica que <b>NO</b> se creó cuenta de acceso en aplicativo Orfeo durante el término su contrato y se procede a inactivar el usuario: <b>{$username}</b>.</p>";
+        } else {
+            $text.=  "se certifica que <b>NO</b> se creó cuenta de acceso en aplicativo Orfeo durante el término su contrato.</p>";
+        }
+        $text.= "<p>Se expide certificado de paz y salvo por solicitud del usuario {$day} del mes de {$m} del año {$year} debido a: <b>TERMINACIÓN DE CONTRATO.</b></p>";
+        return $text;
     }
 
     public function getPDF($file, $text, Certification $certification, $orientation = 'L', $unit = 'mm', $size = 'Letter')

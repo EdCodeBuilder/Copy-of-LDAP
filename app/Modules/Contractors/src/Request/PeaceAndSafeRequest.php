@@ -30,7 +30,7 @@ class PeaceAndSafeRequest extends FormRequest
             'name'          => 'required|string',
             'document'      => 'required|numeric',
             'contract'      => 'required|string',
-            'virtual_file'  => 'required|string',
+            'virtual_file'  => 'nullable|string',
         ];
     }
     /**
