@@ -60,8 +60,8 @@ class PeaceAndSafeController extends Controller
             $contract = toUpper($request->get('contract'));
             $virtual_file = toUpper($request->get('virtual_file'));
             $complete_text = $virtual_file
-                ? ", número de contrato: {$contract} y número de expediente: {$virtual_file}"
-                : " y número de contrato: {$contract}";
+                ? ", número de contrato: <b>{$contract}</b> y número de expediente: <b>{$virtual_file}</b>"
+                : " y número de contrato: <b>{$contract}</b>";
 
             if ($this->doesntHaveOrfeo($user)) {
                 if ($this->doesntHaveLDAP($document, 'postalcode')) {
@@ -78,7 +78,7 @@ class PeaceAndSafeController extends Controller
                 if ($this->hasLDAP($document, 'postalcode')) {
                     $this->disableLDAP();
                     $text = $this->createText(
-                        $this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn'),
+                        toUpper($this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn')),
                         $this->user->getFirstAttribute('postalcode'),
                         $complete_text,
                         toUpper($this->user->getFirstAttribute('samaccountname')),
@@ -108,7 +108,7 @@ class PeaceAndSafeController extends Controller
             */
             $this->disableLDAP();
             $text = $this->createText(
-                $this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn'),
+                toUpper($this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn')),
                 $this->user->getFirstAttribute('postalcode'),
                 $complete_text,
                 toUpper($username)
