@@ -78,8 +78,8 @@ class PeaceAndSafeController extends Controller
                 if ($this->hasLDAP($document, 'postalcode')) {
                     $this->disableLDAP();
                     $text = $this->createText(
-                        $name,
-                        $document,
+                        $this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn'),
+                        $this->user->getFirstAttribute('postalcode'),
                         $complete_text,
                         toUpper($this->user->getFirstAttribute('samaccountname')),
                         false
@@ -108,8 +108,8 @@ class PeaceAndSafeController extends Controller
             */
             $this->disableLDAP();
             $text = $this->createText(
-                $name,
-                $document,
+                $this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn'),
+                $this->user->getFirstAttribute('postalcode'),
                 $complete_text,
                 toUpper($username)
             );
