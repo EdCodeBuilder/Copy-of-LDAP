@@ -105,7 +105,6 @@ class ResetPasswordController extends Controller
      */
     protected function resetPassword($user, $password)
     {
-        /*
         try {
             $ldapUser = Adldap::search()->findByGuid($user->guid);
             if ( $ldapUser instanceof \Adldap\Models\User) {
@@ -130,7 +129,6 @@ class ResetPasswordController extends Controller
                 $exception
             );
         }
-        */
     }
 
     /**
