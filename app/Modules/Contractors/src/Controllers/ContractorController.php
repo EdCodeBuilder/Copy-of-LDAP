@@ -77,6 +77,9 @@ class ContractorController extends Controller
                     ->where('contract_type_id', '!=', 3)
                     ->count(),
                 'not_arl'   => Contract::query()
+                    ->whereHas('contractor', function ($q) {
+                        return $q->whereNull('modifiable');
+                    })
                     ->whereKeyNot(
                         File::query()->where('file_type_id', 1)->get()->pluck('contract_id')->toArray()
                     )
