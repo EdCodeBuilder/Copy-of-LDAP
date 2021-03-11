@@ -49,11 +49,12 @@ class ContractorController extends Controller
     {
         return $this->success_message([
             'total'  => Contractor::count(),
-            'arl'    =>  Contractor::query()->whereHas('contracts', function ($query) {
-                            return $query->whereHas('files', function ($query) {
-                                return $query->where('file_type_id', 1);
-                            });
-                        })->count(),
+            'arl'    =>  Contract::query()
+                            ->whereHas('files', function ($q) {
+                                return $q->where('file_type_id', 1);
+                            })
+                            ->where('contract_type_id', '!=', 3)
+                            ->count(),
             'secop' =>  Contractor::query()->whereHas('contracts', function ($query) {
                             return $query->whereHas('files', function ($query) {
                                 return $query->where('file_type_id', 2);
