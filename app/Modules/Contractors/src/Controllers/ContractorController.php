@@ -12,6 +12,8 @@ use App\Modules\Contractors\src\Jobs\ConfirmContractor;
 use App\Modules\Contractors\src\Jobs\ConfirmUpdateContractor;
 use App\Modules\Contractors\src\Models\Contract;
 use App\Modules\Contractors\src\Models\Contractor;
+use App\Modules\Contractors\src\Models\ContractType;
+use App\Modules\Contractors\src\Models\File;
 use App\Modules\Contractors\src\Notifications\ArlNotification;
 use App\Modules\Contractors\src\Request\FinderRequest;
 use App\Modules\Contractors\src\Request\StoreLawyerRequest;
@@ -48,15 +50,36 @@ class ContractorController extends Controller
         return $this->success_message([
             'total'  => Contractor::count(),
             'arl'    =>  Contractor::query()->whereHas('contracts', function ($query) {
-                return $query->whereHas('files', function ($query) {
-                    return $query->where('file_type_id', 1);
-                });
-            })->count(),
+                            return $query->whereHas('files', function ($query) {
+                                return $query->where('file_type_id', 1);
+                            });
+                        })->count(),
             'secop' =>  Contractor::query()->whereHas('contracts', function ($query) {
-                return $query->whereHas('files', function ($query) {
-                    return $query->where('file_type_id', 2);
-                });
-            })->count(),
+                            return $query->whereHas('files', function ($query) {
+                                return $query->where('file_type_id', 2);
+                            });
+                        })->count(),
+        ]);
+    }
+
+    public function stats()
+    {
+        return $this->success_message([
+            'types' => ContractType::withCount('contracts')->get(),
+            'certified' => [
+                'arl'   => Contract::query()
+                    ->whereHas('files', function ($q) {
+                        return $q->where('file_type_id', 1);
+                    })
+                    ->where('contract_type_id', '!=', 3)
+                    ->count(),
+                'not_arl'   => Contract::query()
+                    ->whereKeyNot(
+                        File::query()->where('file_type_id', 1)->get()->pluck('contract_id')->toArray()
+                    )
+                    ->where('contract_type_id', '!=', 3)
+                    ->count()
+            ]
         ]);
     }
 

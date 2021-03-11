@@ -5,14 +5,17 @@ namespace App\Modules\Contractors\src\Controllers;
 
 
 use Adldap\AdldapInterface;
+use Adldap\Utilities;
 use App\Helpers\FPDF;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Auth\ActiveRecordResource;
 use App\Modules\Contractors\src\Models\Certification;
+use App\Modules\Contractors\src\Request\EnableLDAPRequest;
 use App\Modules\Contractors\src\Request\PeaceAndSafeRequest;
 use App\Modules\Orfeo\src\Models\Filed;
 use App\Modules\Orfeo\src\Models\Informed;
 use App\Modules\Orfeo\src\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -103,9 +106,9 @@ class PeaceAndSafeController extends Controller
             }
             /*
              * Disable Orfeo and LDAP Account
-                $user->usua_esta = 0;
-                $user->saveOrFail();
             */
+            $user->usua_esta = 0;
+            $user->saveOrFail();
             $this->disableLDAP();
             $text = $this->createText(
                 toUpper($this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn')),
@@ -178,8 +181,7 @@ class PeaceAndSafeController extends Controller
      */
     public function accountIsExpired()
     {
-        $expiration_date = isset($this->user->accountexpires[0]) ? ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') ) : now()->addYears(3);
-        return now()->isAfter($expiration_date);
+        return !$this->accountIsActive();
     }
 
     /**
@@ -187,7 +189,7 @@ class PeaceAndSafeController extends Controller
      */
     public function accountIsActive()
     {
-        return ! $this->accountIsExpired();
+        return isset($this->user) && $this->user->isActive();
     }
 
     /**
@@ -195,11 +197,22 @@ class PeaceAndSafeController extends Controller
      */
     public function disableLDAP()
     {
-        /*
-        $ou = 'OU=INACTIVOS,OU=ORGANIZACION IDRD,DC=adidrd,DC=local';
-        $this->user->setAccountControl('514');
-        return $this->user->move($ou);
-        */
+        try {
+            // Find inactive OU
+            $ou = $this->ldap->search()->ous()->find('INACTIVOS');
+            // Get a new account control object for the user.
+            $ac = $this->user->getUserAccountControlObject();
+            // Mark the account as disabled (514).
+            $ac->accountIsDisabled();
+            // Set the account control on the user and save it.
+            $this->user->setUserAccountControl($ac);
+            // Save the user.
+            $this->user->save();
+            // Move user to new OU
+            return $this->user->move($ou);
+        } catch (\Exception $exception) {
+            return false;
+        }
     }
 
     /**

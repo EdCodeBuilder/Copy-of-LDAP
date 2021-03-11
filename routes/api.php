@@ -59,6 +59,9 @@ Route::middleware('auth:api')->prefix('api')->group( function () {
     Route::post('logout', [LoginController::class, 'logout'])->name('passport.logout');
     Route::post('logout-all-devices', [LoginController::class, 'logoutAllDevices'])->name('passport.logout.all');
     Route::prefix('admin')->group( function () {
+        Route::post('enable-users', [ActiveDirectoryController::class, 'enableLDAPUser'])
+            ->middleware('can:enable-users')
+            ->name('admin.enable.ldap_users');
         Route::post('sync-users', [ActiveDirectoryController::class, 'import'])
             ->middleware('can:sync-users')
             ->name('admin.sync.ldap_users');

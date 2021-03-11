@@ -61,8 +61,8 @@ class ContractType extends Model implements Auditable
      * ---------------------------------------------------------
     */
 
-    public function contractors()
+    public function contracts()
     {
-        return $this->hasMany(Contractor::class);
+        return $this->hasMany(Contract::class);
     }
 }

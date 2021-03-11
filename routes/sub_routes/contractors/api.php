@@ -25,6 +25,7 @@ Route::prefix('contractors-portal')->group(function () {
     Route::get('/menu', [UserController::class, 'drawer'])->middleware('auth:api');
     Route::get('/permissions', [UserController::class, 'permissions'])->middleware('auth:api');
     Route::get('/counter', [ContractorController::class, 'counter'])->middleware('auth:api');
+    Route::get('/stats', [ContractorController::class, 'stats'])->middleware('auth:api');
     Route::get('/contract-types', [ContractTypeController::class, 'index']);
     Route::get('/file-types', [FileTypeController::class, 'index']);
     Route::post('/find-contractor', [ContractorController::class, 'find'])->middleware('auth:api');

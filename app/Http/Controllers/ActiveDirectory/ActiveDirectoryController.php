@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\ActiveDirectory;
 
+use Adldap\AdldapInterface;
 use App\Models\Security\User;
+use App\Modules\Contractors\src\Request\EnableLDAPRequest;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -12,6 +15,22 @@ use Illuminate\Support\Facades\DB;
 
 class ActiveDirectoryController extends Controller
 {
+
+    /**
+     * @var AdldapInterface
+     */
+    private $ldap;
+
+    /**
+     * Initialise common request params
+     * @param AdldapInterface $ldap
+     */
+    public function __construct(AdldapInterface $ldap)
+    {
+        parent::__construct();
+        $this->ldap = $ldap;
+    }
+
     /**
      * Sync single user or all users from LDAP to database
      *
@@ -67,5 +86,40 @@ class ActiveDirectoryController extends Controller
             __('validation.handler.success'),
             Response::HTTP_OK
         );
+    }
+
+    /**
+     * @param EnableLDAPRequest $request
+     * @return mixed
+     */
+    public function enableLDAPUser(EnableLDAPRequest $request)
+    {
+        try {
+            $user = $this->ldap->search()->findByOrFail('samaccountname', toLower($request->get('username')));
+            $ou = $request->has('ou') && ( !is_null($request->get('ou')) || $request->get('ou') != '' )
+                ? $request->get('ou')
+                : 'OU=AREA DE SISTEMAS,OU=SUBDIRECCION ADMINISTRATIVA Y FINANCIERA';
+            // Additional OU
+            $ou .= ",OU=ORGANIZACION IDRD,DC=adidrd,DC=local";
+            // Get a new account control object for the user.
+            $ac = $user->getUserAccountControlObject();
+            // Mark the account as enabled (512 normal account).
+            $ac->accountIsNormal();
+            // Set the account control on the user and save it.
+            $user->setUserAccountControl(512);
+            // Set expiration date adding 2 days
+            $user->setAccountExpiry(
+                Carbon::parse(
+                    $request->get('expiration_date')
+                )->endOfDay()->timestamp
+            );
+            // Save the user.
+            $user->save();
+            // Move user to new group
+            $user->move($ou);
+            return $this->success_message('Se ha activado el usuario satisfactoriamente.');
+        } catch (\Exception $exception) {
+            return $this->error_response($exception->getMessage());
+        }
     }
 }
