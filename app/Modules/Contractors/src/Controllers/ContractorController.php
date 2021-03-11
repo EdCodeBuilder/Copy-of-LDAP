@@ -59,7 +59,9 @@ class ContractorController extends Controller
                                 return $query->where('file_type_id', 2);
                             });
                         })->count(),
-            'users' =>  Contractor::whereNotNull('modifiable')->count(),
+            'users' =>  Contractor::whereHas('contracts', function ($query) {
+                            return $query->where('contract_type_id', '!=', 3);
+                        })->whereNotNull('modifiable')->count(),
         ]);
     }
 
