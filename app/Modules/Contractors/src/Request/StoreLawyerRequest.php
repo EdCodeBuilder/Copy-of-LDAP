@@ -32,7 +32,6 @@ class StoreLawyerRequest extends FormRequest
             'name'  =>  'required|string|min:3|max:191',
             'surname'   =>  'required|string|min:3|max:191',
             'email' =>  'required|email',
-            'font_type_id' =>  'required|numeric|exists:mysql_contractors.fonts,id',
             'contract_type_id' =>  'required|numeric|exists:mysql_contractors.contract_types,id',
             'contract' =>  [
                 'required',
@@ -59,7 +58,6 @@ class StoreLawyerRequest extends FormRequest
     public function attributes()
     {
         return [
-            'font_type_id'  =>  'tipo de fuente',
             'document_type_id'  =>  'tipo de documento',
             'document'  =>  'número de documento',
             'name'  =>  'nombres',
