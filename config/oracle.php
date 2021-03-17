@@ -4,8 +4,9 @@ return [
     'oracle' => [
         'driver'         => 'oracle',
         'tns'            => env('DB_ORACLE_TNS', ''),
-        // 'host'           => env('DB_ORACLE_HOST', ''),
-        // 'port'           => env('DB_ORACLE_PORT', '1521'),
+        'host'           => env('DB_ORACLE_HOST', ''),
+        'port'           => env('DB_ORACLE_PORT', '1521'),
+        'service_name'   => env('DB_ORACLE_SERVICE_NAME', ''),
         'database'       => env('DB_ORACLE_DATABASE', ''),
         'username'       => env('DB_ORACLE_USERNAME', ''),
         'password'       => env('DB_ORACLE_PASSWORD', ''),
