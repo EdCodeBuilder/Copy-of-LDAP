@@ -54,39 +54,55 @@ class ContractorController extends Controller
                                 return $q->where('file_type_id', 1);
                             })
                             ->where('contract_type_id', '!=', 3)
+                            ->whereDate('final_date', '>=', now()->format('Y-m-d'))
                             ->count(),
             'secop' =>  Contractor::query()->whereHas('contracts', function ($query) {
-                            return $query->whereHas('files', function ($query) {
+                            return $query
+                                ->whereDate('final_date', '>=', now()->format('Y-m-d'))
+                                ->whereHas('files', function ($query) {
                                 return $query->where('file_type_id', 2);
                             });
                         })->count(),
-            'users' =>  Contractor::whereHas('contracts', function ($query) {
-                            return $query->where('contract_type_id', '!=', 3);
-                        })->whereNotNull('modifiable')->count(),
+            'users' =>  Contractor::whereNotNull('modifiable')->count(),
         ]);
     }
 
     public function stats()
     {
+
+        $collection = Contract::query()
+            ->withCount([
+                'files' => function ($query) {
+                    return $query->where('file_type_id', 1);
+                },
+            ])
+            ->whereDate('final_date', '>=', now()->format('Y-m-d'))
+            ->where('contract_type_id', '!=', 3)
+            ->distinct()
+            ->get(['files_count', 'contractor_id']);
+
+        $with_arl = $collection
+                        ->where('files_count', '>', 0)
+                        ->unique('contractor_id')
+                        ->count();
+        $without_arl = $collection
+            ->where('files_count', '=', 0)
+            ->whereNotIn(
+                'contractor_id',
+                Contractor::query()
+                    ->whereNotNull('modifiable')
+                    ->get()
+                    ->pluck('id')
+                    ->toArray()
+            )
+            ->unique('contractor_id')
+            ->count();
+
         return $this->success_message([
             'types' => ContractType::withCount('contracts')->get(),
             'certified' => [
-                'arl'   => Contract::query()
-                    ->whereHas('files', function ($q) {
-                        return $q->where('file_type_id', 1);
-                    })
-                    ->where('contract_type_id', '!=', 3)
-                    ->count(),
-                'not_arl'   => Contract::query()
-                    ->distinct()
-                    ->whereHas('contractor', function ($q) {
-                        return $q->whereNull('modifiable');
-                    })
-                    ->where('contract_type_id', '!=', 3)
-                    ->whereKeyNot(
-                        File::query()->where('file_type_id', 1)->get()->pluck('contract_id')->toArray()
-                    )
-                    ->count('contractor_id')
+                'arl'   => $with_arl,
+                'not_arl'   => $without_arl
             ]
         ]);
     }
@@ -122,25 +138,42 @@ class ContractorController extends Controller
     {
         $is_hiring_and_not_admin = !auth()->user()->isAll( Roles::ROLE_ADMIN, Roles::ROLE_HIRING );
         $is_legal_and_not_admin = !auth()->user()->isAll( Roles::ROLE_ADMIN, Roles::ROLE_LEGAL );
-        return $builder->when($request->has('has_arl'), function ($q) {
-                    return $q->whereHas('contracts', function ($query) {
-                        return $query->whereHas('files', function ($query) {
-                            return $query->where('file_type_id', 1);
-                        });
+        return $builder->when($request->has('doesnt_have_arl'), function ($q) {
+                    return $q->whereNull('modifiable')->whereHas('contracts', function ($query) {
+                        return $query->where('contract_type_id', '!=', 3)
+                            ->whereDate('final_date', '>=', now()->format('Y-m-d'))
+                            ->withCount([
+                                'files as arl_files_count' => function ($q) {
+                                    return $q->where('file_type_id', 1);
+                                },
+                                'files as other_files_count' => function ($q) {
+                                    return $q->where('file_type_id', '!=', 1);
+                                },
+                            ])->having('arl_files_count', 0);
                     });
-                })->when($request->has('has_secop'), function ($q) {
-                    return $q->whereHas('contracts', function ($query) {
-                        return $query->whereHas('files', function ($query) {
-                            return $query->where('file_type_id', 2);
+                })->when($request->has('doesnt_have_secop'), function ($q) {
+            return $q->whereHas('contracts', function ($query) {
+                return $query->where('contract_type_id', '!=', 3)
+                    ->whereDate('final_date', '>=', now()->format('Y-m-d'))
+                    ->withCount([
+                                'files as arl_files_count' => function ($q) {
+                                    return $q->where('file_type_id', 1);
+                                },
+                                'files as other_files_count' => function ($q) {
+                                    return $q->where('file_type_id', '!=', 1);
+                                },
+                            ])->having('other_files_count', 0);
                         });
-                    });
                 })->when($request->has('query'), function ($q) use ($request) {
                     $data = toLower($request->get('query'));
                     return $q->whereHas('contracts', function ($query) use ($data) {
                         return $query->where('contract', 'like', "%{$data}%");
                     })->orWhere('name', 'like', "%{$data}%")
+                      ->orWhere('id', 'like', "%{$data}%")
                       ->orWhere('surname', 'like', "%{$data}%")
                       ->orWhere('document', 'like', "%{$data}%");
+                })->when($request->has('doesnt_have_data'), function ($q) use ($request) {
+                    return $q->whereNotNull('modifiable');
                 });
     }
 
