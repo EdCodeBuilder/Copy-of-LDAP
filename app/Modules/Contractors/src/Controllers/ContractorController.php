@@ -284,6 +284,7 @@ class ContractorController extends Controller
             $form = Contractor::where('document', $document)->firstOrFail();
             abort_unless(!is_null($form->modifiable), Response::HTTP_UNPROCESSABLE_ENTITY, __('validation.handler.unauthorized'));
             DB::connection('mysql_contractors')->beginTransaction();
+            /* TODO: Third party
             if ($form->getOriginal('rut') && Storage::disk('contractor')->exists($form->getOriginal('rut'))) {
                 Storage::disk('contractor')->delete($form->getOriginal('rut'));
             }
@@ -298,9 +299,11 @@ class ContractorController extends Controller
             $now = now()->format('YmdHis');
             $bank = "CERTIFICADO_BANCARIO_{$document}_{$now}.$ext";
             $request->file('bank')->storeAs('contractor', $bank, [ 'disk' => 'local' ]);
-            $form->fill($request->validated());
+            // This after form fill
             $form->rut = $rut;
             $form->bank = $bank;
+            */
+            $form->fill($request->validated());
             $form->modifiable = null;
             $form->saveOrFail();
             $contract = Contract::findOrFail($request->get('contract_id'));

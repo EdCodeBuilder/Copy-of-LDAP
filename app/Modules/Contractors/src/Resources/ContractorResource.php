@@ -85,12 +85,13 @@ class ContractorResource extends JsonResource
                 'neighborhood'          =>  isset($this->neighborhood) ? $this->neighborhood : null,
                 'address'               =>  isset($this->address) ? $this->address : null,
             ]),
-            'rut'                   =>  isset($this->rut) ? $this->getOriginal('rut') : null,
-            'rut_file'              =>  isset($this->rut) ? $this->rut : null,
-            'bank'                  =>  isset($this->bank) ? $this->getOriginal('bank') : null,
-            'bank_file'             =>  isset($this->bank) ? $this->bank: null,
-            'third_party'           =>  isset($this->third_party) ? (bool) $this->third_party: null,
-            'third_party_text'      =>  $this->setThirdParty(),
+            // TODO: Third party
+            // 'rut'                   =>  isset($this->rut) ? $this->getOriginal('rut') : null,
+            // 'rut_file'              =>  isset($this->rut) ? $this->rut : null,
+            // 'bank'                  =>  isset($this->bank) ? $this->getOriginal('bank') : null,
+            // 'bank_file'             =>  isset($this->bank) ? $this->bank: null,
+            // 'third_party'           =>  isset($this->third_party) ? (bool) $this->third_party: null,
+            // 'third_party_text'      =>  $this->setThirdParty(),
             'contracts'             =>  ContractResource::collection($this->whenLoaded('contracts')),
             'contract_headers'      =>  ContractResource::headers(),
             'user_id'               =>  isset($this->user_id) ? (int) $this->user_id : null,
@@ -130,10 +131,12 @@ class ContractorResource extends JsonResource
                 'text' => "ARL",
                 'value'  =>  "arl_file",
             ],
+            /* TODO: Third party
             [
                 'text'   =>  'Terceros',
                 'value'   =>  'third_party_text',
             ],
+            */
             [
                 'text' => "Nombres",
                 'value'  =>  "name",
@@ -315,6 +318,8 @@ class ContractorResource extends JsonResource
                     'field'  => 'supervisor_email',
                     'icon'   => 'mdi-mail',
                 ],
+                /*
+                 * TODO: Third party creation
                 [
                     'label'   =>  'RUT',
                     'field'   =>  'rut',
@@ -330,6 +335,7 @@ class ContractorResource extends JsonResource
                     'field'   =>  'third_party_text',
                     'icon'   =>   'mdi-archive-arrow-up',
                 ],
+                */
                 [
                     'label'   =>  'Creado por',
                     'field'   =>  'user',

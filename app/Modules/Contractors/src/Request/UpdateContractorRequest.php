@@ -70,8 +70,10 @@ class UpdateContractorRequest extends FormRequest
                 'string',
             ],
             'supervisor_email'  =>  'nullable|email',
-            'rut'   =>  'required|file|mimes:pdf',
-            'bank'  =>  'required|file|mimes:pdf',
+            // TODO: Third party
+            // 'rut'   =>  'required|file|mimes:pdf',
+            // 'bank'  =>  'required|file|mimes:pdf',
+
             // 'contract_type_id' =>  'required|numeric',
         ];
     }
