@@ -21,7 +21,6 @@ Route::prefix('contractors-portal')->group(function () {
     Route::post('/roles/{user}/user', [AdminController::class, 'store'])->middleware('auth:api');
     Route::delete('/roles/{user}/user', [AdminController::class, 'destroy'])->middleware('auth:api');
     Route::get('/find-users', [AdminController::class, 'findUsers'])->middleware('auth:api');
-    Route::get('/fonts', [FontController::class, 'index'])->middleware('auth:api');
     Route::get('/menu', [UserController::class, 'drawer'])->middleware('auth:api');
     Route::get('/permissions', [UserController::class, 'permissions'])->middleware('auth:api');
     Route::get('/counter', [ContractorController::class, 'counter'])->middleware('auth:api');
