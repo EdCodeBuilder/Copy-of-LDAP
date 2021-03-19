@@ -32,6 +32,7 @@ class StoreLawyerRequest extends FormRequest
             'name'  =>  'required|string|min:3|max:191',
             'surname'   =>  'required|string|min:3|max:191',
             'email' =>  'required|email',
+            'phone' =>  'required|numeric',
             'contract_type_id' =>  'required|numeric|exists:mysql_contractors.contract_types,id',
             'contract' =>  [
                 'required',
@@ -63,6 +64,7 @@ class StoreLawyerRequest extends FormRequest
             'name'  =>  'nombres',
             'surname' =>  'apellidos',
             'email' =>  'correo personal',
+            'phone' =>  'telefono de contácto',
             'contract_type_id'  =>  'tipo de trámite',
             'contract'    =>  'contrato',
             'start_date'    =>  'fecha tentativa de inicio del contrato',

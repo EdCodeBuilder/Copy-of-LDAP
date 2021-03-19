@@ -32,6 +32,7 @@ class UpdateContractorLawyerRequest extends FormRequest
             'name'  =>  'required|string|min:3|max:191',
             'surname'   =>  'required|string|min:3|max:191',
             'email' =>  'required|email',
+            'phone' =>  'required|numeric',
             'notify'    => 'nullable'
         ];
     }
@@ -49,6 +50,7 @@ class UpdateContractorLawyerRequest extends FormRequest
             'name'  =>  'nombres',
             'surname' =>  'apellidos',
             'email' =>  'correo personal',
+            'phone' =>  'telefono de contácto',
         ];
     }
 }
