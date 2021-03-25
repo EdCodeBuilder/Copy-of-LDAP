@@ -11,7 +11,9 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Controller;
 use App\Models\Security\User;
 use App\Modules\Contractors\src\Constants\Roles;
+use App\Modules\Contractors\src\Models\WareHouse;
 use App\Modules\Contractors\src\Request\LoginRequest;
+use App\Modules\Contractors\src\Resources\WareHouseResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -138,8 +140,15 @@ class UserController extends LoginController
         ]);
     }
 
-    public function oracle()
+    public function oracle(Request $request)
     {
-        return DB::connection('oracle')->getDatabaseName();
+        $data = WareHouse::query()
+            ->when($request->has('document'), function ($query) use ($request) {
+              return $query->where('ter_carg', $request->get('document'));
+            })
+            ->paginate($this->per_page);
+        return  $this->success_response(
+            WareHouseResource::collection( $data )
+        );
     }
 }
