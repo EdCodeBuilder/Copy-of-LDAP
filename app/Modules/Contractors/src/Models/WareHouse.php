@@ -35,6 +35,7 @@ class WareHouse extends Model
     protected $fillable = [
         'ter_carg',
         'act_desc',
+        'aud_usua',
         'pvd_codi',
         'act_cant',
     ];
