@@ -148,7 +148,9 @@ class UserController extends LoginController
             })
             ->paginate($this->per_page);
         return  $this->success_response(
-            WareHouseResource::collection( $data )
+            WareHouseResource::collection( $data ),
+            Response::HTTP_OK,
+            $data
         );
     }
 }
