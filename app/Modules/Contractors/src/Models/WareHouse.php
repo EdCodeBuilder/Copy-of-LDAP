@@ -25,7 +25,7 @@ class WareHouse extends Model
      *
      * @var string
      */
-    protected $primaryKey = 'rn';
+    protected $primaryKey = 'act_codi';
 
     /**
      * The attributes that are mass assignable.
@@ -35,7 +35,6 @@ class WareHouse extends Model
     protected $fillable = [
         'ter_carg',
         'act_desc',
-        'aud_usua',
         'pvd_codi',
         'act_cant',
     ];
