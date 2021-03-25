@@ -20,6 +20,7 @@ class WareHouseResource extends JsonResource
         return [
             'id'           =>  isset($this->act_codi) ? (int) $this->act_codi : null,
             'document'     =>  isset($this->ter_carg) ? (int) $this->ter_carg : null,
+            'responsable'  =>  isset($this->ter_resp) ? (int) $this->ter_resp : null,
             'name'         =>  isset($this->act_desc) ? $this->act_desc : null,
             'quantity'     =>  isset($this->act_cant) ? (int) $this->act_cant : null,
         ];
