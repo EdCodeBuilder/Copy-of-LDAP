@@ -291,6 +291,8 @@ class PeaceAndSafeController extends Controller
             $this->user->setUserAccountControl($ac);
             // Add two days for expiration date
             $this->user->setAccountExpiry(now()->timestamp);
+            // Sets the option to force the password change at the next logon.
+            $this->user->setFirstAttribute('pwdlastset', 0);
             // Save the user.
             $this->user->save();
             // Move user to new OU
