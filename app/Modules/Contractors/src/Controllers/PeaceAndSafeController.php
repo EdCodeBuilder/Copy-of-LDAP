@@ -77,6 +77,26 @@ class PeaceAndSafeController extends Controller
         return $this->generateCertificate($certification);
     }
 
+    public function show($token)
+    {
+        $certification = Certification::where('token', $token)->firstOrFail();
+        $virtual_file = $certification->virtual_file;
+        $complete_text = $virtual_file
+            ? ", número de contrato: <b>{$certification->contract}</b> y número de expediente: <b>{$virtual_file}</b>"
+            : " y número de contrato: <b>{$certification->contract}</b>";
+        $text = $this->createText(
+            $certification->name,
+            $certification->document,
+            $complete_text,
+            $certification->username
+        );
+        return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output('I', 'PAZ_Y_SALVO.pdf');
+    }
+
+    /**
+     * @param Certification $certification
+     * @return JsonResponse|string
+     */
     public function generateCertificate(Certification $certification)
     {
         try {
@@ -85,6 +105,7 @@ class PeaceAndSafeController extends Controller
             $document = $certification->document;
             $contract = $certification->contract;
             $virtual_file = $certification->virtual_file;
+            $expires_at = $certification->expires_at;
             $complete_text = $virtual_file
                 ? ", número de contrato: <b>{$contract}</b> y número de expediente: <b>{$virtual_file}</b>"
                 : " y número de contrato: <b>{$contract}</b>";
@@ -94,7 +115,7 @@ class PeaceAndSafeController extends Controller
                     $text = $this->createText($name, $document, $complete_text);
                     return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
                 }
-                if ($this->accountIsActive()) {
+                if ($this->accountIsActive() || (isset($expires_at) && now()->greaterThan($expires_at))) {
                     return $this->error_response(
                         "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
                         Response::HTTP_UNPROCESSABLE_ENTITY,
@@ -103,11 +124,14 @@ class PeaceAndSafeController extends Controller
                 }
                 if ($this->hasLDAP($document, 'postalcode')) {
                     $this->disableLDAP();
+                    $certification->name = toUpper($this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn'));
+                    $certification->username = $this->user->getFirstAttribute('samaccountname');
+                    $certification->save();
                     $text = $this->createText(
-                        toUpper($this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn')),
+                        $certification->name,
                         $this->user->getFirstAttribute('postalcode'),
                         $complete_text,
-                        toUpper($this->user->getFirstAttribute('samaccountname')),
+                        $certification->username,
                         false
                     );
                     return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output('I', 'PAZ_Y_SALVO.pdf');
@@ -115,16 +139,20 @@ class PeaceAndSafeController extends Controller
             }
 
             $username = isset($user->usua_login) ? $user->usua_login : 0;
-            if ($this->hasLDAP($username) && $this->accountIsActive()) {
+            if ($this->hasLDAP($username) && ( $this->accountIsActive() || (isset($expires_at) && now()->greaterThan($expires_at)) )) {
                 return $this->error_response(
                     "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
                     Response::HTTP_UNPROCESSABLE_ENTITY,
                     'Usuario con cuenta de ORFEO y LDAP'
                 );
             }
-
+            $certification->username = $this->user->getFirstAttribute('samaccountname');
+            $certification->name = toUpper($this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn'));
+            $certification->save();
             $total = $this->hasUnprocessedData($user->usua_codi);
             if ( $total > 0 ) {
+                $certification->expires_at = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') );
+                $certification->save();
                 return $this->error_response("Para generar el paz y salvo de sistemas debe tener sus bandejas de Orfeo en cero, actualmente cuenta con {$total} radicado(s) sin procesar.");
             }
             /*
@@ -134,7 +162,7 @@ class PeaceAndSafeController extends Controller
             $user->saveOrFail();
             $this->disableLDAP();
             $text = $this->createText(
-                toUpper($this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn')),
+                $certification->name,
                 $this->user->getFirstAttribute('postalcode'),
                 $complete_text,
                 toUpper($username)
@@ -213,6 +241,30 @@ class PeaceAndSafeController extends Controller
     public function accountIsActive()
     {
         return isset($this->user) && $this->user->isActive();
+    }
+
+    public function enableLDAP($username, $ous = 'OU=AREA DE SISTEMAS,OU=SUBDIRECCION ADMINISTRATIVA Y FINANCIERA,OU=ORGANIZACION IDRD')
+    {
+        try {
+            if ($this->hasLDAP($username)) {
+                // Get a new account control object for the user.
+                $ac = $this->user->getUserAccountControlObject();
+                // Mark the account as normal (512).
+                $ac->accountIsNormal();
+                // Set the account control on the user and save it.
+                $this->user->setUserAccountControl(512);
+                // Add two days for expiration date
+                $this->user->setAccountExpiry(now()->addDays(2));
+                // Save the user.
+                $this->user->save();
+                // Move user to new OU
+                $this->user->move($ous);
+                return $this->success_message('Usuario activado y listo para usar');
+            }
+            return $this->error_response('No se encuentra usuario LDAP');
+        } catch (Exception $exception) {
+            return $this->error_response('No se encuentra usuario LDAP');
+        }
     }
 
     /**
@@ -349,8 +401,10 @@ class PeaceAndSafeController extends Controller
         if (Storage::disk('local')->exists("templates/{$name}.png")) {
             Storage::disk('local')->delete("templates/{$name}.png");
         }
-        $certification->token = $name;
-        $certification->save();
+        if (!isset( $certification->token )) {
+            $certification->token = $name;
+            $certification->save();
+        }
         return $pdf;
     }
 }

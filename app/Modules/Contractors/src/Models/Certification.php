@@ -40,8 +40,12 @@ class Certification extends Model implements Auditable
         'document',
         'contract',
         'virtual_file',
+        'username',
+        'expires_at',
         'token',
     ];
+
+    protected $dates = ['expires_at'];
 
     /*
      * ---------------------------------------------------------
