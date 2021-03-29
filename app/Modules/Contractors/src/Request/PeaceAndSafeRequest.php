@@ -28,6 +28,7 @@ class PeaceAndSafeRequest extends FormRequest
     {
         return [
             'name'          => 'required|string',
+            'surname'       => 'required|string',
             'document'      => 'required|numeric',
             'contract'      => 'required|numeric',
             'year'          => 'required|date|date_format:Y',
@@ -44,6 +45,7 @@ class PeaceAndSafeRequest extends FormRequest
         return [
             'document'  =>  'número de documento',
             'name'  =>  'nombres',
+            'surname'  =>  'apellidos',
             'contract'    =>  'contrato',
             'virtual_file'    =>  'expediente virtual',
         ];

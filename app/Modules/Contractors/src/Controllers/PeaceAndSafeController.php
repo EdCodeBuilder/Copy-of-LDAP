@@ -69,6 +69,9 @@ class PeaceAndSafeController extends Controller
         }
         $certification = new Certification;
         $certification->fill($request->validated());
+        $name = toUpper($request->get('name'));
+        $surname = toUpper($request->get('surname'));
+        $certification->name = "{$name} {$surname}";
         $certification->contract = $contract;
         $certification->save();
         return $this->generateCertificate($certification);
