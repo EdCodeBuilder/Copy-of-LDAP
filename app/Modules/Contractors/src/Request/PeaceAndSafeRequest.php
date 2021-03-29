@@ -31,7 +31,7 @@ class PeaceAndSafeRequest extends FormRequest
             'surname'       => 'required|string',
             'document'      => 'required|numeric',
             'contract'      => 'required|numeric',
-            'year'          => 'required|date|date_format:Y',
+            'year'          => 'required|numeric|min:1900|max:'.now()->year,
             'virtual_file'  => 'nullable|string',
         ];
     }
@@ -47,6 +47,7 @@ class PeaceAndSafeRequest extends FormRequest
             'name'  =>  'nombres',
             'surname'  =>  'apellidos',
             'contract'    =>  'contrato',
+            'year'    =>  'año de contrato',
             'virtual_file'    =>  'expediente virtual',
         ];
     }
