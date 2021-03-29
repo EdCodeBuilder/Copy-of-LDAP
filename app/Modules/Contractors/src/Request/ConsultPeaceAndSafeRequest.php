@@ -27,9 +27,9 @@ class ConsultPeaceAndSafeRequest extends FormRequest
     public function rules()
     {
         return [
-            'contract'      => 'required_with:year|numeric',
-            'year'          => 'required_with:contract|numeric|min:1900|max:'.now()->year,
-            'token'         => 'required_without:contract,year|string',
+            'contract'      => 'required_with:year|nullable|numeric',
+            'year'          => 'required_with:contract|nullable|numeric|min:1900|max:'.now()->year,
+            'token'         => 'required_without:contract,year|nullable|string|exists:mysql_contractors.certifications,token',
         ];
     }
     /**
