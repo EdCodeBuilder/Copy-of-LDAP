@@ -254,7 +254,7 @@ class PeaceAndSafeController extends Controller
                 // Set the account control on the user and save it.
                 $this->user->setUserAccountControl(512);
                 // Add two days for expiration date
-                $this->user->setAccountExpiry(now()->addDays(2));
+                $this->user->setAccountExpiry(now()->addDays(2)->timestamp);
                 // Save the user.
                 $this->user->save();
                 // Move user to new OU
