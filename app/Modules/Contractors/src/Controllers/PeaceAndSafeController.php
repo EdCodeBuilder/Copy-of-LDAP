@@ -261,6 +261,8 @@ class PeaceAndSafeController extends Controller
                 $this->user->move($ous);
                 // Add two days for expiration date
                 $this->user->setAccountExpiry(now()->addDay()->timestamp);
+                // Sets the option to force the password change at the next logon.
+                $this->user->setDisableForcePasswordChange();
                 // Save the user.
                 $this->user->save();
                 return $this->success_message('Usuario activado y listo para usar', 200, 200, [
