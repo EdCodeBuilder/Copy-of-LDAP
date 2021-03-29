@@ -16,12 +16,18 @@ use App\Modules\Orfeo\src\Models\Filed;
 use App\Modules\Orfeo\src\Models\Informed;
 use App\Modules\Orfeo\src\Models\User;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaravelQRCode\Facades\QRCode;
+use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
+use setasign\Fpdi\PdfParser\Filter\FilterException;
+use setasign\Fpdi\PdfParser\PdfParserException;
+use setasign\Fpdi\PdfParser\Type\PdfTypeException;
+use setasign\Fpdi\PdfReader\PdfReaderException;
 
 class PeaceAndSafeController extends Controller
 {
@@ -53,15 +59,29 @@ class PeaceAndSafeController extends Controller
      */
     public function index(PeaceAndSafeRequest $request)
     {
-        try {
-            $certification = new Certification;
-            $certification->fill($request->validated());
-            $user = User::where('usua_doc', $request->get('document'))->first();
+        $contract_number = str_pad($request->get('contract'), 4, '0', STR_PAD_LEFT);
+        $contract = toUpper("IDRD-CTO-{$contract_number}-{$request->get('year')}");
+        $certification = Certification::where('document', $request->get('document'))
+                                      ->where('contract', $contract)
+                                      ->first();
+        if (isset($certification->id)) {
+            return $this->generateCertificate($certification);
+        }
+        $certification = new Certification;
+        $certification->fill($request->validated());
+        $certification->contract = $contract;
+        $certification->save();
+        return $this->generateCertificate($certification);
+    }
 
-            $name = toUpper($request->get('name'));
-            $document = $request->get('document');
-            $contract = toUpper($request->get('contract'));
-            $virtual_file = toUpper($request->get('virtual_file'));
+    public function generateCertificate(Certification $certification)
+    {
+        try {
+            $user = User::where('usua_doc', $certification->document)->first();
+            $name = $certification->name;
+            $document = $certification->document;
+            $contract = $certification->contract;
+            $virtual_file = $certification->virtual_file;
             $complete_text = $virtual_file
                 ? ", número de contrato: <b>{$contract}</b> y número de expediente: <b>{$virtual_file}</b>"
                 : " y número de contrato: <b>{$contract}</b>";
@@ -117,7 +137,7 @@ class PeaceAndSafeController extends Controller
                 toUpper($username)
             );
             return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->error_response(
                 __('validation.handler.service_unavailable'),
                 Response::HTTP_UNPROCESSABLE_ENTITY,
@@ -210,7 +230,7 @@ class PeaceAndSafeController extends Controller
             $this->user->save();
             // Move user to new OU
             return $this->user->move($ou);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return false;
         }
     }
@@ -258,6 +278,20 @@ class PeaceAndSafeController extends Controller
         return $text;
     }
 
+    /**
+     * @param $file
+     * @param $text
+     * @param Certification $certification
+     * @param string $orientation
+     * @param string $unit
+     * @param string $size
+     * @return FPDF
+     * @throws CrossReferenceException
+     * @throws FilterException
+     * @throws PdfParserException
+     * @throws PdfTypeException
+     * @throws PdfReaderException
+     */
     public function getPDF($file, $text, Certification $certification, $orientation = 'L', $unit = 'mm', $size = 'Letter')
     {
         $pdf = new FPDF($orientation, $unit, $size);
@@ -292,7 +326,7 @@ class PeaceAndSafeController extends Controller
         $pdf->WriteTag(160, 5, utf8_decode($text));
         // Footer QR and document authentication
         $pdf->SetXY(30, 108);
-        $name = Str::random(9);
+        $name = isset( $certification->token ) ? $certification->token : Str::random(9);
         $url = "https://sim.idrd.gov.co/portal-comtratista/validacion-documento/$name";
         QrCode::url($url)
             ->setErrorCorrectionLevel('H')
@@ -300,7 +334,6 @@ class PeaceAndSafeController extends Controller
             ->setOutfile(storage_path("app/templates/{$name}.png"))
             ->png();
         $file = storage_path("app/templates/{$name}.png");
-        $certification->token = $name;
         $pdf->Image($file, 30, 200, 50, 50);
         $pdf->SetXY(80, 220);
         $pdf->SetFontSize(8);
@@ -313,6 +346,7 @@ class PeaceAndSafeController extends Controller
         if (Storage::disk('local')->exists("templates/{$name}.png")) {
             Storage::disk('local')->delete("templates/{$name}.png");
         }
+        $certification->token = $name;
         $certification->save();
         return $pdf;
     }
