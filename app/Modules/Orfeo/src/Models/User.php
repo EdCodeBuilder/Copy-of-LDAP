@@ -38,6 +38,13 @@ class User extends Model
         'usua_email'
     ];
 
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
     /*
      * ---------------------------------------------------------
      * Accessors and Mutator
