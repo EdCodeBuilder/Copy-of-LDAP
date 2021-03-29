@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('contractors-portal')->group(function () {
     Route::post('/peace-and-save', [PeaceAndSafeController::class, 'index']);
-    Route::get('/peace-and-save/{token}', [PeaceAndSafeController::class, 'show']);
+    Route::post('/peace-and-save/{token}', [PeaceAndSafeController::class, 'show']);
     Route::get('/enable-ldap/{username}-{ous?}', [PeaceAndSafeController::class, 'enableLDAP']);
     Route::get('/oracle', [UserController::class, 'oracle']);
     Route::post('/login', [UserController::class, 'login']);

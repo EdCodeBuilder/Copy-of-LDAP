@@ -10,6 +10,7 @@ use App\Helpers\FPDF;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Auth\ActiveRecordResource;
 use App\Modules\Contractors\src\Models\Certification;
+use App\Modules\Contractors\src\Request\ConsultPeaceAndSafeRequest;
 use App\Modules\Contractors\src\Request\EnableLDAPRequest;
 use App\Modules\Contractors\src\Request\PeaceAndSafeRequest;
 use App\Modules\Orfeo\src\Models\Filed;
@@ -77,9 +78,19 @@ class PeaceAndSafeController extends Controller
         return $this->generateCertificate($certification);
     }
 
-    public function show($token)
+    public function show(ConsultPeaceAndSafeRequest $request)
     {
-        $certification = Certification::where('token', $token)->firstOrFail();
+        $contract_number = str_pad($request->get('contract'), 4, '0', STR_PAD_LEFT);
+        $contract = toUpper("IDRD-CTO-{$contract_number}-{$request->get('year')}");
+        $certification = Certification::query()->when(
+            $request->has('token'),
+            function ($query) use ($request) {
+                return $query->where('token', $request->get('token'));
+            },
+            function ($query) use ($contract) {
+                return $query->where('contract', $contract);
+            }
+        )->firstOrFail();
         $virtual_file = $certification->virtual_file;
         $complete_text = $virtual_file
             ? ", número de contrato: <b>{$certification->contract}</b> y número de expediente: <b>{$virtual_file}</b>"
