@@ -110,7 +110,7 @@ class PeaceAndSafeController extends Controller
                         toUpper($this->user->getFirstAttribute('samaccountname')),
                         false
                     );
-                    return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
+                    return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output('I', 'PAZ_Y_SALVO.pdf');
                 }
             }
 
@@ -139,7 +139,7 @@ class PeaceAndSafeController extends Controller
                 $complete_text,
                 toUpper($username)
             );
-            return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
+            return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output('I', 'PAZ_Y_SALVO.pdf');
         } catch (Exception $e) {
             return $this->error_response(
                 __('validation.handler.service_unavailable'),
