@@ -88,7 +88,8 @@ class PeaceAndSafeController extends Controller
             $certification->name,
             $certification->document,
             $complete_text,
-            $certification->username
+            $certification->username,
+            isset($certification->username)
         );
         return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output('I', 'PAZ_Y_SALVO.pdf');
     }
@@ -115,11 +116,11 @@ class PeaceAndSafeController extends Controller
                     $text = $this->createText($name, $document, $complete_text);
                     return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
                 }
-                if ($this->accountIsActive() || (isset($expires_at) && now()->greaterThan($expires_at))) {
+                if ($this->accountIsActive()) {
                     return $this->error_response(
                         "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
                         Response::HTTP_UNPROCESSABLE_ENTITY,
-                        'Usuario sin cuenta de ORFEO pero con LDAP'
+                        'Usuario sin cuenta de ORFEO pero con cuenta institucional'
                     );
                 }
                 if ($this->hasLDAP($document, 'postalcode')) {
@@ -139,12 +140,15 @@ class PeaceAndSafeController extends Controller
             }
 
             $username = isset($user->usua_login) ? $user->usua_login : 0;
-            if ($this->hasLDAP($username) && ( $this->accountIsActive() || (isset($expires_at) && now()->greaterThan($expires_at)) )) {
-                return $this->error_response(
-                    "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
-                    Response::HTTP_UNPROCESSABLE_ENTITY,
-                    'Usuario con cuenta de ORFEO y LDAP'
-                );
+            if ($this->hasLDAP($username) ) {
+                $new_expire_date = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') );
+                if ($this->accountIsActive() && !(isset($expires_at) && abs( $expires_at->diffInDays($new_expire_date) ) <= 3)) {
+                    return $this->error_response(
+                        "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
+                        Response::HTTP_UNPROCESSABLE_ENTITY,
+                        'Usuario con cuenta de ORFEO y LDAP'
+                    );
+                }
             }
             $certification->username = $this->user->getFirstAttribute('samaccountname');
             $certification->name = toUpper($this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn'));
@@ -281,6 +285,8 @@ class PeaceAndSafeController extends Controller
             $ac->accountIsDisabled();
             // Set the account control on the user and save it.
             $this->user->setUserAccountControl($ac);
+            // Add two days for expiration date
+            $this->user->setAccountExpiry(now()->timestamp);
             // Save the user.
             $this->user->save();
             // Move user to new OU
