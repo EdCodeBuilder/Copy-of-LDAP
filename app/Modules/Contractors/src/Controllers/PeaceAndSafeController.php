@@ -263,7 +263,7 @@ class PeaceAndSafeController extends Controller
             }
             return $this->error_response('No se encuentra usuario LDAP');
         } catch (Exception $exception) {
-            return $this->error_response('No se encuentra usuario LDAP');
+            return $this->error_response('No se encuentra usuario LDAP', 422, $exception);
         }
     }
 
