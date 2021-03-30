@@ -81,16 +81,17 @@ class PeaceAndSafeController extends Controller
     public function show(ConsultPeaceAndSafeRequest $request)
     {
         $contract_number = str_pad($request->get('contract'), 4, '0', STR_PAD_LEFT);
-        $contract = toUpper("IDRD-CTO-{$contract_number}-{$request->get('year')}");
+        $contract = "IDRD-CTO-{$contract_number}-{$request->get('year')}";
         $certification = Certification::query()->when(
             $request->has('token'),
             function ($query) use ($request) {
                 return $query->where('token', $request->get('token'));
+            },
+            function ($query) use ($contract, $request) {
+                return $query->where('contract', $contract)
+                    ->where('document', $request->get('document'));
             }
-        )->when(($request->has('document')), function ($query) use ($contract, $request) {
-            return $query->where('contract', $contract)
-                ->where('document', $request->get('document'));
-        })->firstOrFail();
+        )->firstOrFail();
         $virtual_file = $certification->virtual_file;
         $complete_text = $virtual_file
             ? ", número de contrato: <b>{$certification->contract}</b> y número de expediente: <b>{$virtual_file}</b>"
