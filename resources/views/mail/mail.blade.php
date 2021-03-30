@@ -93,6 +93,35 @@
                                     {{ isset( $content ) ? $content : '¡Hola! hemos registrado tus datos satisfactoriamente' }}
                                 </td>
                             </tr>
+                            @if( isset( $remember ) && !isset($hide_btn) || (isset($hide_btn) && $hide_btn == false)  )
+                            <tr>
+                                <td style="border-bottom-left-radius: 4px;border-bottom-right-radius: 4px;" align="center">
+                                    <table width="90%" border="0" align="center" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td height="40"></td>
+                                        </tr>
+                                        <!-- button -->
+                                        <tr>
+                                            <td align="center">
+                                                <table class="textbutton" align="center" border="0" cellspacing="0" cellpadding="0">
+                                                    <tr>
+                                                        <td class="btn-link" bgcolor="#594d95" height="55" align="center" style="font-family: 'Open Sans', Arial, sans-serif; font-size:16px; color:#FFFFFF;font-weight: bold;padding-left: 25px;padding-right: 25px;border-radius:4px;">
+                                                            <a href="{{ isset( $url ) ? $url : "https://www.idrd.gov.co/" }}">
+                                                                {{ isset($btn_text) ? $btn_text : 'Ver Formulario' }}
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <!-- end button -->
+                                        <tr>
+                                            <td height="30"></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            @endif
                             <tr>
                                 <td align="center" style="font-family: 'Open Sans', Arial, sans-serif; font-size:14px; color:#594d95; font-weight: bold; line-height:29px;">
                                     {{ isset( $title ) ? $title : '' }}
@@ -136,6 +165,22 @@
                                     {!!  isset( $info ) ? $info : '' !!}
                                 </td>
                             </tr>
+                            @if(isset( $remember ))
+                            <tr>
+                                <td height="20"></td>
+                            </tr>
+                            <tr>
+                                <td align="center" style="font-family: 'Open Sans', Arial, sans-serif; font-size:14px; color:#3b3b3b; font-weight: bold; line-height:29px;">
+                                    {!!  isset( $remember ) ? $remember : '' !!}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td height="20"></td>
+                            </tr>
+                            <tr>
+                                <td align="center" style="line-height: 0px;"><img style="display:block; line-height:0px; font-size:0px; border:0px; height: 60%;" src="{{ asset('images/remember.png') }}" alt="Recuerde" /></td>
+                            </tr>
+                            @endif
                             <tr>
                                 <td height="50"></td>
                             </tr>

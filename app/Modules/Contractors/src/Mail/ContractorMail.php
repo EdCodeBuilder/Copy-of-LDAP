@@ -56,7 +56,7 @@ class ContractorMail extends Mailable
             ->with([
                 'header'    => 'IDRD',
                 'title'     => 'Registro Portal Contratista',
-                'content'   =>  "¡{$name}! hemos registrado sus datos de forma satisfactoria. Por favor ingrese al link que se relaciona a continuación para que complete el registro de datos personales.",
+                'content'   =>  "¡{$name}! hemos registrado sus datos de manera satisfactoria, para continuar con el proceso de afiliación a la ARL, es indispensable que ingrese sus datos personales en el siguiente enlace.",
                 'details'   =>  "
                         <p>Número de Registro: {$id}</p>
                         <p>Nombre: {$name}</p>
@@ -65,6 +65,7 @@ class ContractorMail extends Mailable
                 // 'hide_btn'  => true,
                 'url'       =>  "https://sim.idrd.gov.co/{$path}/es/contracts?payload=$document",
                 'info'      =>  "Será notificado a este correo electrónico una vez se haya expedido su certificado de afiliación a la ARL Positiva.",
+                'remember'  =>  'Recuerde cargar en el SECOP II la póliza de cumplimiento y en el campo de acciones dar clic en la opción de Publicar para aprobación de la Entidad Estatal.',
                 'year'      =>  Carbon::now()->year
             ]);
     }
