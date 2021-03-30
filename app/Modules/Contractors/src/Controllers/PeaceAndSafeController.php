@@ -78,7 +78,16 @@ class PeaceAndSafeController extends Controller
         return $this->generateCertificate($certification);
     }
 
-    public function show(ConsultPeaceAndSafeRequest $request)
+    /**
+     * @param ConsultPeaceAndSafeRequest $request
+     * @return string
+     * @throws CrossReferenceException
+     * @throws FilterException
+     * @throws PdfParserException
+     * @throws PdfReaderException
+     * @throws PdfTypeException
+     */
+    public function validation(ConsultPeaceAndSafeRequest $request)
     {
         $contract_number = str_pad($request->get('contract'), 4, '0', STR_PAD_LEFT);
         $contract = "IDRD-CTO-{$contract_number}-{$request->get('year')}";
@@ -104,6 +113,16 @@ class PeaceAndSafeController extends Controller
             isset($certification->username)
         );
         return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output('I', 'PAZ_Y_SALVO.pdf');
+    }
+
+    /**
+     * @param $token
+     * @return JsonResponse
+     */
+    public function show($token)
+    {
+        $certification = Certification::where('token', $token)->firstOrFail();
+        return $this->success_message($certification);
     }
 
     /**
@@ -406,7 +425,10 @@ class PeaceAndSafeController extends Controller
         // Footer QR and document authentication
         $pdf->SetXY(30, 108);
         $name = isset( $certification->token ) ? $certification->token : Str::random(9);
-        $url = "https://sim.idrd.gov.co/portal-comtratista/validacion-documento/$name";
+        $path = env('APP_ENV') == 'local'
+            ? env('APP_PATH_DEV')
+            : env('APP_PATH_PROD');
+        $url = "https://sim.idrd.gov.co/{$path}/es/validar-documento?validate=$name";
         QrCode::url($url)
             ->setErrorCorrectionLevel('H')
             ->setSize(10)
