@@ -87,8 +87,9 @@ class PeaceAndSafeController extends Controller
             function ($query) use ($request) {
                 return $query->where('token', $request->get('token'));
             },
-            function ($query) use ($contract) {
-                return $query->where('contract', $contract);
+            function ($query) use ($contract, $request) {
+                return $query->where('contract', $contract)
+                             ->where('document', $request->get('document'));
             }
         )->firstOrFail();
         $virtual_file = $certification->virtual_file;
