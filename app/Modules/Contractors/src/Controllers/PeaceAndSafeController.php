@@ -53,6 +53,11 @@ class PeaceAndSafeController extends Controller
         $this->ldap = $ldap;
     }
 
+    /**
+     * @param Request $request
+     * @param $type
+     * @return Certification
+     */
     public function saveInDatabase(Request $request, $type)
     {
         $contract_number = str_pad($request->get('contract'), 4, '0', STR_PAD_LEFT);
@@ -61,7 +66,7 @@ class PeaceAndSafeController extends Controller
             ->where('contract', $contract)
             ->where('type', $type)
             ->first();
-        if (isset($certification->token)) {
+        if (isset($certification->id)) {
             return $certification;
         }
         $certification = new Certification;
