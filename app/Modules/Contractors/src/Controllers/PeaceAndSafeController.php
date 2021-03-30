@@ -143,7 +143,7 @@ class PeaceAndSafeController extends Controller
             }
             $http = new Client();
             $response = $http->post('http://66.70.171.168/api/contractors-portal/oracle', [
-                'form_params' => [
+                'json' => [
                     'document' => $request->get('document'),
                 ],
                 'headers' => [
