@@ -43,6 +43,7 @@ class Certification extends Model implements Auditable
         'username',
         'expires_at',
         'token',
+        'type',
     ];
 
     protected $dates = ['expires_at'];

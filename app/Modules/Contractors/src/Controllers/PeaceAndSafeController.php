@@ -18,6 +18,7 @@ use App\Modules\Orfeo\src\Models\Informed;
 use App\Modules\Orfeo\src\Models\User;
 use Carbon\Carbon;
 use Exception;
+use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -52,6 +53,28 @@ class PeaceAndSafeController extends Controller
         $this->ldap = $ldap;
     }
 
+    public function saveInDatabase(Request $request, $type)
+    {
+        $contract_number = str_pad($request->get('contract'), 4, '0', STR_PAD_LEFT);
+        $contract = toUpper("IDRD-CTO-{$contract_number}-{$request->get('year')}");
+        $certification = Certification::where('document', $request->get('document'))
+            ->where('contract', $contract)
+            ->where('type', $type)
+            ->first();
+        if (isset($certification->token)) {
+            return $certification;
+        }
+        $certification = new Certification;
+        $certification->fill($request->validated());
+        $name = toUpper($request->get('name'));
+        $surname = toUpper($request->get('surname'));
+        $certification->name = "{$name} {$surname}";
+        $certification->contract = $contract;
+        $certification->type = $type;
+        $certification->save();
+        return $certification;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -60,21 +83,7 @@ class PeaceAndSafeController extends Controller
      */
     public function index(PeaceAndSafeRequest $request)
     {
-        $contract_number = str_pad($request->get('contract'), 4, '0', STR_PAD_LEFT);
-        $contract = toUpper("IDRD-CTO-{$contract_number}-{$request->get('year')}");
-        $certification = Certification::where('document', $request->get('document'))
-                                      ->where('contract', $contract)
-                                      ->first();
-        if (isset($certification->id)) {
-            return $this->generateCertificate($certification);
-        }
-        $certification = new Certification;
-        $certification->fill($request->validated());
-        $name = toUpper($request->get('name'));
-        $surname = toUpper($request->get('surname'));
-        $certification->name = "{$name} {$surname}";
-        $certification->contract = $contract;
-        $certification->save();
+        $certification = $this->saveInDatabase($request, 'SYS');
         return $this->generateCertificate($certification);
     }
 
@@ -123,6 +132,63 @@ class PeaceAndSafeController extends Controller
     {
         $certification = Certification::where('token', $token)->firstOrFail();
         return $this->success_message($certification);
+    }
+
+    public function wareHouse(PeaceAndSafeRequest $request)
+    {
+        try {
+            $certification = $this->saveInDatabase($request, 'ALM');
+            if (isset($certification->token)) {
+                return $this->createWarehouseCert($certification);
+            }
+            $http = new Client();
+            $response = $http->post('http://66.70.171.168:8081/api/contractors-portal/oracle', [
+                'form_params' => [
+                    'document' => $request->get('document'),
+                ],
+                'headers' => [
+                    'Accept'    => 'application/json',
+                    'Content-type' => 'application/json'
+                ]
+            ]);
+            $data = json_decode($response->getBody()->getContents(), true);
+            if ( isset( $data['data'] ) && count($data['data']) > 0 ) {
+                return \response()->json($data);
+            }
+            return $this->createWarehouseCert($certification);
+        } catch (\Exception $exception) {
+            return $this->error_response('No podemos realizar la consulta en este momento, por favor intente más tarde.');
+        }
+    }
+
+    public function createWarehouseCert(Certification $certification)
+    {
+        $day = intval(now()->format('d'));
+        $day = $day > 1 ? "a los {$day} días" : "al primer día";
+        $month = intval(now()->format('m'));
+        $months = [
+            1 => 'enero',
+            2 => 'febrero',
+            3 => 'marzo',
+            4 => 'abril',
+            5 => 'mayo',
+            6 => 'junio',
+            7 => 'julio',
+            8 => 'agosto',
+            9 => 'septiembre',
+            10 => 'octubre',
+            11 => 'noviembre',
+            12 => 'diciembre',
+        ];
+        $m = isset($months[$month]) ? $months[$month] : toLower(now()->format('M'));
+        $year = now()->format('Y');
+        $virtual_file = $certification->virtual_file;
+        $complete_text = $virtual_file
+            ? ", número de contrato: <b>{$certification->contract}</b> y número de expediente: <b>{$certification->virtual_file}</b>"
+            : " y número de contrato: <b>{$certification->contract}</b>";
+        $text= "<p>Una vez verificado en el sistema SEVEN los datos del(la) funcionario(a) <b>{$certification->name}</b>, identificado(a) con cédula de ciudadanía No. <b>{$certification->document}</b>{$complete_text}.</p><p>Se da constancia que <b>NO</b> posee activos a cargo.</p>";
+        $text.= "<p>Se expide certificado de paz y salvo por solicitud del usuario {$day} del mes de {$m} del año {$year} debido a: <b>TERMINACIÓN DE CONTRATO.</b></p>";
+        return $this->getPDF('PAZ_Y_SALVO_ALMACEN.pdf', $text, $certification);
     }
 
     /**
@@ -424,7 +490,7 @@ class PeaceAndSafeController extends Controller
         $pdf->WriteTag(160, 5, utf8_decode($text));
         // Footer QR and document authentication
         $pdf->SetXY(30, 108);
-        $name = isset( $certification->token ) ? $certification->token : Str::random(9);
+        $name = isset( $certification->token ) ? $certification->token : $certification->type.'-'.Str::random(9);
         $path = env('APP_ENV') == 'local'
             ? env('APP_PATH_DEV')
             : env('APP_PATH_PROD');
