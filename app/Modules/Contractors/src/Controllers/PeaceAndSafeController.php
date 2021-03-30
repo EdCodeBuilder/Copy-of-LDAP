@@ -153,7 +153,7 @@ class PeaceAndSafeController extends Controller
             ]);
             $data = json_decode($response->getBody()->getContents(), true);
             if ( isset( $data['data'] ) && count($data['data']) > 0 ) {
-                return \response()->json($data);
+                return $this->error_response($data);
             }
             return $this->createWarehouseCert($certification);
         } catch (\Exception $exception) {
