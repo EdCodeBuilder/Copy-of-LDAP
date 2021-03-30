@@ -527,12 +527,12 @@ class PeaceAndSafeController extends Controller
         $pdf->Image($file, 30, 200, 50, 50);
         $pdf->SetXY(80, 220);
         $pdf->SetFontSize(8);
-        $x = 'La autenticidad de este documento se puede validar a través de:';
+        $x = 'La autenticidad de este documento se puede validar a través del enlace inferior.';
         $pdf->Write(5 , utf8_decode($x));
         $pdf->SetXY(80, 225);
-        $pdf->Write(5, $url, $url);
-        $pdf->SetXY(80, 230);
         $pdf->Cell(30, 5, utf8_decode('O escaneando el código QR desde un dispositivo móvil.'));
+        $pdf->SetXY(32, 248);
+        $pdf->Write(5, $url, $url);
         if (Storage::disk('local')->exists("templates/{$name}.png")) {
             Storage::disk('local')->delete("templates/{$name}.png");
         }
