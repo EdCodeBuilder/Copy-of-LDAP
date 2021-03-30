@@ -157,7 +157,11 @@ class PeaceAndSafeController extends Controller
             }
             return $this->createWarehouseCert($certification);
         } catch (\Exception $exception) {
-            return $this->error_response('No podemos realizar la consulta en este momento, por favor intente más tarde.');
+            return $this->error_response(
+                'No podemos realizar la consulta en este momento, por favor intente más tarde.',
+                422,
+                $exception->getMessage()
+            );
         }
     }
 
