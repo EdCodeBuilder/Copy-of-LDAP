@@ -88,7 +88,7 @@ class PeaceAndSafeController extends Controller
                 return $query->where('token', $request->get('token'));
             },
             function ($query) use ($contract, $request) {
-                return $query->where('contract', $contract)
+                return $query->where('contract', 'like', "%{$contract}%")
                     ->where('document', $request->get('document'));
             }
         )->firstOrFail();
