@@ -83,7 +83,7 @@ class PeaceAndSafeController extends Controller
         $contract_number = str_pad($request->get('contract'), 4, '0', STR_PAD_LEFT);
         $contract = "IDRD-CTO-{$contract_number}-{$request->get('year')}";
         $certification = Certification::query()->when(
-            $request->has('token'),
+            $request->has('token') && ($request->get('token') != "" || !is_null($request->get('token'))),
             function ($query) use ($request) {
                 return $query->where('token', $request->get('token'));
             },
