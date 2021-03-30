@@ -142,7 +142,7 @@ class PeaceAndSafeController extends Controller
                 return $this->createWarehouseCert($certification);
             }
             $http = new Client();
-            $response = $http->post('http://66.70.171.168:8081/api/contractors-portal/oracle', [
+            $response = $http->post('http://66.70.171.168/api/contractors-portal/oracle', [
                 'form_params' => [
                     'document' => $request->get('document'),
                 ],
