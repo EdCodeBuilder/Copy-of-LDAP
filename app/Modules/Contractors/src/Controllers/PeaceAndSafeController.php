@@ -134,6 +134,10 @@ class PeaceAndSafeController extends Controller
         return $this->success_message($certification);
     }
 
+    /**
+     * @param PeaceAndSafeRequest $request
+     * @return JsonResponse|string
+     */
     public function wareHouse(PeaceAndSafeRequest $request)
     {
         try {
@@ -165,6 +169,15 @@ class PeaceAndSafeController extends Controller
         }
     }
 
+    /**
+     * @param Certification $certification
+     * @return string
+     * @throws CrossReferenceException
+     * @throws FilterException
+     * @throws PdfParserException
+     * @throws PdfReaderException
+     * @throws PdfTypeException
+     */
     public function createWarehouseCert(Certification $certification)
     {
         $day = intval(now()->format('d'));
@@ -192,7 +205,8 @@ class PeaceAndSafeController extends Controller
             : " y número de contrato: <b>{$certification->contract}</b>";
         $text= "<p>Una vez verificado en el sistema SEVEN los datos del(la) funcionario(a) <b>{$certification->name}</b>, identificado(a) con cédula de ciudadanía No. <b>{$certification->document}</b>{$complete_text}.</p><p>Se da constancia que <b>NO</b> posee activos a cargo.</p>";
         $text.= "<p>Se expide certificado de paz y salvo por solicitud del usuario {$day} del mes de {$m} del año {$year} debido a: <b>TERMINACIÓN DE CONTRATO.</b></p>";
-        return $this->getPDF('PAZ_Y_SALVO_ALMACEN.pdf', $text, $certification);
+
+        return $this->getPDF('PAZ_Y_SALVO_ALMACEN.pdf', $text, $certification)->Output('I', 'PAZ_Y_SALVO.pdf');;
     }
 
     /**
