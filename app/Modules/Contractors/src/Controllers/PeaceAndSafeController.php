@@ -262,7 +262,7 @@ class PeaceAndSafeController extends Controller
             $username = isset($user->usua_login) ? $user->usua_login : 0;
             if ($this->hasLDAP($username) ) {
                 $new_expire_date = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') );
-                if ($this->accountIsActive() && !(isset($expires_at) && abs( $expires_at->diffInDays($new_expire_date) ) <= 3)) {
+                if ($this->accountIsActive() && !(isset($expires_at) && Carbon::parse($new_expire_date)->diffInDays($expires_at, false) <= 3)) {
                     return $this->error_response(
                         "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
                         Response::HTTP_UNPROCESSABLE_ENTITY,
@@ -282,6 +282,8 @@ class PeaceAndSafeController extends Controller
             /*
              * Disable Orfeo and LDAP Account
             */
+            $certification->expires_at = null;
+            $certification->save();
             $user->usua_esta = 0;
             $user->saveOrFail();
             $this->disableLDAP();
