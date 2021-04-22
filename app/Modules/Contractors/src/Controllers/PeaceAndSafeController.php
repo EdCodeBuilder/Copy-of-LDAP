@@ -500,11 +500,12 @@ class PeaceAndSafeController extends Controller
         // use the imported page and place it at point 10,10 with a width of 100 mm
         $pdf->useTemplate($tplId, 0, 0, null, null, true);
         // Creation date and time
+        $created_at = isset($certification->created_at) ? $certification->created_at->format('Y-m-d H:i:s') : null;
         $pdf->SetFont('Helvetica', 'B');
         $pdf->SetFontSize(8);
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetXY(30, 38);
-        $pdf->Cell(160,10, 'Fecha: '.now()->format('Y-m-d H:i:s'),0,0,'L');
+        $pdf->Cell(160,10, utf8_decode('Fecha de solicitud original: '.$created_at),0,0,'L');
         // Document Text
         $pdf->SetFont('Helvetica');
         $pdf->SetFontSize(11);
@@ -533,6 +534,10 @@ class PeaceAndSafeController extends Controller
         $pdf->Write(5 , utf8_decode($x));
         $pdf->SetXY(80, 225);
         $pdf->Cell(30, 5, utf8_decode('O escaneando el código QR desde un dispositivo móvil.'));
+        $pdf->SetXY(80, 235);
+        $pdf->SetFontSize(12);
+        $pdf->Cell(30, 5, utf8_decode('Código de verificación: '.$name.'00'));
+        $pdf->SetFontSize(8);
         $pdf->SetXY(32, 248);
         $pdf->Write(5, $url, $url);
         if (Storage::disk('local')->exists("templates/{$name}.png")) {
@@ -544,4 +549,17 @@ class PeaceAndSafeController extends Controller
         }
         return $pdf;
     }
+
+    /*
+    public function sample()
+    {
+        $contract = 'IDRD-CTO-0933-2021';
+        $virtual_file = '2897348973497E';
+        $complete_text = $virtual_file
+            ? ", número de contrato: <b>{$contract}</b> y número de expediente: <b>{$virtual_file}</b>"
+            : " y número de contrato: <b>{$contract}</b>";
+        $text = $this->createText('DANIEL ALEJANDRO PRADO MENDOZA', 1073240539, $complete_text, 'daniel.prado');
+        return $this->getPDF('PAZ_Y_SALVO_ALMACEN.pdf', $text, new Certification)->Output('I', 'PAZ_Y_SALVO.pdf');
+    }
+    */
 }

@@ -2,15 +2,28 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class NotificationController extends Controller
 {
-    public function index()
+    /**
+     * NotificationController constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request)
     {
         return $this->success_message(
-            auth('api')->user()->notifications
+            auth('api')->user()->notifications()->paginate($this->per_page)
         );
     }
 
