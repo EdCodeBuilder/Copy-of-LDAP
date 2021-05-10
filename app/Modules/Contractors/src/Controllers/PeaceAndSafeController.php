@@ -150,14 +150,19 @@ class PeaceAndSafeController extends Controller
             if (isset($certification->token)) {
                 return $this->createWarehouseCert($certification);
             }
+            $page = $request->has('page') ? $request->get('page') : 1;
             $http = new Client();
-            $response = $http->post('http://66.70.171.168/api/contractors-portal/oracle', [
+            $response = $http->post("http://66.70.171.168/api/contractors-portal/oracle", [
                 'json' => [
                     'document' => $request->get('document'),
                 ],
                 'headers' => [
                     'Accept'    => 'application/json',
                     'Content-type' => 'application/json'
+                ],
+                'query' => [
+                    'per_page'    => $this->per_page,
+                    'page' => $page
                 ]
             ]);
             $data = json_decode($response->getBody()->getContents(), true);
@@ -369,6 +374,11 @@ class PeaceAndSafeController extends Controller
         return isset($this->user) && $this->user->isActive();
     }
 
+    /**
+     * @param $username
+     * @param string $ous
+     * @return JsonResponse
+     */
     public function enableLDAP($username, $ous = 'OU=AREA DE SISTEMAS,OU=SUBDIRECCION ADMINISTRATIVA Y FINANCIERA,OU=ORGANIZACION IDRD')
     {
         try {
@@ -536,7 +546,7 @@ class PeaceAndSafeController extends Controller
         $pdf->Cell(30, 5, utf8_decode('O escaneando el código QR desde un dispositivo móvil.'));
         $pdf->SetXY(80, 235);
         $pdf->SetFontSize(12);
-        $pdf->Cell(30, 5, utf8_decode('Código de verificación: '.$name.'00'));
+        $pdf->Cell(30, 5, utf8_decode('Código de verificación: '.$name));
         $pdf->SetFontSize(8);
         $pdf->SetXY(32, 248);
         $pdf->Write(5, $url, $url);
