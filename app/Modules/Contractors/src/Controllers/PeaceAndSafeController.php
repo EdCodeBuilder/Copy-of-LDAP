@@ -276,11 +276,9 @@ class PeaceAndSafeController extends Controller
 
             $username = isset($user->usua_login) ? $user->usua_login : 0;
             if ($this->hasLDAP($username) ) {
-                $new_expire_date = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') );
                 if (
                     $this->accountIsActive() &&
-                    $this->cantCreateDocument($expires_at) &&
-                    !(isset($expires_at) && Carbon::parse($new_expire_date)->diffInDays($expires_at, false) <= 3)
+                    $this->cantCreateDocument($expires_at)
                 ) {
                     return $this->error_response(
                         "El Servicio de Paz y Salvo del Área de Sistemas estará disponible desde el último día del vencimiento de su contrato.",
