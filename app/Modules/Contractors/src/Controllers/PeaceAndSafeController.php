@@ -277,9 +277,10 @@ class PeaceAndSafeController extends Controller
             $username = isset($user->usua_login) ? $user->usua_login : 0;
             if ($this->hasLDAP($username) ) {
                 $new_expire_date = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') );
+                $date = isset($expires_at) ? $expires_at : $new_expire_date;
                 if (
                     $this->accountIsActive() &&
-                    $this->cantCreateDocument($expires_at) &&
+                    $this->cantCreateDocument($date) &&
                     !(isset($expires_at) && Carbon::parse($new_expire_date)->diffInDays($expires_at, false) <= 3)
                 ) {
                     return $this->error_response(
@@ -296,7 +297,7 @@ class PeaceAndSafeController extends Controller
             if ( $total['total'] > 0 ) {
                 $certification->expires_at = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') );
                 $certification->save();
-                // array_push($total, ['result' => $this->canCreateDocument($expires_at)]);
+                // array_push($total, ['result' => $this->cantCreateDocument($expires_at)]);
                 return $this->error_response(
                     "Para generar el paz y salvo de sistemas debe tener sus bandejas de Orfeo en cero, actualmente cuenta con {$total['total']} radicado(s) sin procesar.",
                     Response::HTTP_UNPROCESSABLE_ENTITY,
