@@ -251,7 +251,7 @@ class PeaceAndSafeController extends Controller
                     $text = $this->createText($name, $document, $complete_text);
                     return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
                 }
-                if ($this->accountIsActive() && $this->canCreateDocument($expires_at)) {
+                if ($this->accountIsActive() && $this->cantCreateDocument($expires_at)) {
                     return $this->error_response(
                         "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
                         Response::HTTP_UNPROCESSABLE_ENTITY,
@@ -279,7 +279,7 @@ class PeaceAndSafeController extends Controller
                 $new_expire_date = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') );
                 if (
                     $this->accountIsActive() &&
-                    $this->canCreateDocument($expires_at) &&
+                    $this->cantCreateDocument($expires_at) &&
                     !(isset($expires_at) && Carbon::parse($new_expire_date)->diffInDays($expires_at, false) <= 3)
                 ) {
                     return $this->error_response(
@@ -296,6 +296,7 @@ class PeaceAndSafeController extends Controller
             if ( $total['total'] > 0 ) {
                 $certification->expires_at = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') );
                 $certification->save();
+                // array_push($total, ['result' => $this->canCreateDocument($expires_at)]);
                 return $this->error_response(
                     "Para generar el paz y salvo de sistemas debe tener sus bandejas de Orfeo en cero, actualmente cuenta con {$total['total']} radicado(s) sin procesar.",
                     Response::HTTP_UNPROCESSABLE_ENTITY,
@@ -386,7 +387,7 @@ class PeaceAndSafeController extends Controller
         $total = $collect->sum('filed_count');
         return [
             'folders'   =>  $data,
-            'total'     => $total
+            'total'     => $total,
         ];
     }
 
@@ -415,9 +416,14 @@ class PeaceAndSafeController extends Controller
         if (isset($this->user)) {
             $exp_day_account = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires'));
             $expires_at = isset($expires_at) ? $expires_at : $exp_day_account;
-            return now()->subDay()->endOfDay()->isAfter(Carbon::parse($expires_at));
+            return Carbon::parse($expires_at)->startOfDay()->equalTo(now()->startOfDay());
         }
         return false;
+    }
+
+    public function cantCreateDocument($expires_at = null)
+    {
+        return $this->canCreateDocument($expires_at);
     }
 
     /**
