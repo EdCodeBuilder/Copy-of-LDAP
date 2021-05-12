@@ -22,6 +22,7 @@ use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaravelQRCode\Facades\QRCode;
@@ -30,6 +31,7 @@ use setasign\Fpdi\PdfParser\Filter\FilterException;
 use setasign\Fpdi\PdfParser\PdfParserException;
 use setasign\Fpdi\PdfParser\Type\PdfTypeException;
 use setasign\Fpdi\PdfReader\PdfReaderException;
+use Tightenco\Collect\Support\Collection;
 
 class PeaceAndSafeController extends Controller
 {
@@ -103,30 +105,38 @@ class PeaceAndSafeController extends Controller
      */
     public function validation(ConsultPeaceAndSafeRequest $request)
     {
-        $contract_number = str_pad($request->get('contract'), 4, '0', STR_PAD_LEFT);
-        $contract = "IDRD-CTO-{$contract_number}-{$request->get('year')}";
-        $certification = Certification::query()->when(
-            $request->has('token') && ($request->get('token') != "" || !is_null($request->get('token'))),
-            function ($query) use ($request) {
-                return $query->where('token', $request->get('token'));
-            },
-            function ($query) use ($contract, $request) {
-                return $query->where('contract', 'like', "%{$contract}%")
-                    ->where('document', $request->get('document'));
-            }
-        )->firstOrFail();
-        $virtual_file = $certification->virtual_file;
-        $complete_text = $virtual_file
-            ? ", número de contrato: <b>{$certification->contract}</b> y número de expediente: <b>{$virtual_file}</b>"
-            : " y número de contrato: <b>{$certification->contract}</b>";
-        $text = $this->createText(
-            $certification->name,
-            $certification->document,
-            $complete_text,
-            $certification->username,
-            isset($certification->username)
-        );
-        return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output('I', 'PAZ_Y_SALVO.pdf');
+        try {
+            $contract_number = str_pad($request->get('contract'), 4, '0', STR_PAD_LEFT);
+            $contract = "IDRD-CTO-{$contract_number}-{$request->get('year')}";
+            $certification = Certification::query()->when(
+                $request->has('token') && ($request->get('token') != "" || !is_null($request->get('token'))),
+                function ($query) use ($request) {
+                    return $query->where('token', $request->get('token'));
+                },
+                function ($query) use ($contract, $request) {
+                    return $query->where('contract', 'like', "%{$contract}%")
+                        ->where('document', $request->get('document'));
+                }
+            )->firstOrFail();
+            $virtual_file = $certification->virtual_file;
+            $complete_text = $virtual_file
+                ? ", número de contrato: <b>{$certification->contract}</b> y número de expediente: <b>{$virtual_file}</b>"
+                : " y número de contrato: <b>{$certification->contract}</b>";
+            $text = $this->createText(
+                $certification->name,
+                $certification->document,
+                $complete_text,
+                $certification->username,
+                isset($certification->username)
+            );
+            return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output('I', 'PAZ_Y_SALVO.pdf');
+        } catch (Exception $exception) {
+            return $this->error_response(
+                __('validation.handler.resource_not_found'),
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                $exception->getMessage()
+            );
+        }
     }
 
     /**
@@ -170,7 +180,7 @@ class PeaceAndSafeController extends Controller
                 return $this->error_response($data);
             }
             return $this->createWarehouseCert($certification);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return $this->error_response(
                 'No podemos realizar la consulta en este momento, por favor intente más tarde.',
                 422,
@@ -216,7 +226,7 @@ class PeaceAndSafeController extends Controller
         $text= "<p>Una vez verificado en el sistema SEVEN los datos del(la) funcionario(a) <b>{$certification->name}</b>, identificado(a) con cédula de ciudadanía No. <b>{$certification->document}</b>{$complete_text}.</p><p>Se da constancia que <b>NO</b> posee activos a cargo.</p>";
         $text.= "<p>Se expide certificado de paz y salvo por solicitud del usuario {$day} del mes de {$m} del año {$year} debido a: <b>TERMINACIÓN DE CONTRATO.</b></p>";
 
-        return $this->getPDF('PAZ_Y_SALVO_ALMACEN.pdf', $text, $certification)->Output('I', 'PAZ_Y_SALVO.pdf');;
+        return $this->getPDF('PAZ_Y_SALVO_ALMACEN.pdf', $text, $certification)->Output('I', 'PAZ_Y_SALVO.pdf');
     }
 
     /**
@@ -241,7 +251,7 @@ class PeaceAndSafeController extends Controller
                     $text = $this->createText($name, $document, $complete_text);
                     return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
                 }
-                if ($this->accountIsActive()) {
+                if ($this->accountIsActive() && $this->canCreateDocument($expires_at)) {
                     return $this->error_response(
                         "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
                         Response::HTTP_UNPROCESSABLE_ENTITY,
@@ -267,9 +277,13 @@ class PeaceAndSafeController extends Controller
             $username = isset($user->usua_login) ? $user->usua_login : 0;
             if ($this->hasLDAP($username) ) {
                 $new_expire_date = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') );
-                if ($this->accountIsActive() && !(isset($expires_at) && Carbon::parse($new_expire_date)->diffInDays($expires_at, false) <= 3)) {
+                if (
+                    $this->accountIsActive() &&
+                    $this->canCreateDocument($expires_at) &&
+                    !(isset($expires_at) && Carbon::parse($new_expire_date)->diffInDays($expires_at, false) <= 3)
+                ) {
                     return $this->error_response(
-                        "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
+                        "El Servicio de Paz y Salvo del Área de Sistemas estará disponible desde el último día del vencimiento de su contrato.",
                         Response::HTTP_UNPROCESSABLE_ENTITY,
                         'Usuario con cuenta de ORFEO y LDAP'
                     );
@@ -279,10 +293,14 @@ class PeaceAndSafeController extends Controller
             $certification->name = toUpper($this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn'));
             $certification->save();
             $total = $this->hasUnprocessedData($user->usua_codi);
-            if ( $total > 0 ) {
+            if ( $total['total'] > 0 ) {
                 $certification->expires_at = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') );
                 $certification->save();
-                return $this->error_response("Para generar el paz y salvo de sistemas debe tener sus bandejas de Orfeo en cero, actualmente cuenta con {$total} radicado(s) sin procesar.");
+                return $this->error_response(
+                    "Para generar el paz y salvo de sistemas debe tener sus bandejas de Orfeo en cero, actualmente cuenta con {$total} radicado(s) sin procesar.",
+                    Response::HTTP_UNPROCESSABLE_ENTITY,
+                    $total
+                );
             }
             /*
              * Disable Orfeo and LDAP Account
@@ -349,13 +367,27 @@ class PeaceAndSafeController extends Controller
 
     /**
      * @param $id
-     * @return bool
+     * @return array
      */
     public function hasUnprocessedData($id)
     {
-        $filed = Filed::query()->where('radi_usua_actu', $id)->count();
+        $data = DB::connection('pgsql_orfeo')
+            ->table('radicado')
+            ->select(DB::raw("carpeta.carp_desc AS folder, COUNT(*) AS filed_count"))
+            ->leftJoin('carpeta', 'carpeta.carp_codi', '=', 'radicado.carp_codi')
+            ->where('radicado.radi_usua_actu', $id)
+            ->groupBy('carpeta.carp_codi')
+            ->get()->toArray();
         $informed = Informed::query()->where('usua_codi', $id)->count();
-        return (int) $filed + (int) $informed;
+        if ($informed > 0) {
+            array_push($data, ['folder' => 'Informados', 'filed_count' => $informed]);
+        }
+        $collect = collect($data);
+        $total = $collect->sum('filed_count');
+        return [
+            'folders'   =>  $data,
+            'total'     => $total
+        ];
     }
 
     /**
@@ -372,6 +404,20 @@ class PeaceAndSafeController extends Controller
     public function accountIsActive()
     {
         return isset($this->user) && $this->user->isActive();
+    }
+
+    /**
+     * @param null $expires_at
+     * @return bool
+     */
+    public function canCreateDocument($expires_at = null)
+    {
+        if (isset($this->user)) {
+            $exp_day_account = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires'));
+            $expires_at = isset($expires_at) ? $expires_at : $exp_day_account;
+            return now()->subDay()->endOfDay()->isAfter(Carbon::parse($expires_at));
+        }
+        return false;
     }
 
     /**
