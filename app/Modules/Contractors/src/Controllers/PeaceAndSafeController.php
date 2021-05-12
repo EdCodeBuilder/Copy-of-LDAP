@@ -297,7 +297,7 @@ class PeaceAndSafeController extends Controller
                 $certification->expires_at = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') );
                 $certification->save();
                 return $this->error_response(
-                    "Para generar el paz y salvo de sistemas debe tener sus bandejas de Orfeo en cero, actualmente cuenta con {$total} radicado(s) sin procesar.",
+                    "Para generar el paz y salvo de sistemas debe tener sus bandejas de Orfeo en cero, actualmente cuenta con {$total['total']} radicado(s) sin procesar.",
                     Response::HTTP_UNPROCESSABLE_ENTITY,
                     $total
                 );
