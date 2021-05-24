@@ -31,11 +31,12 @@ class WareHouseResource extends JsonResource
     {
         return [
             [
+                'sortable'  => false,
                 'text' => "#",
                 'value'  =>  "consecutive",
             ],
             [
-                'align' => "right",
+                'sortable'  => false,
                 'text' => "Descripción",
                 'value'  =>  "name",
             ],
@@ -44,13 +45,13 @@ class WareHouseResource extends JsonResource
                 'value'  =>  "id",
             ],
             [
-                'align' => "right",
+                'sortable'  => false,
                 'text' => "Cantidad",
                 'value'  =>  "quantity",
             ],
             [
-                'align' => "right",
-                'text' => "Valor",
+                'sortable'  => false,
+                'text' => "Valor histórico",
                 'value'  =>  "quantity",
             ],
         ];
