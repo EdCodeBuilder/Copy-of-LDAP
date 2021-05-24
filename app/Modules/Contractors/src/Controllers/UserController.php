@@ -156,10 +156,10 @@ class UserController extends LoginController
         );
     }
 
-    public function excelOracle($document)
+    public function excelOracle(Request $request)
     {
         $data = WareHouse::query()
-            ->where('ter_carg', $document)
+            ->where('ter_carg', $request->get('document'))
             ->where('act_acti', '=', 'A')
             ->get();
         return  $this->success_response(
