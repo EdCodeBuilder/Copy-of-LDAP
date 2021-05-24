@@ -147,8 +147,16 @@ class PeaceAndSafeController extends Controller
      */
     public function show($token)
     {
-        $certification = Certification::where('token', $token)->firstOrFail();
-        return $this->success_message($certification);
+        try {
+            $certification = Certification::where('token', $token)->firstOrFail();
+            return $this->success_message($certification);
+        } catch (Exception $exception) {
+            return $this->error_response(
+                "No se encuentró ningún certificado válido para el token {$token}.",
+                422,
+                $exception->getMessage()
+            );
+        }
     }
 
     /**
@@ -191,21 +199,33 @@ class PeaceAndSafeController extends Controller
         }
     }
 
+    /**
+     * @param PeaceAndSafeRequest $request
+     * @return JsonResponse|Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
     public function excelWare(PeaceAndSafeRequest $request)
     {
-        $http = new Client();
-        $response = $http->post("http://66.70.171.168/api/contractors-portal/oracle-excel", [
-            'json' => [
-                'document' => $request->get('document'),
-            ],
-            'headers' => [
-                'Accept'    => 'application/json',
-                'Content-type' => 'application/json'
-            ],
-        ]);
-        $data = json_decode($response->getBody()->getContents(), true);
-        $collections = isset($data['data']) ? collect($data['data']) : collect([]);
-        return (new WareHouseExport($collections))->download('INVENTARIO_ALMACEN.xlsx', Excel::XLSX);
+        try {
+            $http = new Client();
+            $response = $http->post("http://66.70.171.168/api/contractors-portal/oracle-excel", [
+                'json' => [
+                    'document' => $request->get('document'),
+                ],
+                'headers' => [
+                    'Accept'    => 'application/json',
+                    'Content-type' => 'application/json'
+                ],
+            ]);
+            $data = json_decode($response->getBody()->getContents(), true);
+            $collections = isset($data['data']) ? collect($data['data']) : collect([]);
+            return (new WareHouseExport($collections))->download('INVENTARIO_ALMACEN.xlsx', Excel::XLSX);
+        } catch (Exception $exception) {
+            return $this->error_response(
+                'No podemos realizar la consulta en este momento, por favor intente más tarde.',
+                422,
+                $exception->getMessage()
+            );
+        }
     }
 
     /**
@@ -271,8 +291,9 @@ class PeaceAndSafeController extends Controller
                     return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
                 }
                 if ($this->accountIsActive() && $this->cantCreateDocument($expires_at)) {
+                    $date = $this->getExpireDate($expires_at);
                     return $this->error_response(
-                        "El Servicio de Paz y Salvo del Área de Sistemas estará disponible posterior al vencimiento de su contrato.",
+                        "El Servicio de Paz y Salvo del Área de Sistemas estará disponible a partir de la fecha {$date}.",
                         Response::HTTP_UNPROCESSABLE_ENTITY,
                         'Usuario sin cuenta de ORFEO pero con cuenta institucional'
                     );
@@ -299,8 +320,9 @@ class PeaceAndSafeController extends Controller
                     $this->accountIsActive() &&
                     $this->cantCreateDocument($expires_at)
                 ) {
+                    $date = $this->getExpireDate($expires_at);
                     return $this->error_response(
-                        "El Servicio de Paz y Salvo del Área de Sistemas estará disponible desde el último día del vencimiento de su contrato.",
+                        "El Servicio de Paz y Salvo del Área de Sistemas estará disponible a partir de la fecha {$date}.",
                         Response::HTTP_UNPROCESSABLE_ENTITY,
                         'Usuario con cuenta de ORFEO y LDAP'
                     );
@@ -441,6 +463,16 @@ class PeaceAndSafeController extends Controller
     public function cantCreateDocument($expires_at = null)
     {
         return ! $this->canCreateDocument($expires_at);
+    }
+
+    public function getExpireDate($expires_at = null)
+    {
+        if (isset($this->user)) {
+            $exp_day_account = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires'));
+            $expires_at = isset($expires_at) ? $expires_at : $exp_day_account;
+            return Carbon::parse($expires_at)->startOfDay()->format('Y-m-d H:i:s');
+        }
+        return null;
     }
 
     /**

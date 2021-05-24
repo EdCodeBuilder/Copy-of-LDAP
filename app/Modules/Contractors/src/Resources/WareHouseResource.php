@@ -24,6 +24,7 @@ class WareHouseResource extends JsonResource
             'responsable'  =>  isset($this->ter_resp) ? (int) $this->ter_resp : null,
             'name'         =>  isset($this->act_desc) ? $this->act_desc : null,
             'quantity'     =>  isset($this->act_cant) ? (int) $this->act_cant : null,
+            'value'        =>  isset($this->value) ? (int) $this->value : null,
         ];
     }
 
@@ -52,7 +53,7 @@ class WareHouseResource extends JsonResource
             [
                 'sortable'  => false,
                 'text' => "Valor histórico",
-                'value'  =>  "quantity",
+                'value'  =>  "value",
             ],
         ];
     }
