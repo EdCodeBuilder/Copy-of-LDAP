@@ -28,11 +28,12 @@ class UpdateContractorRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'document_type_id'  =>  'required|numeric|exists:mysql_ldap:document_types,id',
-            // 'document'  =>  'required|numeric|unique:mysql_contractors.contractors,document,'.$this->route('contractor')->id,
             'name'  =>  'required|string|min:3|max:191',
             'surname'   =>  'required|string|min:3|max:191',
             'birthdate' =>  'required|date|date_format:Y-m-d',
+            'birthdate_country_id'  =>  'required|numeric|exists:mysql_ldap.countries,id',
+            'birthdate_state_id'    =>  'required|numeric|exists:mysql_ldap.states,id',
+            'birthdate_city_id'     =>  'required|numeric|exists:mysql_ldap.cities,id',
             'sex_id' =>  'required|numeric|exists:mysql_sim.genero,Id_Genero',
             'email' =>  'required|email',
             'institutional_email'   =>  'nullable|email',
@@ -51,12 +52,8 @@ class UpdateContractorRequest extends FormRequest
             'address'  =>  'string|required|min:3|max:191',
             // Contract
             'contract_id' =>  'required|numeric|exists:mysql_contractors.contracts,id',
-            // 'contract' =>  'required|string',
             'transport' =>  'required|boolean',
             'position'  =>  'required|string',
-            // 'start_date'    =>  'required|date|date_format:Y-m-d|before:final_date',
-            // 'final_date'    =>  'required|date|date_format:Y-m-d|after:start_date',
-            // 'total' =>  'required|numeric',
             'day'   =>  'required|array',
             'risk'  =>  'required|numeric|between:1,5',
             'subdirectorate_id'    =>  'required|numeric|exists:mysql_ldap.subdirectorates,id',
@@ -70,11 +67,12 @@ class UpdateContractorRequest extends FormRequest
                 'string',
             ],
             'supervisor_email'  =>  'nullable|email',
-            // TODO: Third party
-            // 'rut'   =>  'required|file|mimes:pdf',
-            // 'bank'  =>  'required|file|mimes:pdf',
-
-            // 'contract_type_id' =>  'required|numeric',
+            'academic_level_id'  =>  'required|numeric|exists:mysql_contractors.academic_level,id',
+            'career_id'  =>  'required|numeric|exists:mysql_contractors.careers,id',
+            'graduate'  =>  'required|boolean',
+            'year_approved'  =>  'nullable|numeric|min:1|max:13',
+            'rut'   =>  'required|file|mimes:pdf',
+            'bank'  =>  'required|file|mimes:pdf',
         ];
     }
 
@@ -91,6 +89,9 @@ class UpdateContractorRequest extends FormRequest
             'name'  =>  'required|string|min:3|max:191',
             'surname'   =>  'required|string|min:3|max:191',
             'birthdate' =>  'fecha de nacimiento',
+            'birthdate_country_id'  =>  'país de nacimiento',
+            'birthdate_state_id'    =>  'departamaneto de nacimiento',
+            'birthdate_city_id' =>  'ciudad de nacimiento',
             'sex_id' =>  'sexo',
             'email' =>  'correo personal',
             'institutional_email'   =>  'correo institucional',
@@ -99,9 +100,9 @@ class UpdateContractorRequest extends FormRequest
             'eps'    =>  'otra eps',
             'afp_id'    =>  'fondo de pensiones',
             'afp'    =>  'otro fondo de pensiones',
-            'residence_country_id'  =>  'país',
-            'residence_state_id'    =>  'departamaneto',
-            'residence_city_id' =>  'ciudad',
+            'residence_country_id'  =>  'país de residencia',
+            'residence_state_id'    =>  'departamaneto de residencia',
+            'residence_city_id' =>  'ciudad de residencia',
             'locality_id'   =>  'localidad',
             'upz_id'    =>  'upz',
             'neighborhood_id'   =>  'barrio',
@@ -122,6 +123,10 @@ class UpdateContractorRequest extends FormRequest
             'dependency_id'    =>  'dependencia',
             'other_dependency_subdirectorate'  =>  'otra dependencia o subdirección',
             'supervisor_email'  =>  'correo del supervisor',
+            'academic_level_id'  =>  'nivel académico',
+            'career_id'  =>  'título académico',
+            'graduate'  =>  'graduado',
+            'year_approved'  =>  'último semestre o año aprobado',
             'rut'  =>  'certificado rut',
             'bank'  =>  'certificación bancaria',
         ];

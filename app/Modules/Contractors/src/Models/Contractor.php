@@ -15,6 +15,7 @@ use App\Modules\Parks\src\Models\Neighborhood;
 use App\Modules\Parks\src\Models\Upz;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use OwenIt\Auditing\Contracts\Auditable;
 
@@ -54,6 +55,9 @@ class Contractor extends Model implements Auditable
         'name',
         'surname',
         'birthdate',
+        'birthdate_country_id',
+        'birthdate_state_id',
+        'birthdate_city_id',
         'sex_id',
         'email',
         'institutional_email',
@@ -95,6 +99,9 @@ class Contractor extends Model implements Auditable
         'sex_id'    => 'int',
         'eps_id'    => 'int',
         'afp_id'    => 'int',
+        'birthdate_country_id'  => 'int',
+        'birthdate_state_id'    => 'int',
+        'birthdate_city_id' => 'int',
         'residence_country_id'  => 'int',
         'residence_state_id'    => 'int',
         'residence_city_id' => 'int',
@@ -128,6 +135,9 @@ class Contractor extends Model implements Auditable
         'name',
         'surname',
         'birthdate',
+        'birthdate_country_id',
+        'birthdate_state_id',
+        'birthdate_city_id',
         'sex_id',
         'email',
         'institutional_email',
@@ -303,6 +313,29 @@ class Contractor extends Model implements Auditable
             : null;
     }
 
+    public function getModifiableLinkAttribute()
+    {
+        if (isset($this->document)) {
+            $document = Crypt::encrypt($this->document);
+            $path = env('APP_ENV') == 'local'
+                ? env('APP_PATH_DEV')
+                : env('APP_PATH_PROD');
+            return "https://sim.idrd.gov.co/{$path}/es/contracts?payload=$document";
+        }
+        return null;
+    }
+
+    public function getWhatsappLinkAttribute()
+    {
+        if (isset($this->phone) && strlen($this->phone) > 9 && isset($this->modifiable_link)) {
+            $base = "https://api.whatsapp.com/send?";
+            $phone = "phone=57{$this->phone}";
+            $text = "&text=%F0%9F%91%8B%20%20Hola%2C%20hemos%20generado%20el%20siguiente%20enlace%20desde%20el%20Portal%20Contratista%20para%20que%20completes%20tu%20informaci%C3%B3n%20personal.%20C%C3%B3pialo%20y%20p%C3%A9galo%20en%20el%20navegador%20de%20tu%20computador.%20Gracias.%0A%0A{$this->modifiable_link}";
+            return "{$base}{$phone}{$text}";
+        }
+        return null;
+    }
+
     /*
      * ---------------------------------------------------------
      * Eloquent Relations
@@ -312,6 +345,10 @@ class Contractor extends Model implements Auditable
     public function contracts()
     {
         return $this->hasMany(Contract::class)->latest();
+    }
+    public function careers()
+    {
+        return $this->hasMany(ContractorCareer::class)->latest();
     }
 
     public function document_type()
@@ -347,6 +384,21 @@ class Contractor extends Model implements Auditable
     public function residence_city()
     {
         return $this->hasOne(CityLDAP::class, 'id','residence_city_id');
+    }
+
+    public function birthdate_country()
+    {
+        return $this->hasOne(CountryLDAP::class, 'id','birthdate_country_id');
+    }
+
+    public function birthdate_state()
+    {
+        return $this->hasOne(StateLDAP::class, 'id','birthdate_state_id');
+    }
+
+    public function birthdate_city()
+    {
+        return $this->hasOne(CityLDAP::class, 'id','birthdate_city_id');
     }
 
     public function locality()

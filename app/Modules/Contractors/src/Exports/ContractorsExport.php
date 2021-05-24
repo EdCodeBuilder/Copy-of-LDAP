@@ -69,6 +69,9 @@ class ContractorsExport implements FromQuery, WithMapping, WithHeadings
             'NOMBRES',
             'APELLIDOS',
             'FECHA DE NACIMIENTO',
+            'PAÍS DE NACIMIENTO',
+            'DEPTO DE NACIMIENTO',
+            'CIUDAD DE NACIMIENTO',
             'EDAD',
             'SEXO',
             'CORREO PERSONAL',
@@ -86,6 +89,10 @@ class ContractorsExport implements FromQuery, WithMapping, WithHeadings
             'BARRIO',
             'OTRO BARRIO',
             'DIRECCIÓN',
+            'NIVEL ACADÉMICO',
+            'GRADUADO',
+            'AÑO O SEMESTRE APROBADO',
+            'TÍTULO ACADÉMICO',
             'USUARIO QUE REGISTRÓ CONTRATISTA',
             'FECHA DE CREACIÓN',
             'FECHA DE MODIFICACIÓN',
@@ -96,6 +103,8 @@ class ContractorsExport implements FromQuery, WithMapping, WithHeadings
     {
         $contract = $row->contracts()->latest()->first();
         $transport = isset($contract->transport) ? $contract->transport : null;
+        $career = $row->careers()->latest()->first();
+        $graduate = isset($career->graduate) ? (boolean) $career->graduate : null;
         return [
             'id'                    =>  isset($row->id) ? (int) $row->id : null,
             // Start Contract Data
@@ -121,6 +130,9 @@ class ContractorsExport implements FromQuery, WithMapping, WithHeadings
             'name'                  =>  isset($row->name) ? $row->name : null,
             'surname'               =>  isset($row->surname) ? $row->surname : null,
             'birthdate'             =>  isset($row->birthdate) ? $row->birthdate->format('Y-m-d H:i:s') : null,
+            'birthdate_country'     =>  isset($row->birthdate_country->name) ? $row->birthdate_country->name : null,
+            'birthdate_state'       =>  isset($row->birthdate_state->name) ? $row->birthdate_state->name : null,
+            'birthdate_city'        =>  isset($row->birthdate_city->name) ? $row->birthdate_city->name : null,
             'age'                   =>  isset($row->birthdate) ? $row->birthdate->age : null,
             'sex'                   =>  isset($row->sex->name) ? $row->sex->name : null,
             'email'                 =>  isset($row->email) ? $row->email : null,
@@ -138,6 +150,10 @@ class ContractorsExport implements FromQuery, WithMapping, WithHeadings
             'neighborhood_name'     =>  $this->setNeighborhoodName($row),
             'neighborhood'          =>  isset($row->neighborhood) ? $row->neighborhood : null,
             'address'               =>  isset($row->address) ? $row->address : null,
+            'academic_level'        =>  isset($career->career->level->name) ? $career->career->level->name : null,
+            'graduate_text'         =>  $graduate ? 'SI' : 'NO',
+            'year_approved'         =>  isset($career->year_approved) ? (int) $career->year_approved : null,
+            'career'                =>  isset($career->career->name) ? $career->career->name : null,
             'user'                  =>  isset($row->user->full_name) ? $row->user->full_name : null,
             'created_at'            =>  isset($row->created_at) ? $row->created_at->format('Y-m-d H:i:s') : null,
             'updated_at'            =>  isset($row->updated_at) ? $row->updated_at->format('Y-m-d H:i:s') : null,

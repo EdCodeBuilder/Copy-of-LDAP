@@ -28,13 +28,16 @@ class StoreLawyerContractRequest extends FormRequest
     {
         return [
             'contract_type_id' =>  'required|numeric|exists:mysql_contractors.contract_types,id',
+            'contract_year' =>  'required|numeric|min:2019|max:2999',
             'contract' =>  [
                 'required',
                 'string',
                 Rule::unique('mysql_contractors.contracts')->where(function ($query) {
+                    $contract_number = str_pad($this->get('contract'), 4, '0', STR_PAD_LEFT);
+                    $contract = toUpper("IDRD-CTO-{$contract_number}-{$this->get('contract_year')}");
                     return $query
-                            ->where('contract_type_id', $this->get('contract_type_id'))
-                            ->where('contract', $this->get('contract'));
+                        ->where('contract_type_id', $this->get('contract_type_id'))
+                        ->where('contract', $contract);
                 })
             ],
             'start_date'    =>  'required|date|date_format:Y-m-d|before:final_date',

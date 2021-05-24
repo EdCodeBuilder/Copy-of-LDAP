@@ -143,11 +143,16 @@ class UserController extends LoginController
     public function oracle(Request $request)
     {
         $data = WareHouse::query()
+                ->selectRaw(DB::raw('ROW_NUMBER() as consecutive, *'))
                 ->when($request->has('document'), function ($query) use ($request) {
                   return $query->where('ter_carg', $request->get('document'));
-                })->paginate($this->per_page);
+                })->where('act_acti', '=', 'A')->paginate($this->per_page);
         return  $this->success_response(
-            WareHouseResource::collection( $data )
+            WareHouseResource::collection( $data ),
+            Response::HTTP_OK,
+            [
+                'headers'   =>  WareHouseResource::headers(),
+            ]
         );
     }
 }

@@ -12,6 +12,7 @@ use App\Modules\Contractors\src\Jobs\ConfirmContractor;
 use App\Modules\Contractors\src\Jobs\ConfirmUpdateContractor;
 use App\Modules\Contractors\src\Models\Contract;
 use App\Modules\Contractors\src\Models\Contractor;
+use App\Modules\Contractors\src\Models\ContractorCareer;
 use App\Modules\Contractors\src\Models\ContractType;
 use App\Modules\Contractors\src\Models\File;
 use App\Modules\Contractors\src\Notifications\ArlNotification;
@@ -219,9 +220,12 @@ class ContractorController extends Controller
             $form->user_id = auth()->user()->id;
             $form->modifiable = now()->format('Y-m-d H:i:s');
             $form->saveOrFail();
+            $contract_number = str_pad($request->get('contract'), 4, '0', STR_PAD_LEFT);
+            $contract = toUpper("IDRD-CTO-{$contract_number}-{$request->get('contract_year')}");
             $form->contracts()
                 ->create(array_merge(
                     $request->validated(),
+                    ['contract' => $contract],
                     ['lawyer_id' => auth()->user()->id]
                 ));
             $this->dispatch(new ConfirmContractor($form));
@@ -317,7 +321,6 @@ class ContractorController extends Controller
             $form = Contractor::where('document', $document)->firstOrFail();
             abort_unless(!is_null($form->modifiable), Response::HTTP_UNPROCESSABLE_ENTITY, __('validation.handler.unauthorized'));
             DB::connection('mysql_contractors')->beginTransaction();
-            /* TODO: Third party
             if ($form->getOriginal('rut') && Storage::disk('contractor')->exists($form->getOriginal('rut'))) {
                 Storage::disk('contractor')->delete($form->getOriginal('rut'));
             }
@@ -332,15 +335,22 @@ class ContractorController extends Controller
             $now = now()->format('YmdHis');
             $bank = "CERTIFICADO_BANCARIO_{$document}_{$now}.$ext";
             $request->file('bank')->storeAs('contractor', $bank, [ 'disk' => 'local' ]);
-            // This after form fill
+            $form->fill($request->validated());
+            // This always after form fill
             $form->rut = $rut;
             $form->bank = $bank;
-            */
-            $form->fill($request->validated());
             $form->modifiable = null;
             $form->saveOrFail();
             $contract = Contract::findOrFail($request->get('contract_id'));
             $contract->update($request->validated());
+            ContractorCareer::updateOrCreate(
+                ['contractor_id' => $form->id],
+                [
+                    'career_id'     =>  $request->get('career_id'),
+                    'graduate'     =>  $request->get('graduate'),
+                    'year_approved'     =>  $request->get('year_approved')
+                ]
+            );
             Notification::send( User::whereIs(Roles::ROLE_ARL, Roles::ROLE_THIRD_PARTY)->get(), new ArlNotification($form, $contract) );
             $this->dispatch(new ConfirmUpdateContractor($form));
             DB::connection('mysql_contractors')->commit();

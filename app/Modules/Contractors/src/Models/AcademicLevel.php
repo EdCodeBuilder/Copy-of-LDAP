@@ -3,9 +3,10 @@
 namespace App\Modules\Contractors\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
-class Certification extends Model implements Auditable
+class AcademicLevel extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
 
@@ -21,7 +22,7 @@ class Certification extends Model implements Auditable
      *
      * @var string
      */
-    protected $table = 'certifications';
+    protected $table = 'academic_level';
 
     /**
      * The primary key for the model.
@@ -35,23 +36,7 @@ class Certification extends Model implements Auditable
      *
      * @var array
      */
-    protected $fillable = [
-        'name',
-        'document',
-        'contract',
-        'virtual_file',
-        'username',
-        'expires_at',
-        'token',
-        'type',
-    ];
-
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = ['expires_at'];
+    protected $fillable = [ 'name' ];
 
     /*
     * ---------------------------------------------------------
@@ -66,13 +51,6 @@ class Certification extends Model implements Auditable
      */
     protected $auditInclude = [
         'name',
-        'document',
-        'contract',
-        'virtual_file',
-        'username',
-        'expires_at',
-        'token',
-        'type',
     ];
 
     /**
@@ -82,42 +60,24 @@ class Certification extends Model implements Auditable
      */
     public function generateTags(): array
     {
-        return ['contractors_certifications'];
+        return ['contractors_academic_level'];
     }
 
     /*
      * ---------------------------------------------------------
-     * Accessors and Mutator
+     * Eloquent Relations
      * ---------------------------------------------------------
-     */
+    */
 
     /**
-     * Set value in uppercase
-     *
-     * @param $value
+     * @return HasMany
      */
-    public function setNameAttribute($value)
+    public function careers()
     {
-        $this->attributes['name'] = toUpper($value);
-    }
-
-    /**
-     * Set value in uppercase
-     *
-     * @param $value
-     */
-    public function setContractAttribute($value)
-    {
-        $this->attributes['contract'] = toUpper($value);
-    }
-
-    /**
-     * Set value in uppercase
-     *
-     * @param $value
-     */
-    public function setVirtualFileAttribute($value)
-    {
-        $this->attributes['virtual_file'] = toUpper($value);
+        // https://cloud.google.com/maps-platform/pricing/sheet/
+        // https://codelabs.developers.google.com/?cat=mapsplatform
+        // https://developers.google.com/maps/api-key-best-practices
+        // https://developers.google.com/maps/documentation/api-picker
+        return $this->hasMany(Career::class);
     }
 }

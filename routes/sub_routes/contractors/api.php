@@ -1,17 +1,19 @@
 <?php
 
 use App\Modules\Contractors\src\Controllers\AdminController;
+use App\Modules\Contractors\src\Controllers\CareerController;
 use App\Modules\Contractors\src\Controllers\ContractController;
 use App\Modules\Contractors\src\Controllers\ContractorController;
 use App\Modules\Contractors\src\Controllers\ContractTypeController;
 use App\Modules\Contractors\src\Controllers\FileController;
 use App\Modules\Contractors\src\Controllers\FileTypeController;
-use App\Modules\Contractors\src\Controllers\FontController;
 use App\Modules\Contractors\src\Controllers\PeaceAndSafeController;
 use App\Modules\Contractors\src\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('contractors-portal')->group(function () {
+    Route::get('/academic-level', [CareerController::class, 'levels']);
+    Route::get('/academic-level/{level}/careers', [CareerController::class, 'index']);
     Route::post('/peace-and-save', [PeaceAndSafeController::class, 'index']);
     Route::post('/warehouse-peace-and-save', [PeaceAndSafeController::class, 'wareHouse']);
     Route::get('/peace-and-save/{token}', [PeaceAndSafeController::class, 'show']);

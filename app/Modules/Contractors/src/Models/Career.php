@@ -3,9 +3,10 @@
 namespace App\Modules\Contractors\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use OwenIt\Auditing\Contracts\Auditable;
 
-class Certification extends Model implements Auditable
+class Career extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
 
@@ -21,7 +22,7 @@ class Certification extends Model implements Auditable
      *
      * @var string
      */
-    protected $table = 'certifications';
+    protected $table = 'careers';
 
     /**
      * The primary key for the model.
@@ -35,23 +36,7 @@ class Certification extends Model implements Auditable
      *
      * @var array
      */
-    protected $fillable = [
-        'name',
-        'document',
-        'contract',
-        'virtual_file',
-        'username',
-        'expires_at',
-        'token',
-        'type',
-    ];
-
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = ['expires_at'];
+    protected $fillable = [ 'name', 'academic_level_id' ];
 
     /*
     * ---------------------------------------------------------
@@ -66,13 +51,7 @@ class Certification extends Model implements Auditable
      */
     protected $auditInclude = [
         'name',
-        'document',
-        'contract',
-        'virtual_file',
-        'username',
-        'expires_at',
-        'token',
-        'type',
+        'academic_level_id'
     ];
 
     /**
@@ -82,42 +61,20 @@ class Certification extends Model implements Auditable
      */
     public function generateTags(): array
     {
-        return ['contractors_certifications'];
+        return ['contractors_careers'];
     }
 
     /*
      * ---------------------------------------------------------
-     * Accessors and Mutator
+     * Eloquent Relations
      * ---------------------------------------------------------
-     */
+    */
 
     /**
-     * Set value in uppercase
-     *
-     * @param $value
+     * @return BelongsTo
      */
-    public function setNameAttribute($value)
+    public function level()
     {
-        $this->attributes['name'] = toUpper($value);
-    }
-
-    /**
-     * Set value in uppercase
-     *
-     * @param $value
-     */
-    public function setContractAttribute($value)
-    {
-        $this->attributes['contract'] = toUpper($value);
-    }
-
-    /**
-     * Set value in uppercase
-     *
-     * @param $value
-     */
-    public function setVirtualFileAttribute($value)
-    {
-        $this->attributes['virtual_file'] = toUpper($value);
+        return $this->belongsTo(AcademicLevel::class, 'academic_level_id', 'id');
     }
 }

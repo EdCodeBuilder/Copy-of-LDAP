@@ -6,6 +6,7 @@ namespace App\Modules\Contractors\src\Resources;
 
 use App\Modules\Contractors\src\Constants\Roles;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Crypt;
 
 class ContractorResource extends JsonResource
 {
@@ -58,8 +59,18 @@ class ContractorResource extends JsonResource
             'surname'               =>  isset($this->surname) ? $this->surname : null,
             'email'                 =>  isset($this->email) ? $this->email : null,
             'phone'                 =>  isset($this->phone) ? $this->phone : null,
+            $this->mergeWhen(auth()->user()->isA(Roles::ROLE_ARL, Roles::ROLE_ADMIN), [
+                'modifiable_link'  =>  isset($this->modifiable_link) ? $this->modifiable_link : null,
+                'whatsapp_link'   =>  isset($this->whatsapp_link) ? $this->whatsapp_link : null,
+            ]),
             $this->mergeWhen(auth()->user()->isA(Roles::ROLE_ARL, Roles::ROLE_ADMIN, Roles::ROLE_THIRD_PARTY), [
                 'birthdate'             =>  isset($this->birthdate) ? $this->birthdate->format('Y-m-d') : null,
+                'birthdate_country_id'  =>  isset($this->birthdate_country_id) ? (int) $this->birthdate_country_id : null,
+                'birthdate_country'     =>  isset($this->birthdate_country->name) ? $this->birthdate_country->name : null,
+                'birthdate_state_id'    =>  isset($this->birthdate_state_id) ? (int) $this->birthdate_state_id : null,
+                'birthdate_state'       =>  isset($this->birthdate_state->name) ? $this->birthdate_state->name : null,
+                'birthdate_city_id'     =>  isset($this->birthdate_city_id) ? (int) $this->birthdate_city_id : null,
+                'birthdate_city'        =>  isset($this->birthdate_city->name) ? $this->birthdate_city->name : null,
                 'age'                   =>  isset($this->birthdate) ? $this->birthdate->age : null,
                 'sex_id'                =>  isset($this->sex_id) ? $this->sex_id : null,
                 'sex'                   =>  isset($this->sex->name) ? $this->sex->name : null,
@@ -84,14 +95,16 @@ class ContractorResource extends JsonResource
                 'neighborhood_name'     =>  $this->setNeighborhoodName(),
                 'neighborhood'          =>  isset($this->neighborhood) ? $this->neighborhood : null,
                 'address'               =>  isset($this->address) ? $this->address : null,
+                $this->merge(new ContractorCareerResource($this->careers()->latest()->first())),
             ]),
-            // TODO: Third party
-            // 'rut'                   =>  isset($this->rut) ? $this->getOriginal('rut') : null,
-            // 'rut_file'              =>  isset($this->rut) ? $this->rut : null,
-            // 'bank'                  =>  isset($this->bank) ? $this->getOriginal('bank') : null,
-            // 'bank_file'             =>  isset($this->bank) ? $this->bank: null,
-            // 'third_party'           =>  isset($this->third_party) ? (bool) $this->third_party: null,
-            // 'third_party_text'      =>  $this->setThirdParty(),
+
+            'rut'                   =>  isset($this->rut) ? $this->getOriginal('rut') : null,
+            'rut_file'              =>  isset($this->rut) ? $this->rut : null,
+            'bank'                  =>  isset($this->bank) ? $this->getOriginal('bank') : null,
+            'bank_file'             =>  isset($this->bank) ? $this->bank: null,
+            'third_party'           =>  isset($this->third_party) ? (bool) $this->third_party: null,
+            'third_party_text'      =>  $this->setThirdParty(),
+
             'contracts'             =>  ContractResource::collection($this->whenLoaded('contracts')),
             'contract_headers'      =>  ContractResource::headers(),
             'user_id'               =>  isset($this->user_id) ? (int) $this->user_id : null,
@@ -131,12 +144,10 @@ class ContractorResource extends JsonResource
                 'text' => "ARL",
                 'value'  =>  "arl_file",
             ],
-            /* TODO: Third party
             [
                 'text'   =>  'Terceros',
                 'value'   =>  'third_party_text',
             ],
-            */
             [
                 'text' => "Nombres",
                 'value'  =>  "name",
@@ -182,6 +193,21 @@ class ContractorResource extends JsonResource
                     'label' => "Fecha de nacimiento",
                     'field'  =>  "birthdate",
                     'icon'  =>  'mdi-calendar',
+                ],
+                [
+                    'label'  => 'País de nacimiento',
+                    'field'  => 'birthdate_country',
+                    'icon'   => 'mdi-map',
+                ],
+                [
+                    'label'  => 'Departamento de nacimiento',
+                    'field'  => 'birthdate_state',
+                    'icon'   => 'mdi-map-marker',
+                ],
+                [
+                    'label'  => 'Ciudad de nacimiento',
+                    'field'  => 'birthdate_city',
+                    'icon'   => 'mdi-crosshairs-gps',
                 ],
                 [
                     'label'  => 'Sexo',
@@ -264,6 +290,26 @@ class ContractorResource extends JsonResource
                     'icon'   => 'mdi-book-account-outline',
                 ],
                 [
+                    'label'  => 'Nivel Académico',
+                    'field'  => 'academic_level',
+                    'icon'   => 'mdi-book',
+                ],
+                [
+                    'label'  => 'TÍtulo Académico',
+                    'field'  => 'career',
+                    'icon'   => 'mdi-school',
+                ],
+                [
+                    'label'  => '¿Graduado?',
+                    'field'  => 'graduate_text',
+                    'icon'   => 'mdi-book',
+                ],
+                [
+                    'label'  => 'Último semestre o año aprobado',
+                    'field'  => 'year_approved',
+                    'icon'   => 'mdi-book-account-outline',
+                ],
+                [
                     'label'  => 'Fecha inicio contrato',
                     'field'  => 'start_date',
                     // 'icon'   => 'mdi-calendar',
@@ -318,8 +364,6 @@ class ContractorResource extends JsonResource
                     'field'  => 'supervisor_email',
                     'icon'   => 'mdi-mail',
                 ],
-                /*
-                 * TODO: Third party creation
                 [
                     'label'   =>  'RUT',
                     'field'   =>  'rut',
@@ -335,7 +379,6 @@ class ContractorResource extends JsonResource
                     'field'   =>  'third_party_text',
                     'icon'   =>   'mdi-archive-arrow-up',
                 ],
-                */
                 [
                     'label'   =>  'Creado por',
                     'field'   =>  'user',

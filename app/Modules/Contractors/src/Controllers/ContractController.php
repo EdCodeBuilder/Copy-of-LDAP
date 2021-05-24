@@ -60,9 +60,12 @@ class ContractController extends Controller
             DB::connection('mysql_contractors')->beginTransaction();
             $contractor->modifiable = now()->format('Y-m-d H:i:s');
             $contractor->saveOrFail();
+            $contract_number = str_pad($request->get('contract'), 4, '0', STR_PAD_LEFT);
+            $contract = toUpper("IDRD-CTO-{$contract_number}-{$request->get('contract_year')}");
             $contractor->contracts()
                 ->create(array_merge(
                     $request->validated(),
+                    ['contract' => $contract],
                     ['lawyer_id' => auth()->user()->id]
                 ));
             $this->dispatch(new ConfirmContractor($contractor));
