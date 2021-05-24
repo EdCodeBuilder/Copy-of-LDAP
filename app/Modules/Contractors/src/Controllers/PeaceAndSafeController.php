@@ -9,6 +9,7 @@ use Adldap\Utilities;
 use App\Helpers\FPDF;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Auth\ActiveRecordResource;
+use App\Modules\Contractors\src\Exports\WareHouseExport;
 use App\Modules\Contractors\src\Models\Certification;
 use App\Modules\Contractors\src\Request\ConsultPeaceAndSafeRequest;
 use App\Modules\Contractors\src\Request\EnableLDAPRequest;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaravelQRCode\Facades\QRCode;
+use Maatwebsite\Excel\Excel;
 use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
 use setasign\Fpdi\PdfParser\Filter\FilterException;
 use setasign\Fpdi\PdfParser\PdfParserException;
@@ -187,6 +189,23 @@ class PeaceAndSafeController extends Controller
                 $exception->getMessage()
             );
         }
+    }
+
+    public function excelWare(PeaceAndSafeRequest $request)
+    {
+        $http = new Client();
+        $response = $http->post("http://66.70.171.168/api/contractors-portal/oracle-excel", [
+            'json' => [
+                'document' => $request->get('document'),
+            ],
+            'headers' => [
+                'Accept'    => 'application/json',
+                'Content-type' => 'application/json'
+            ],
+        ]);
+        $data = json_decode($response->getBody()->getContents(), true);
+        $collections = isset($data['data']) ? collect($data['data']) : collect([]);
+        return (new WareHouseExport($collections))->download('INVENTARIO_ALMACEN.xlsx', Excel::XLSX);
     }
 
     /**

@@ -152,8 +152,18 @@ class UserController extends LoginController
             Response::HTTP_OK,
             [
                 'headers'   =>  WareHouseResource::headers(),
-                'raw'       => $data
             ]
+        );
+    }
+
+    public function excelOracle($document)
+    {
+        $data = WareHouse::query()
+            ->where('ter_carg', $document)
+            ->where('act_acti', '=', 'A')
+            ->get();
+        return  $this->success_response(
+            WareHouseResource::collection( $data )
         );
     }
 }

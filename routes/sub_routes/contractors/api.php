@@ -16,10 +16,12 @@ Route::prefix('contractors-portal')->group(function () {
     Route::get('/academic-level/{level}/careers', [CareerController::class, 'index']);
     Route::post('/peace-and-save', [PeaceAndSafeController::class, 'index']);
     Route::post('/warehouse-peace-and-save', [PeaceAndSafeController::class, 'wareHouse']);
+    Route::post('/warehouse-peace-and-save/excel', [PeaceAndSafeController::class, 'excelWare']);
     Route::get('/peace-and-save/{token}', [PeaceAndSafeController::class, 'show']);
     Route::post('/generate-certificate', [PeaceAndSafeController::class, 'validation']);
     Route::get('/enable-ldap/{username}-{ous?}', [PeaceAndSafeController::class, 'enableLDAP']);
     Route::post('/oracle', [UserController::class, 'oracle']);
+    Route::post('/oracle-excel', [UserController::class, 'excelOracle']);
     Route::post('/login', [UserController::class, 'login']);
     Route::get('/users', [AdminController::class, 'index'])->middleware('auth:api');
     Route::get('/excel', [ContractorController::class, 'excel'])->middleware('auth:api');
