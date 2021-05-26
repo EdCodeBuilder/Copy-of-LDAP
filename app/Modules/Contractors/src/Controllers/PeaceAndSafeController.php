@@ -287,7 +287,7 @@ class PeaceAndSafeController extends Controller
         $text .= "Disciplinario Ley 1952 del 28 de enero de 2019, que deroga la Ley 734 de 2002, a partir del 01 de julio de 2021 y los lineamientos ";
         $text .= "internos emitidos por la Subdirección Administrativa y Financiera en lo que respecta a los traslados o reintegros de bienes al Almacén General, ";
         $text .= "se evidencia: </p>";
-        $text .= "<p>Que, una vez revisado en el módulo de Almacén e Inventarios del Sistema Administrativo y Financiero –SEVEN– de la Entidad los datos del(la) funcionario(a): ";
+        $text .= "<p>Que, una vez revisado en el módulo de Almacén e Inventarios del Sistema Administrativo y Financiero - SEVEN - de la Entidad los datos del(la) funcionario(a): ";
         $text .= "<b>{$name}</b> identificado(a) con cédula de ciudadanía No. <b>{$certification->document}</b>{$complete_text}, ";
         $text .= "no tiene a la fecha, ningún elemento o activo, bajo su cargo. </p>";
         $text.= "<p>Se expide certificado de paz y salvo por solicitud del usuario {$day} del mes de {$m} del año {$year} debido a: <b>TERMINACIÓN DE CONTRATO.</b></p>";
