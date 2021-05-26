@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('contractors-portal')->group(function () {
     Route::get('/academic-level', [CareerController::class, 'levels']);
     Route::get('/academic-level/{level}/careers', [CareerController::class, 'index']);
+    // Route::get('/sample', [PeaceAndSafeController::class, 'sample']);
     Route::post('/peace-and-save', [PeaceAndSafeController::class, 'index']);
     Route::post('/warehouse-peace-and-save', [PeaceAndSafeController::class, 'wareHouse']);
     Route::post('/warehouse-peace-and-save/excel', [PeaceAndSafeController::class, 'excelWare']);
