@@ -37,5 +37,6 @@ class WareHouse extends Model
         'ter_resp',
         'act_desc',
         'act_cant',
+        'act_cost',
     ];
 }

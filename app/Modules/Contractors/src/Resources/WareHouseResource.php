@@ -24,10 +24,15 @@ class WareHouseResource extends JsonResource
             'responsable'  =>  isset($this->ter_resp) ? (int) $this->ter_resp : null,
             'name'         =>  isset($this->act_desc) ? $this->act_desc : null,
             'quantity'     =>  isset($this->act_cant) ? (int) $this->act_cant : null,
-            'value'        =>  isset($this->value) ? (int) $this->value : null,
+            'value'        =>  isset($this->act_cost) ? (int) $this->act_cost : null,
         ];
     }
 
+    /**
+     * Datatable headers
+     *
+     * @return array[]
+     */
     public static function headers()
     {
         return [
@@ -42,6 +47,7 @@ class WareHouseResource extends JsonResource
                 'value'  =>  "name",
             ],
             [
+                'sortable'  => false,
                 'text' => "Placa",
                 'value'  =>  "id",
             ],
