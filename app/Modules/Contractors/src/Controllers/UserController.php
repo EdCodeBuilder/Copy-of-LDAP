@@ -156,6 +156,15 @@ class UserController extends LoginController
         );
     }
 
+    public function countOracle(Request $request)
+    {
+        $count = WareHouse::query()
+            ->where('ter_carg', $request->get('document'))
+            ->where('act_acti', '=', 'A')
+            ->count();
+        return  $this->success_message($count);
+    }
+
     public function excelOracle(Request $request)
     {
         $data = WareHouse::query()

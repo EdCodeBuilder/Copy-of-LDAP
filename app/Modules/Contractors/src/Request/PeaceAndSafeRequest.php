@@ -27,8 +27,10 @@ class PeaceAndSafeRequest extends FormRequest
     public function rules()
     {
         return [
+            /*
             'name'          => 'required|string',
             'surname'       => 'required|string',
+            */
             'document'      => 'required|numeric',
             'contract'      => 'required|numeric',
             'year'          => 'required|numeric|min:1900|max:'.now()->year,

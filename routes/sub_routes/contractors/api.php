@@ -17,11 +17,14 @@ Route::prefix('contractors-portal')->group(function () {
     // Route::get('/sample', [PeaceAndSafeController::class, 'sample']);
     Route::post('/peace-and-save', [PeaceAndSafeController::class, 'index']);
     Route::post('/warehouse-peace-and-save', [PeaceAndSafeController::class, 'wareHouse']);
+    Route::post('/warehouse-peace-and-save/notification', [PeaceAndSafeController::class, 'sendWareHouseNotification']);
+    Route::post('/warehouse-peace-and-save/validate-code/{code}', [PeaceAndSafeController::class, 'validateCode']);
     Route::post('/warehouse-peace-and-save/excel', [PeaceAndSafeController::class, 'excelWare']);
     Route::get('/peace-and-save/{token}', [PeaceAndSafeController::class, 'show']);
     Route::post('/generate-certificate', [PeaceAndSafeController::class, 'validation']);
     Route::get('/enable-ldap/{username}-{ous?}', [PeaceAndSafeController::class, 'enableLDAP']);
     Route::post('/oracle', [UserController::class, 'oracle']);
+    Route::post('/oracle-count', [UserController::class, 'countOracle']);
     Route::post('/oracle-excel', [UserController::class, 'excelOracle']);
     Route::post('/login', [UserController::class, 'login']);
     Route::get('/users', [AdminController::class, 'index'])->middleware('auth:api');

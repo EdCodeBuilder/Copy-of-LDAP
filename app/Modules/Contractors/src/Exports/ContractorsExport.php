@@ -102,15 +102,23 @@ class ContractorsExport implements FromQuery, WithMapping, WithHeadings
     public function map($row): array
     {
         $contract = $row->contracts()->latest()->first();
-        $transport = isset($contract->transport) ? $contract->transport : null;
+        $transport = isset($contract->transport) ? (boolean) $contract->transport : null;
+        $transport_text = null;
+        if (!is_null($transport)) {
+            $transport_text = $transport ? 'SI' : 'NO';
+        }
         $career = $row->careers()->latest()->first();
         $graduate = isset($career->graduate) ? (boolean) $career->graduate : null;
+        $graduate_text = null;
+        if (!is_null($graduate)) {
+            $graduate_text = $graduate ? 'SI' : 'NO';
+        }
         return [
             'id'                    =>  isset($row->id) ? (int) $row->id : null,
             // Start Contract Data
             'contract_type'         =>  isset($contract->contract_type->name) ? $contract->contract_type->name : null,
             'contract'              =>  isset($contract->contract) ? $contract->contract : null,
-            'transport_text'                    =>  $transport ? 'SI' : 'NO',
+            'transport_text'                    =>  $transport_text,
             'position'                          =>  isset($contract->position) ? $contract->position : null,
             'start_date'                        =>  isset($contract->start_date) ? $contract->start_date->format('Y-m-d') : null,
             'final_date'                        =>  isset($contract->final_date) ? $contract->final_date->format('Y-m-d') : null,
@@ -151,7 +159,7 @@ class ContractorsExport implements FromQuery, WithMapping, WithHeadings
             'neighborhood'          =>  isset($row->neighborhood) ? $row->neighborhood : null,
             'address'               =>  isset($row->address) ? $row->address : null,
             'academic_level'        =>  isset($career->career->level->name) ? $career->career->level->name : null,
-            'graduate_text'         =>  $graduate ? 'SI' : 'NO',
+            'graduate_text'         =>  $graduate_text,
             'year_approved'         =>  isset($career->year_approved) ? (int) $career->year_approved : null,
             'career'                =>  isset($career->career->name) ? $career->career->name : null,
             'user'                  =>  isset($row->user->full_name) ? $row->user->full_name : null,

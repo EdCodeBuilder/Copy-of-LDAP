@@ -158,6 +158,10 @@ if ( ! function_exists('ldapFormatDate') ) {
 }
 
 if ( ! function_exists('isJson') ) {
+    /**
+     * @param $string
+     * @return bool
+     */
     function isJson($string) {
         // decode the JSON data
         $result = is_array($string)
@@ -202,5 +206,43 @@ if ( ! function_exists('isJson') ) {
         }
 
         return $error !== '';
+    }
+}
+
+if ( ! function_exists('mask') ) {
+    /**
+     * @param $str
+     * @param $first
+     * @param $last
+     * @return string
+     */
+    function mask($str, $first, $last) {
+        $len = strlen($str);
+        $toShow = $first + $last;
+        return substr($str, 0, $len <= $toShow ? 0 : $first).str_repeat("*", $len - ($len <= $toShow ? 0 : $toShow)).substr($str, $len - $last, $len <= $toShow ? 0 : $last);
+    }
+}
+
+if ( ! function_exists('mask_email') ) {
+    /**
+     * @param $email
+     * @return string
+     */
+    function mask_email($email) {
+        $mail_parts = explode("@", $email);
+        $domain_parts = explode('.', $mail_parts[1]);
+
+        $mail_parts[0] = mask($mail_parts[0], 2, 1); // show first 2 letters and last 1 letter
+        $domain_parts[0] = mask($domain_parts[0], 2, 1); // same here
+        $mail_parts[1] = implode('.', $domain_parts);
+
+        return implode("@", $mail_parts);
+    }
+}
+
+if ( ! function_exists('format_contract') ) {
+    function format_contract($number, $year) {
+        $contract_number = str_pad($number, 4, '0', STR_PAD_LEFT);
+        return toUpper("IDRD-CTO-{$contract_number}-{$year}");
     }
 }

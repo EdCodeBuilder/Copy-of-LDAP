@@ -10,6 +10,8 @@ use App\Helpers\FPDF;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Auth\ActiveRecordResource;
 use App\Modules\Contractors\src\Exports\WareHouseExport;
+use App\Modules\Contractors\src\Jobs\VerificationCode;
+use App\Modules\Contractors\src\Mail\WareHouseMail;
 use App\Modules\Contractors\src\Models\Certification;
 use App\Modules\Contractors\src\Models\Contractor;
 use App\Modules\Contractors\src\Request\ConsultPeaceAndSafeRequest;
@@ -21,9 +23,11 @@ use App\Modules\Orfeo\src\Models\User;
 use Carbon\Carbon;
 use Exception;
 use GuzzleHttp\Client;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -34,6 +38,7 @@ use setasign\Fpdi\PdfParser\Filter\FilterException;
 use setasign\Fpdi\PdfParser\PdfParserException;
 use setasign\Fpdi\PdfParser\Type\PdfTypeException;
 use setasign\Fpdi\PdfReader\PdfReaderException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tightenco\Collect\Support\Collection;
 
 class PeaceAndSafeController extends Controller
@@ -65,8 +70,40 @@ class PeaceAndSafeController extends Controller
      */
     public function saveInDatabase(Request $request, $type)
     {
-        $contract_number = str_pad($request->get('contract'), 4, '0', STR_PAD_LEFT);
-        $contract = toUpper("IDRD-CTO-{$contract_number}-{$request->get('year')}");
+        // try {
+            $contract = format_contract($request->get('contract'), $request->get('year'));
+            $contractor = Contractor::query()
+                ->where('document', $request->get('document'))
+                ->whereHas('contracts', function ($query) use ($contract) {
+                    return $query->where('contract', $contract);
+                })->with([
+                    'contracts' => function($query) use ($contract) {
+                        return $query->where('contract', $contract)->first();
+                    }
+                ])->firstOrFail();
+
+            return Certification::firstOrCreate(
+                [
+                    'document'  =>  $contractor->document,
+                    'contract'  =>  $contract,
+                    'type'      =>  $type
+                ],
+                [
+                    'name'      =>  $contractor->full_name
+                ]
+            );
+            /*
+        } catch (Exception $exception) {
+            return $this->error_response(
+                'No se encuentra el usuario con los parámetros establecidos',
+                422,
+                $exception->getMessage()
+            );
+        }
+            */
+
+
+        /*
         $certification = Certification::where('document', $request->get('document'))
             ->where('contract', $contract)
             ->where('type', $type)
@@ -95,6 +132,7 @@ class PeaceAndSafeController extends Controller
         $certification->type = $type;
         $certification->save();
         return $certification;
+        */
     }
 
     /**
@@ -183,11 +221,88 @@ class PeaceAndSafeController extends Controller
             if (isset($certification->token)) {
                 return $this->createWarehouseCert($certification);
             }
+            $http = new Client();
+            $response = $http->post("http://66.70.171.168/api/contractors-portal/oracle-count", [
+                'json' => [
+                    'document' => $request->get('document'),
+                ],
+                'headers' => [
+                    'Accept'    => 'application/json',
+                    'Content-type' => 'application/json'
+                ]
+            ]);
+            $data = json_decode($response->getBody()->getContents(), true);
+            if ( isset( $data['data'] ) && $data['data'] > 0 ) {
+                return $this->error_response($data);
+            }
+            return $this->createWarehouseCert($certification);
+        } catch (Exception $exception) {
+
+            if ($exception instanceof ModelNotFoundException) {
+                return $this->error_response(
+                    'No se encuentra el usuario con los parámetros establecidos.',
+                    422
+                );
+            }
+
+            return $this->error_response(
+                'No podemos realizar la consulta en este momento, por favor intente más tarde.',
+                422,
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function sendWareHouseNotification(PeaceAndSafeRequest $request)
+    {
+        try {
+            $contract = format_contract($request->get('contract'), $request->get('year'));
+            $contractor = Contractor::where('document', $request->get('document'))
+                ->whereHas('contracts', function ($query) use ($contract) {
+                    return $query->where('contract', $contract);
+                })->with([
+                    'contracts' => function($query) use ($contract) {
+                        return $query->where('contract', $contract)->first();
+                    }
+                ])->firstOrFail();
+
+            $certification = Certification::where([
+                                            ['document',   $contractor->document],
+                                            ['contract',   $contract],
+                                            ['type'    ,   'ALM'],
+                                        ])->firstOrFail();
+
+            $this->dispatch(new VerificationCode($contractor, $certification));
+            return $this->success_message(
+                mask_email($contractor->email)
+            );
+        } catch (Exception $exception) {
+            if ($exception instanceof ModelNotFoundException) {
+                return $this->error_response(
+                    'No se encuentra el usuario con los parámetros establecidos.',
+                    422
+                );
+            }
+
+            return $this->error_response(
+                'No podemos realizar la consulta en este momento, por favor intente más tarde.',
+                422,
+                $exception->getMessage()
+            );
+        }
+    }
+
+    public function validateCode(Request $request, $code)
+    {
+        try {
+            $certification = Certification::where('code', $code)->firstOrFail();
+            $certification->code = null;
+            $certification->save();
             $page = $request->has('page') ? $request->get('page') : 1;
             $http = new Client();
             $response = $http->post("http://66.70.171.168/api/contractors-portal/oracle", [
                 'json' => [
-                    'document' => $request->get('document'),
+                    'document' => $certification->document,
                 ],
                 'headers' => [
                     'Accept'    => 'application/json',
@@ -197,6 +312,33 @@ class PeaceAndSafeController extends Controller
                     'per_page'    => $this->per_page,
                     'page' => $page
                 ]
+            ]);
+            $data = json_decode($response->getBody()->getContents(), true);
+            return $this->success_message($data);
+        } catch (Exception $exception) {
+            return $this->error_response(
+                'No se encuentra un código válido.',
+                422
+            );
+        }
+    }
+
+    public function countWareHouse(Request $request)
+    {
+        try {
+            $certification = $this->saveInDatabase($request, 'ALM');
+            if (isset($certification->token)) {
+                return $this->createWarehouseCert($certification);
+            }
+            $http = new Client();
+            $response = $http->post("http://66.70.171.168/api/contractors-portal/oracle-count", [
+                'json' => [
+                    'document' => $request->get('document'),
+                ],
+                'headers' => [
+                    'Accept'    => 'application/json',
+                    'Content-type' => 'application/json'
+                ],
             ]);
             $data = json_decode($response->getBody()->getContents(), true);
             if ( isset( $data['data'] ) && count($data['data']) > 0 ) {
@@ -713,4 +855,18 @@ class PeaceAndSafeController extends Controller
         return $this->getPDF('PAZ_Y_SALVO_ALMACEN.pdf', $text, new Certification)->Output('I', 'PAZ_Y_SALVO_ALMACEN.pdf');
     }
     */
+
+    public function sample()
+    {
+        $contractor = Contractor::query()
+            ->where('document', 1073240539)
+            ->whereHas('contracts', function ($query) {
+                return $query->where('contract', 'IDRD-CTO-1132-2021');
+            })->with([
+                'contracts' => function($query) {
+                    return $query->where('contract', 'IDRD-CTO-1132-2021')->first();
+                }
+            ])->firstOrFail();
+        return $contractor;
+    }
 }

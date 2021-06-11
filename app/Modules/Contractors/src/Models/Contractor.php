@@ -14,6 +14,9 @@ use App\Modules\Parks\src\Models\Location;
 use App\Modules\Parks\src\Models\Neighborhood;
 use App\Modules\Parks\src\Models\Upz;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
@@ -313,6 +316,21 @@ class Contractor extends Model implements Auditable
             : null;
     }
 
+    /**
+     * Full name
+     *
+     * @return string
+     */
+    public function getFullNameAttribute()
+    {
+        return "$this->name $this->surname";
+    }
+
+    /**
+     * Encrypted url
+     *
+     * @return string|null
+     */
     public function getModifiableLinkAttribute()
     {
         if (isset($this->document)) {
@@ -325,6 +343,11 @@ class Contractor extends Model implements Auditable
         return null;
     }
 
+    /**
+     * WhatsApp Link
+     *
+     * @return string|null
+     */
     public function getWhatsappLinkAttribute()
     {
         if (isset($this->phone) && strlen($this->phone) > 9 && isset($this->modifiable_link)) {
@@ -342,80 +365,129 @@ class Contractor extends Model implements Auditable
      * ---------------------------------------------------------
     */
 
+    /**
+     * @return HasMany
+     */
     public function contracts()
     {
         return $this->hasMany(Contract::class)->latest();
     }
+
+    /**
+     * @return HasMany
+     */
     public function careers()
     {
         return $this->hasMany(ContractorCareer::class)->latest();
     }
 
+    /**
+     * @return BelongsTo
+     */
     public function document_type()
     {
         return $this->belongsTo(DocumentType::class, 'document_type_id');
     }
 
+    /**
+     * @return HasOne
+     */
     public function eps_name()
     {
         return $this->hasOne(Eps::class, 'id', 'eps_id');
     }
 
+    /**
+     * @return HasOne
+     */
     public function sex()
     {
         return $this->hasOne(Sex::class, 'Id_Genero', 'sex_id');
     }
 
+    /**
+     * @return HasOne
+     */
     public function afp_name()
     {
         return $this->hasOne(Afp::class, 'id', 'afp_id');
     }
 
+    /**
+     * @return HasOne
+     */
     public function residence_country()
     {
         return $this->hasOne(CountryLDAP::class, 'id','residence_country_id');
     }
 
+    /**
+     * @return HasOne
+     */
     public function residence_state()
     {
         return $this->hasOne(StateLDAP::class, 'id','residence_state_id');
     }
 
+    /**
+     * @return HasOne
+     */
     public function residence_city()
     {
         return $this->hasOne(CityLDAP::class, 'id','residence_city_id');
     }
 
+    /**
+     * @return HasOne
+     */
     public function birthdate_country()
     {
         return $this->hasOne(CountryLDAP::class, 'id','birthdate_country_id');
     }
 
+    /**
+     * @return HasOne
+     */
     public function birthdate_state()
     {
         return $this->hasOne(StateLDAP::class, 'id','birthdate_state_id');
     }
 
+    /**
+     * @return HasOne
+     */
     public function birthdate_city()
     {
         return $this->hasOne(CityLDAP::class, 'id','birthdate_city_id');
     }
 
+    /**
+     * @return HasOne
+     */
     public function locality()
     {
         return $this->hasOne(Location::class, 'Id_Localidad', 'locality_id');
     }
 
+    /**
+     * @return HasOne
+     */
     public function upz()
     {
         return $this->hasOne(Upz::class, 'Id_Upz','upz_id');
     }
 
+    /**
+     * @return HasOne
+     */
     public function neighborhood_name()
     {
         return $this->hasOne(Neighborhood::class, 'IdBarrio','neighborhood_id');
     }
 
+    /**
+     * @return HasOne
+     */
     public function user()
     {
         return $this->hasOne(User::class, 'id', 'user_id');

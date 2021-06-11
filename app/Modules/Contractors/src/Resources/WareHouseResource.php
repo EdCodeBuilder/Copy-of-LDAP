@@ -25,6 +25,7 @@ class WareHouseResource extends JsonResource
             'name'         =>  isset($this->act_desc) ? $this->act_desc : null,
             'quantity'     =>  isset($this->act_cant) ? (int) $this->act_cant : null,
             'value'        =>  isset($this->act_cost) ? (int) $this->act_cost : null,
+            'currency'     =>  isset($this->act_cost) ? $this->currency($this->act_cost) : null,
         ];
     }
 
@@ -62,5 +63,14 @@ class WareHouseResource extends JsonResource
                 'value'  =>  "value",
             ],
         ];
+    }
+
+    /**
+     * @param mixed|int $value
+     * @return int|mixed|string
+     */
+    public function currency($value = 0)
+    {
+        return is_numeric($value) ? "$ ".number_format($value, 2) : $value;
     }
 }
