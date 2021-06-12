@@ -54,13 +54,8 @@ class WareHouseResource extends JsonResource
             ],
             [
                 'sortable'  => false,
-                'text' => "Cantidad",
-                'value'  =>  "quantity",
-            ],
-            [
-                'sortable'  => false,
                 'text' => "Valor histórico",
-                'value'  =>  "value",
+                'value'  =>  "currency",
             ],
         ];
     }

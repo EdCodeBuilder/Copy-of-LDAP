@@ -20,6 +20,7 @@ Route::prefix('contractors-portal')->group(function () {
     Route::post('/warehouse-peace-and-save/notification', [PeaceAndSafeController::class, 'sendWareHouseNotification']);
     Route::post('/warehouse-peace-and-save/validate-code/{code}', [PeaceAndSafeController::class, 'validateCode']);
     Route::post('/warehouse-peace-and-save/excel', [PeaceAndSafeController::class, 'excelWare']);
+    Route::post('/warehouse-peace-and-save/more-data', [PeaceAndSafeController::class, 'paginateData']);
     Route::get('/peace-and-save/{token}', [PeaceAndSafeController::class, 'show']);
     Route::post('/generate-certificate', [PeaceAndSafeController::class, 'validation']);
     Route::get('/enable-ldap/{username}-{ous?}', [PeaceAndSafeController::class, 'enableLDAP']);

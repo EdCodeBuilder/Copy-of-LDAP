@@ -10,6 +10,7 @@ use App\Helpers\FPDF;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Auth\ActiveRecordResource;
 use App\Modules\Contractors\src\Exports\WareHouseExport;
+use App\Modules\Contractors\src\Exports\WareHouseExportTemplate;
 use App\Modules\Contractors\src\Jobs\VerificationCode;
 use App\Modules\Contractors\src\Mail\WareHouseMail;
 use App\Modules\Contractors\src\Models\Certification;
@@ -33,6 +34,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaravelQRCode\Facades\QRCode;
 use Maatwebsite\Excel\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
 use setasign\Fpdi\PdfParser\Filter\FilterException;
 use setasign\Fpdi\PdfParser\PdfParserException;
@@ -298,29 +300,45 @@ class PeaceAndSafeController extends Controller
             $certification = Certification::where('code', $code)->firstOrFail();
             $certification->code = null;
             $certification->save();
-            $page = $request->has('page') ? $request->get('page') : 1;
-            $http = new Client();
-            $response = $http->post("http://66.70.171.168/api/contractors-portal/oracle", [
-                'json' => [
-                    'document' => $certification->document,
-                ],
-                'headers' => [
-                    'Accept'    => 'application/json',
-                    'Content-type' => 'application/json'
-                ],
-                'query' => [
-                    'per_page'    => $this->per_page,
-                    'page' => $page
-                ]
-            ]);
-            $data = json_decode($response->getBody()->getContents(), true);
-            return $this->success_message($data);
+            return $this->success_message( $this->getWareHouseData($request) );
         } catch (Exception $exception) {
             return $this->error_response(
                 'No se encuentra un código válido.',
                 422
             );
         }
+    }
+
+    public function paginateData(PeaceAndSafeRequest $request)
+    {
+        try {
+            return $this->success_message( $this->getWareHouseData($request) );
+        } catch (Exception $exception) {
+            return $this->error_response(
+                'No se encuentra un código válido.',
+                422
+            );
+        }
+    }
+
+    public function getWareHouseData(Request $request)
+    {
+        $page = $request->has('page') ? $request->get('page') : 1;
+        $http = new Client();
+        $response = $http->post("http://66.70.171.168/api/contractors-portal/oracle", [
+            'json' => [
+                'document' => $request->get('document'),
+            ],
+            'headers' => [
+                'Accept'    => 'application/json',
+                'Content-type' => 'application/json'
+            ],
+            'query' => [
+                'per_page'    => $this->per_page,
+                'page' => $page
+            ]
+        ]);
+        return json_decode($response->getBody()->getContents(), true);
     }
 
     public function countWareHouse(Request $request)
@@ -361,6 +379,7 @@ class PeaceAndSafeController extends Controller
     public function excelWare(PeaceAndSafeRequest $request)
     {
         try {
+            $contractor = Contractor::where('document', $request->get('document'))->first();
             $http = new Client();
             $response = $http->post("http://66.70.171.168/api/contractors-portal/oracle-excel", [
                 'json' => [
@@ -373,8 +392,24 @@ class PeaceAndSafeController extends Controller
             ]);
             $data = json_decode($response->getBody()->getContents(), true);
             $collections = isset($data['data']) ? collect($data['data']) : collect([]);
-            return (new WareHouseExport($collections))->download('INVENTARIO_ALMACEN.xlsx', Excel::XLSX);
+            // return (new WareHouseExport($collections))->download('INVENTARIO_ALMACEN.xlsx', Excel::XLSX);
+            $writer = new WareHouseExportTemplate($contractor, $collections);
+            return response()
+                ->file(
+                    $writer->create()->save("php://output"),
+                    [
+                        'Content-Type'  =>  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        'Content-Disposition'  =>  'attachment;filename="FORMATO_TRASLADOS.xlsx"',
+                        'Access-Control-Allow-Origin'  =>  '*',
+                    ]
+                );
         } catch (Exception $exception) {
+            if ($exception instanceof ModelNotFoundException) {
+                return $this->error_response(
+                    'No se encuentra el usuario con los parámetros establecidos.',
+                    422
+                );
+            }
             return $this->error_response(
                 'No podemos realizar la consulta en este momento, por favor intente más tarde.',
                 422,
@@ -855,18 +890,4 @@ class PeaceAndSafeController extends Controller
         return $this->getPDF('PAZ_Y_SALVO_ALMACEN.pdf', $text, new Certification)->Output('I', 'PAZ_Y_SALVO_ALMACEN.pdf');
     }
     */
-
-    public function sample()
-    {
-        $contractor = Contractor::query()
-            ->where('document', 1073240539)
-            ->whereHas('contracts', function ($query) {
-                return $query->where('contract', 'IDRD-CTO-1132-2021');
-            })->with([
-                'contracts' => function($query) {
-                    return $query->where('contract', 'IDRD-CTO-1132-2021')->first();
-                }
-            ])->firstOrFail();
-        return $contractor;
-    }
 }

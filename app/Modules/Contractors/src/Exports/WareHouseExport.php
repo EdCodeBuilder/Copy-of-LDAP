@@ -4,10 +4,13 @@ namespace App\Modules\Contractors\src\Exports;
 
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class WareHouseExport implements FromCollection, WithMapping, WithHeadings
+class WareHouseExport implements FromCollection, WithMapping, WithHeadings, WithColumnFormatting, ShouldAutoSize
 {
     use Exportable;
 
@@ -34,7 +37,6 @@ class WareHouseExport implements FromCollection, WithMapping, WithHeadings
             'Nº',
             'PLACA',
             'DESCRIPCIÓN',
-            'CANTIDAD',
             'VALOR HISTÓRICO',
             'RESPONSABLE',
         ];
@@ -46,7 +48,6 @@ class WareHouseExport implements FromCollection, WithMapping, WithHeadings
             'consecutive'  =>  $this->counter++,
             'id'           =>  isset($row['id']) ? (int) $row['id'] : null,
             'name'         =>  isset($row['name']) ? (string) $row['name'] : null,
-            'quantity'     =>  isset($row['quantity']) ? (int) $row['quantity'] : null,
             'value'        =>  isset($row['value']) ? (int) $row['value'] : null,
             'document'     =>  isset($row['document']) ? (int) $row['document'] : null,
         ];
@@ -55,5 +56,12 @@ class WareHouseExport implements FromCollection, WithMapping, WithHeadings
     public function collection()
     {
         return $this->array;
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'D' => NumberFormat::FORMAT_CURRENCY_USD
+        ];
     }
 }
