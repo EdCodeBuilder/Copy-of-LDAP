@@ -36,7 +36,10 @@ class WareHouseExportTemplate
     {
         try {
             $this->file = IOFactory::load( storage_path('app/templates/FORMATO_TRASLADOS.xlsx') );
+            $this->file->setActiveSheetIndex(0);
             $this->worksheet = $this->file->getActiveSheet();
+            $this->worksheet->getProtection()->setSheet(true);
+
             $sub = isset($this->contractor->contracts()->latest()->first()->subdirectorate->name)
                 ? $this->contractor->contracts()->latest()->first()->subdirectorate->name
                 : null;
@@ -68,6 +71,23 @@ class WareHouseExportTemplate
                 $this->worksheet->getCell("D$i")->setValue(isset($collection['name']) ? (string) $collection['name'] : null);
                 $i++;
             }
+
+            $security = $this->file->getSecurity();
+            $security->setLockWindows(true);
+            $security->setLockStructure(true);
+            $security->setWorkbookPassword($this->contractor->document."-".now()->year);
+
+            $x = $i + 2;
+            $this->worksheet->getStyle("B7:M$x")
+                ->getProtection()
+                ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_PROTECTED);
+
+            $protection = $this->worksheet->getProtection();
+            $protection->setSheet(true);
+            $protection->setSort(true);
+            $protection->setInsertRows(true);
+            $protection->setPassword($this->contractor->document."-".now()->year);
+
             return IOFactory::createWriter($this->file, Excel::XLSX);
         } catch (\Exception $exception) {
 
