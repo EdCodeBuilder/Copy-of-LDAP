@@ -209,7 +209,7 @@ class PeaceAndSafeController extends Controller
 
             return $this->success_message([
                 'id'        =>  $certification->id,
-                'message'   =>  "Este documento fue emitido originalmente en la fecha correspondiente a {$certification->created_at->format('Y-m-d H:i:s')} a nombre de $certification->name bajo el contrato $certification->contract para el área de $area"
+                'message'   =>  "Este certificado fue emitido originalmente en la fecha correspondiente a {$certification->created_at->format('Y-m-d H:i:s')} a nombre de $certification->name con número de documento $certification->document bajo el contrato $certification->contract para el área de $area."
             ]);
         } catch (Exception $exception) {
             return $this->error_response(
