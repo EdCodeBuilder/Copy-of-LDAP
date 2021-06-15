@@ -202,7 +202,15 @@ class PeaceAndSafeController extends Controller
     {
         try {
             $certification = Certification::where('token', $token)->firstOrFail();
-            return $this->success_message($certification);
+
+            $area = $certification->type == 'ALM'
+                ? 'almacén'
+                : 'sistemas';
+
+            return $this->success_message([
+                'id'        =>  $certification->id,
+                'message'   =>  "Este documento fue emitido originalmente en la fecha correspondiente a {$certification->created_at->format('Y-m-d H:i:s')} a nombre de $certification->name bajo el contrato $certification->contract para el área de $area"
+            ]);
         } catch (Exception $exception) {
             return $this->error_response(
                 "No se encuentró ningún certificado válido para el token {$token}.",
