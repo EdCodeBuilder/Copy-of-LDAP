@@ -93,6 +93,7 @@ class PeaceAndSafeController extends Controller
                 ],
                 [
                     'name'      =>  $contractor->full_name,
+                    'virtual_file'      =>  $request->get('virtual_file'),
                     'contractor_id'      =>  $contractor->id,
                 ]
             );
