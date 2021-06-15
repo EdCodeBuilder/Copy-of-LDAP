@@ -40,8 +40,12 @@ class ConfirmContractor implements ShouldQueue
      */
     public function handle(Mailer $mailer)
     {
-        if ( isset( $this->user->email )  && filter_var( $this->user->email, FILTER_VALIDATE_EMAIL) ) {
-            $mailer->to($this->user->email)->send( new ContractorMail( $this->user ) );
+        $email = env('APP_ENV') == 'local'
+            ? env('SAMPLE_EMAIL', 'daniel.prado@idrd.gov.co')
+            : isset($this->user->email) ? $this->user->email : null;
+
+        if ( isset( $email )  && filter_var( $email, FILTER_VALIDATE_EMAIL) ) {
+            $mailer->to($email)->send( new ContractorMail( $this->user ) );
         }
     }
 }
