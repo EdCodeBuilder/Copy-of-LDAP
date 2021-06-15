@@ -303,7 +303,7 @@ class PeaceAndSafeController extends Controller
             return $this->success_message( $this->getWareHouseData($request) );
         } catch (Exception $exception) {
             return $this->error_response(
-                'No se encuentra un código válido.',
+                'El código de verificación ingresado no es válido.',
                 422
             );
         }
@@ -315,7 +315,7 @@ class PeaceAndSafeController extends Controller
             return $this->success_message( $this->getWareHouseData($request) );
         } catch (Exception $exception) {
             return $this->error_response(
-                'No se encuentra un código válido.',
+                'No se puede consltar información en este momento. Por favor intente más tarde.',
                 422
             );
         }
@@ -873,8 +873,9 @@ class PeaceAndSafeController extends Controller
         }
         if (!isset( $certification->token )) {
             $certification->token = $name;
-            $certification->save();
         }
+        $certification->increment('downloads');
+        $certification->save();
         return $pdf;
     }
 
