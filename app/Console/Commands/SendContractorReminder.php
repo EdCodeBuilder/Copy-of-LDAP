@@ -45,7 +45,7 @@ class SendContractorReminder extends Command
         Contractor::whereNotNull('modifiable')->chunk(100, function ($contractors) use ($count) {
             foreach ($contractors as $contractor) {
                 $date = Carbon::parse( $contractor->modifiable );
-                if ($date->diffInDays( now(), false ) >= 1 ) {
+                if ($date->diffInDays( now(), false ) >= 1 && $date->diffInDays( now(), false ) <= 20) {
                     dispatch( new ContractorReminder($contractor) );
                     $count++;
                 }
