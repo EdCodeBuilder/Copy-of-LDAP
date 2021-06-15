@@ -145,8 +145,23 @@ class PeaceAndSafeController extends Controller
      */
     public function index(PeaceAndSafeRequest $request)
     {
-        $certification = $this->saveInDatabase($request, 'SYS');
-        return $this->generateCertificate($certification);
+        try {
+            $certification = $this->saveInDatabase($request, 'SYS');
+            return $this->generateCertificate($certification);
+        } catch (Exception $exception) {
+
+            if ($exception instanceof ModelNotFoundException) {
+                return $this->error_response(
+                    'No se encuentra el usuario con los parámetros establecidos.',
+                    422
+                );
+            }
+            return $this->error_response(
+                'No podemos realizar la consulta en este momento, por favor intente más tarde.',
+                422,
+                $exception->getMessage()
+            );
+        }
     }
 
     /**
@@ -263,6 +278,10 @@ class PeaceAndSafeController extends Controller
         }
     }
 
+    /**
+     * @param PeaceAndSafeRequest $request
+     * @return JsonResponse
+     */
     public function sendWareHouseNotification(PeaceAndSafeRequest $request)
     {
         try {
@@ -302,6 +321,11 @@ class PeaceAndSafeController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @param $code
+     * @return JsonResponse
+     */
     public function validateCode(Request $request, $code)
     {
         try {
@@ -317,6 +341,10 @@ class PeaceAndSafeController extends Controller
         }
     }
 
+    /**
+     * @param PeaceAndSafeRequest $request
+     * @return JsonResponse
+     */
     public function paginateData(PeaceAndSafeRequest $request)
     {
         try {
@@ -329,6 +357,10 @@ class PeaceAndSafeController extends Controller
         }
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     */
     public function getWareHouseData(Request $request)
     {
         $page = $request->has('page') ? $request->get('page') : 1;
@@ -349,6 +381,10 @@ class PeaceAndSafeController extends Controller
         return json_decode($response->getBody()->getContents(), true);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse|string
+     */
     public function countWareHouse(Request $request)
     {
         try {
@@ -680,11 +716,19 @@ class PeaceAndSafeController extends Controller
         return false;
     }
 
+    /**
+     * @param null $expires_at
+     * @return bool
+     */
     public function cantCreateDocument($expires_at = null)
     {
         return ! $this->canCreateDocument($expires_at);
     }
 
+    /**
+     * @param null $expires_at
+     * @return string|null
+     */
     public function getExpireDate($expires_at = null)
     {
         if (isset($this->user)) {
