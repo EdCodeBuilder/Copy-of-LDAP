@@ -14,6 +14,7 @@ use App\Modules\Contractors\src\Exports\WareHouseExportTemplate;
 use App\Modules\Contractors\src\Jobs\VerificationCode;
 use App\Modules\Contractors\src\Mail\WareHouseMail;
 use App\Modules\Contractors\src\Models\Certification;
+use App\Modules\Contractors\src\Models\Contract;
 use App\Modules\Contractors\src\Models\Contractor;
 use App\Modules\Contractors\src\Request\ConsultPeaceAndSafeRequest;
 use App\Modules\Contractors\src\Request\EnableLDAPRequest;
@@ -91,7 +92,8 @@ class PeaceAndSafeController extends Controller
                     'type'      =>  $type
                 ],
                 [
-                    'name'      =>  $contractor->full_name
+                    'name'      =>  $contractor->full_name,
+                    'contractor_id'      =>  $contractor->id,
                 ]
             );
             /*
@@ -147,6 +149,9 @@ class PeaceAndSafeController extends Controller
     {
         try {
             $certification = $this->saveInDatabase($request, 'SYS');
+            if (isset($certification->token)) {
+                return $this->generateCertificate($certification);
+            }
             return $this->generateCertificate($certification);
         } catch (Exception $exception) {
 
@@ -556,12 +561,11 @@ class PeaceAndSafeController extends Controller
                 }
                 if ($this->hasLDAP($document, 'postalcode')) {
                     $this->disableLDAP();
-                    $certification->name = toUpper($this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn'));
                     $certification->username = $this->user->getFirstAttribute('samaccountname');
                     $certification->save();
                     $text = $this->createText(
                         $certification->name,
-                        $this->user->getFirstAttribute('postalcode'),
+                        $certification->document,
                         $complete_text,
                         $certification->username,
                         false
@@ -585,11 +589,20 @@ class PeaceAndSafeController extends Controller
                 }
             }
             $certification->username = $this->user->getFirstAttribute('samaccountname');
-            $certification->name = toUpper($this->user->getFirstAttribute('givenname').' '.$this->user->getFirstAttribute('sn'));
             $certification->save();
             $total = $this->hasUnprocessedData($user->usua_codi);
             if ( $total['total'] > 0 ) {
-                $certification->expires_at = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') );
+                // TODO: Check date in other platform
+                $contract = Contract::query()
+                    ->where('contract', $certification->contract)
+                    ->where('contractor_id', $certification->contractor_id)
+                    ->get(['final_date']);
+
+                $final_date = isset($contract->final_date)
+                    ? $contract->final_date
+                    : ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') );
+
+                $certification->expires_at = $final_date;
                 $certification->save();
                 array_push($total, ['result' => $this->cantCreateDocument($expires_at)]);
                 return $this->error_response(
