@@ -70,7 +70,7 @@ class UpdateContractorRequest extends FormRequest
             'academic_level_id'  =>  'required|numeric|exists:mysql_contractors.academic_level,id',
             'career_id'  =>  'required|numeric|exists:mysql_contractors.careers,id',
             'graduate'  =>  'required|boolean',
-            'year_approved'  =>  'nullable|numeric|min:1|max:13',
+            'year_approved'  =>  'nullable|numeric',
             'rut'   =>  'required|file|mimes:pdf',
             'bank'  =>  'required|file|mimes:pdf',
         ];
