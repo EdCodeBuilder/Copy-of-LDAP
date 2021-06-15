@@ -98,7 +98,6 @@ class Contractor extends Model implements Auditable
     protected $casts = [
         'document_type_id'  => 'int',
         'document'  => 'int',
-        'modifiable'  => 'bool',
         'sex_id'    => 'int',
         'eps_id'    => 'int',
         'afp_id'    => 'int',
@@ -119,7 +118,7 @@ class Contractor extends Model implements Auditable
      *
      * @var array
      */
-    protected $dates = [ 'birthdate' ];
+    protected $dates = [ 'birthdate', 'modifiable' ];
 
     /*
     * ---------------------------------------------------------

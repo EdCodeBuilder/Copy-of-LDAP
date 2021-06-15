@@ -15,7 +15,7 @@ class SendContractorReminder extends Command
      *
      * @var string
      */
-    protected $signature = 'contractor:reminder';
+    protected $signature = 'contractor:reminder {max : Max days to send reminder.}';
 
     /**
      * The console command description.
@@ -45,12 +45,12 @@ class SendContractorReminder extends Command
         Contractor::whereNotNull('modifiable')->chunk(100, function ($contractors) use ($count) {
             foreach ($contractors as $contractor) {
                 $date = Carbon::parse( $contractor->modifiable );
-                if ($date->diffInDays( now(), false ) >= 1 && $date->diffInDays( now(), false ) <= 20) {
+                if ($date->diffInDays( now(), false ) > 1 && $date->diffInDays( now(), false ) <= (int) $this->argument('max')) {
                     dispatch( new ContractorReminder($contractor) );
                     $count++;
                 }
             }
         });
-        $this->info("$count reminders was sent to contractors.");
+        $this->info("Reminders was sent to contractors.");
     }
 }
