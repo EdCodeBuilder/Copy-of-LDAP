@@ -374,7 +374,7 @@ class PeaceAndSafeController extends Controller
 
     /**
      * @param PeaceAndSafeRequest $request
-     * @return JsonResponse|Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function excelWare(PeaceAndSafeRequest $request)
     {
@@ -394,10 +394,22 @@ class PeaceAndSafeController extends Controller
             $collections = isset($data['data']) ? collect($data['data']) : collect([]);
             // return (new WareHouseExport($collections))->download('INVENTARIO_ALMACEN.xlsx', Excel::XLSX);
             $writer = new WareHouseExportTemplate($contractor, $collections);
-            if (ob_get_contents()) {
-                ob_end_clean();
-            }
-            return response()->download($writer->create()->save("php://output"), 'INVENTARIO_ALMACEN.xlsx');
+            /*
+            $date = date('d-m-y-'.substr((string)microtime(), 1, 8));
+            $date = str_replace(".", "", $date);
+            $filename = "export_".$date.".xlsx";
+            $content = file_get_contents($filename);
+            unlink($filename);
+            */
+
+            $response = response()->streamDownload(function() use ($writer) {
+                $writer->create()->save('php://output');
+            });
+            $response->setStatusCode(200);
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', 'attachment; filename="INVENTARIO_ALMACEN.xlsx"');
+            return $response->send();
+
         } catch (Exception $exception) {
             if ($exception instanceof ModelNotFoundException) {
                 return $this->error_response(
