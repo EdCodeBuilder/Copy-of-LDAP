@@ -55,7 +55,7 @@ class WareHouseMail extends Mailable
         $style = "font-family:'Open Sans',Arial,sans-serif;font-size:42px;color:#3b3b3b;font-weight:bold;letter-spacing:4px;text-align:center";
 
         return $this->view('mail.mail')
-            ->subject('Código de Verficiación Reporte Almacén')
+            ->subject('Código de Verificación Reporte Almacén')
             ->with([
                 'header'    => 'IDRD',
                 'title'     => 'Código de Verificación',
