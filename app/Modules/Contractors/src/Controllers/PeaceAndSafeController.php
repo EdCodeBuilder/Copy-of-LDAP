@@ -394,7 +394,9 @@ class PeaceAndSafeController extends Controller
             $collections = isset($data['data']) ? collect($data['data']) : collect([]);
             // return (new WareHouseExport($collections))->download('INVENTARIO_ALMACEN.xlsx', Excel::XLSX);
             $writer = new WareHouseExportTemplate($contractor, $collections);
-            ob_end_clean();
+            if (ob_get_contents()) {
+                ob_end_clean();
+            }
             return response()->download($writer->create()->save("php://output"), 'INVENTARIO_ALMACEN.xlsx');
         } catch (Exception $exception) {
             if ($exception instanceof ModelNotFoundException) {
