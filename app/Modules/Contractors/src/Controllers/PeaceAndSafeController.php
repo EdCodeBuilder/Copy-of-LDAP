@@ -552,8 +552,9 @@ class PeaceAndSafeController extends Controller
             $virtual_file = $certification->virtual_file;
             $expires_at = isset($certification->expires_at) ? $certification->expires_at : null;
 
+            $contract_date = isset( $contract_query->final_date ) ? $contract_query->final_date : $expires_at;
             $expires_at = is_null($expires_at)
-                ? isset( $contract_query->final_date ) ? $contract_query->final_date : null
+                ? $contract_date
                 : $expires_at;
 
             $certification->expires_at = $expires_at;
