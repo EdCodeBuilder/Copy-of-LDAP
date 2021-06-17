@@ -92,6 +92,7 @@ class PeaceAndSafeController extends Controller
                     'type'      =>  $type
                 ],
                 [
+                    'expires_at'    => isset($contractor->contracts[0]->final_date) ? $contractor->contracts[0]->final_date : null,
                     'name'      =>  $contractor->full_name,
                     'virtual_file'      =>  toUpper($request->get('virtual_file')),
                     'contractor_id'      =>  $contractor->id,
@@ -550,15 +551,7 @@ class PeaceAndSafeController extends Controller
             $document = $certification->document;
             $contract = $certification->contract;
             $virtual_file = $certification->virtual_file;
-            $expires_at = isset($certification->expires_at) ? $certification->expires_at : null;
-
-            $contract_date = isset( $contract_query->final_date ) ? $contract_query->final_date : $expires_at;
-            $expires_at = is_null($expires_at)
-                ? $contract_date
-                : $expires_at;
-
-            $certification->expires_at = $expires_at;
-            $certification->save();
+            $expires_at = $certification->expires_at;
 
             $complete_text = $virtual_file
                 ? ", número de contrato: <b>{$contract}</b> y número de expediente: <b>{$virtual_file}</b>"
