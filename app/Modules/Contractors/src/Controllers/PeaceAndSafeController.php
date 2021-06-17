@@ -539,11 +539,26 @@ class PeaceAndSafeController extends Controller
     {
         try {
             $user = User::where('usua_doc', $certification->document)->first();
+
+            // TODO: Check date in other platform
+            $contract_query = Contract::query()
+                ->where('contract', $certification->contract)
+                ->where('contractor_id', $certification->contractor_id)
+                ->get(['final_date']);
+
             $name = $certification->name;
             $document = $certification->document;
             $contract = $certification->contract;
             $virtual_file = $certification->virtual_file;
-            $expires_at = $certification->expires_at;
+            $expires_at = isset($certification->expires_at) ? $certification->expires_at : null;
+
+            $expires_at = is_null($expires_at)
+                ? isset( $contract_query->final_date ) ? $contract_query->final_date : null
+                : $expires_at;
+
+            $certification->expires_at = $expires_at;
+            $certification->save();
+
             $complete_text = $virtual_file
                 ? ", número de contrato: <b>{$contract}</b> y número de expediente: <b>{$virtual_file}</b>"
                 : " y número de contrato: <b>{$contract}</b>";
@@ -594,18 +609,6 @@ class PeaceAndSafeController extends Controller
             $certification->save();
             $total = $this->hasUnprocessedData($user->usua_codi);
             if ( $total['total'] > 0 ) {
-                // TODO: Check date in other platform
-                $contract = Contract::query()
-                    ->where('contract', $certification->contract)
-                    ->where('contractor_id', $certification->contractor_id)
-                    ->get(['final_date']);
-
-                $final_date = isset($contract->final_date)
-                    ? $contract->final_date
-                    : ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires') );
-
-                $certification->expires_at = $final_date;
-                $certification->save();
                 array_push($total, ['result' => $this->cantCreateDocument($expires_at)]);
                 return $this->error_response(
                     "Para generar el paz y salvo de sistemas debe tener sus bandejas de Orfeo en cero, actualmente cuenta con {$total['total']} radicado(s) sin procesar.",
