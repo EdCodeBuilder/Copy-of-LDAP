@@ -93,7 +93,7 @@ class PeaceAndSafeController extends Controller
                 ],
                 [
                     'name'      =>  $contractor->full_name,
-                    'virtual_file'      =>  $request->get('virtual_file'),
+                    'virtual_file'      =>  toUpper($request->get('virtual_file')),
                     'contractor_id'      =>  $contractor->id,
                 ]
             );
@@ -487,7 +487,7 @@ class PeaceAndSafeController extends Controller
     public function createWarehouseCert(Certification $certification)
     {
         $day = intval(now()->format('d'));
-        $day = $day > 1 ? "a los {$day} días" : "al primer día";
+        $day = $day > 1 ? "a los <b>$day</b> días" : "al <b>primer</b> día";
         $month = intval(now()->format('m'));
         $months = [
             1 => 'enero',
@@ -507,24 +507,25 @@ class PeaceAndSafeController extends Controller
         $year = now()->format('Y');
         $virtual_file = $certification->virtual_file;
         $complete_text = $virtual_file
-            ? ", número de contrato: <b>{$certification->contract}</b> y número de expediente: <b>{$certification->virtual_file}</b>"
-            : " y número de contrato: <b>{$certification->contract}</b>";
+            ? "<b>{$certification->contract}</b> y número de expediente: <b>{$certification->virtual_file}</b>"
+            : "<b>{$certification->contract}</b>";
 
         $name = $certification->name;
 
-        $text  = "<p>Que, en cumplimiento a lo previsto en el numeral 2.2 del Manual de Procedimientos Administrativos y Contables ";
-        $text .= "para el manejo y control de los bienes en las Entidades de Gobierno Distritales, adoptado mediante la Resolución ";
-        $text .= "001 del 30 de septiembre de 2019 expedida por el Contador General de Bogotá, donde se establece como estrategia de ";
-        $text .= "control y buena gestión, que el servidor público al momento del retiro y el contratista al finalizar su relación ";
-        $text .= "contractual, entregue a través de los documentos establecidos, los elementos que tenía a su cargo; para la generación ";
-        $text .= "del certificado de recibo a satisfacción por parte del área competente, en concordancia con lo dispuesto en el Código General ";
-        $text .= "Disciplinario Ley 1952 del 28 de enero de 2019, que deroga la Ley 734 de 2002, a partir del 01 de julio de 2021 y los lineamientos ";
-        $text .= "internos emitidos por la Subdirección Administrativa y Financiera en lo que respecta a los traslados o reintegros de bienes al Almacén General, ";
-        $text .= "se evidencia: </p>";
-        $text .= "<p>Que, una vez revisado en el módulo de Almacén e Inventarios del Sistema Administrativo y Financiero - SEVEN - de la Entidad los datos del(la) funcionario(a): ";
-        $text .= "<b>{$name}</b> identificado(a) con cédula de ciudadanía No. <b>{$certification->document}</b>{$complete_text}, ";
-        $text .= "no tiene a la fecha, ningún elemento o activo, bajo su cargo. </p>";
-        $text.= "<p>Se expide certificado de paz y salvo por solicitud del usuario {$day} del mes de {$m} del año {$year} debido a: <b>TERMINACIÓN DE CONTRATO.</b></p>";
+        $text  = "<p>Que, una vez revisado en el módulo de Activos Fijos del Sistema de Información Administrativo y ";
+        $text .= "Financiero <b>SEVEN</b> del Instituto Distrital de Recreación y Deporte - IDRD,  el Almacenista General ";
+        $text .= "de la Entidad certifica que el(la) señor(a): <b>$name</b>. identificado(a) con cédula de ciudadanía ";
+        $text .= "No. <b>{$certification->document}</b>, no tiene, ningún elemento o activo, bajo su cargo.</p>";
+        $text .= "<p>Se expide el presente certificado de cumplimiento de entrega de bienes por parte de contratistas a ";
+        $text .= "solicitud del peticionario con el fin de realizar los trámites administrativos correspondientes con ";
+        $text .= "motivo de la <b>TERMINACIÓN O CESIÓN DE CONTRATO DE PRESTACION DE SERVICIOS Y/O DE APOYO ";
+        $text .= "A LA GESTIÓN No.</b> $complete_text.</p>";
+        $text .= "<p></p>";
+        $text .= "<p>Presente certificación, firmada en <b>Bogotá D.C.</b> $day del mes de <b>$m</b> de <b>$year</b>.</p>";
+        $text .= "<p></p>";
+        $text.= "<small><b>NOTA:</b> Lo anterior en cumplimiento con lo previsto en el Manual de Procedimientos Administrativos y Contables para el ";
+        $text.= "manejo y control de los bienes en las Entidades de Gobierno Distritales, adoptado mediante la Resolución No. 001 del 30 ";
+        $text.= "de septiembre de 2019 expedida por la Secretaria de Hacienda de Bogotá. </small>";
 
 
         return $this->getPDF('PAZ_Y_SALVO_ALMACEN.pdf', $text, $certification)->Output('I', 'PAZ_Y_SALVO_ALMACEN.pdf');
@@ -824,7 +825,7 @@ class PeaceAndSafeController extends Controller
     public function createText($name, $document, $contract_info, $username = null, $hasOrfeo = true)
     {
         $day = intval(now()->format('d'));
-        $day = $day > 1 ? "a los {$day} días" : "al primer día";
+        $day = $day > 1 ? "a los <b>{$day}</b> días" : "al <b>primer</b> día";
         $month = intval(now()->format('m'));
         $months = [
             1 => 'enero',
@@ -844,26 +845,22 @@ class PeaceAndSafeController extends Controller
         $year = now()->format('Y');
 
         // NEW TEXT
-        $text = "<p>Que, en cumplimiento a lo previsto en la Ley 594 del 14 de julio de 2000 <pers>\"Ley General de Archivos\"</pers>, ";
-        $text .= "que relaciona las responsabilidades que tienen los servidores públicos mientras cumplen su función y aún después de ";
-        $text .= "que estos hayan finalizado su relación con las instituciones, así como las implicaciones jurídicas, disciplinarias, ";
-        $text .= "civiles y penales, por la gestión o manejo documental, en concordancia con lo dispuesto en el Código General ";
-        $text .= "Disciplinario Ley 1952 del 28 de enero de 2019, que deroga la Ley 734 de 2002, a partir del 01 de julio de 2021 y los ";
-        $text .= "lineamientos internos emitidos por la Subdirección Administrativa y financiera, donde se contempla la verificación del ";
-        $text .= "Sistema de Gestión Documental - Orfeo, para constatar la inexistencia de radicados pendientes de trámite al momento de la ";
-        $text .= "terminación del contrato para contratistas y/o desvinculación, traslado ó encargo para los servidores públicos del IDRD, se evidencia: </p>";
-        $text .= "<p>Que, una vez revisado el Sistema de Gestión Documental - Orfeo - a cargo del(la) funcionario(a):  <b>{$name}</b>, ";
-        $text .= "identificado(a) con cédula de ciudadanía No. <b>{$document}</b>{$contract_info}, ";
-        if ($username) {
-            $text .= "no tiene a la fecha, documentos en soporte papel y/o electrónico de archivo ni de trámite a su cargo; y no tiene comunicaciones oficiales pendientes por entregar, ";
-            $text .= "recibir, tramitar, organizar o finalizar, de acuerdo al reporte generado por el Sistema de Gestión Documental y se procede en consecuencia, a ";
-            $text .= "inactivar el usuario de acceso <b>{$username}</b> a todos los aplicativos utilizados o administrados por la entidad de los cuales se requirió ";
-            $text .= "ingreso entre otros como: correo institucional, sistemas administrativos y financieros.</p>";
-        } else {
-            $text .= "no tiene a la fecha cuenta de acceso a los aplicativos utilizados o administrados por la entidad.</p>";
-        }
-
-        $text.= "<p>Se expide certificado de paz y salvo por solicitud del usuario {$day} del mes de {$m} del año {$year} debido a la novedad de: <b>TERMINACIÓN DE CONTRATO.</b></p>";
+        $text = "<p>Que revisados los buzones habilitados por el Instituto Distrital de Recreación y Deporte - IDRD al ";
+        $text .= "señor(a) <b>$name</b>, identificado(a) con la cédula de ciudadanía No. <b>$document</b>, se encontró que el ";
+        $text .= "(la) contratista a la fecha de expedición de la presente certificación no tiene en el buzón correos o ";
+        $text .= "documentos pendientes por tramitar o descargar del Sistema de Gestión Documental <b>\"ORFEO\"</b> e ";
+        $text .= "institucional utilizados y/o administrados por la entidad. Así mismo se inactivan los demás servicios ";
+        $text .= "de correo institucional, sistemas de información de apoyo y misional y de red, cuando aplique.</p>";
+        $text .= "<p>Se expide el presente certificado a solicitud del (la) contratista en la inactivación de cuentas de ";
+        $text .= "usuario autorizado por el IDRD y utilizados por la solicitante, con el fin de realizar los trámites ";
+        $text .= "administrativos con motivo de la <b>TERMINACIÓN O CESIÓN DE CONTRATO DE PRESTACION DE ";
+        $text .= "SERVICIOS Y/O DE APOYO A LA GESTIÓN No.</b> {$contract_info}.</p>";
+        $text .= "<p></p>";
+        $text .= "<p>Presente certificación, firmada en <b>Bogotá D.C.</b> $day del mes de <b>$m</b> de <b>$year</b>.</p>";
+        $text .= "<p></p>";
+        $text.= "<small><b>NOTA:</b> Lo anterior en cumplimiento de la Cláusula segunda. - Obligaciones Generales del Anexo clausulas adicionales del ";
+        $text.= "Contrato Electrónico de Prestación de Servicios Profesionales y de Apoyo a la Gestión en especial los numerales: 3, 7, 8, 14 ";
+        $text.= "y 23 y memorando Rad. 20203000123583 de febrero 24 de 2020 expedido por la Subdirección Administrativa y Financiera.</small>";
 
         return $text;
     }
@@ -887,6 +884,7 @@ class PeaceAndSafeController extends Controller
         $pdf = new FPDF($orientation, $unit, $size);
 
         $pdf->SetStyle("p","Helvetica","N",10,"0,0,0",15);
+        $pdf->SetStyle("small","Helvetica","N",8,"0,0,0",0);
         $pdf->SetStyle("h1","Helvetica","N",14,"0,0,0",0);
         $pdf->SetStyle("a","Helvetica","BU",9,"0,0,0", 15);
         $pdf->SetStyle("pers","Helvetica","I",0,"0,0,0");
@@ -928,7 +926,7 @@ class PeaceAndSafeController extends Controller
             ->setOutfile(storage_path("app/templates/{$name}.png"))
             ->png();
         $file = storage_path("app/templates/{$name}.png");
-        $pdf->Image($file, 30, 200, 50, 50);
+        $pdf->Image($file, 30, 195, 50, 50);
         $pdf->SetXY(80, 220);
         $pdf->SetFontSize(8);
         $x = 'La autenticidad de este documento se puede validar a través del enlace inferior.';
@@ -939,7 +937,7 @@ class PeaceAndSafeController extends Controller
         $pdf->SetFontSize(12);
         $pdf->Cell(30, 5, utf8_decode('Código de verificación: '.$name));
         $pdf->SetFontSize(8);
-        $pdf->SetXY(32, 248);
+        $pdf->SetXY(32, 245);
         $pdf->Write(5, $url, $url);
         if (Storage::disk('local')->exists("templates/{$name}.png")) {
             Storage::disk('local')->delete("templates/{$name}.png");
@@ -956,12 +954,14 @@ class PeaceAndSafeController extends Controller
     public function sample()
     {
         $contract = 'IDRD-CTO-0933-2021';
-        $virtual_file = '2897348973497E';
+        $virtual_file = null;
         $complete_text = $virtual_file
-            ? ", número de contrato: <b>{$contract}</b> y número de expediente: <b>{$virtual_file}</b>"
-            : " y número de contrato: <b>{$contract}</b>";
+            ? "<b>{$contract}</b> y número de expediente: <b>{$virtual_file}</b>"
+            : "<b>{$contract}</b>";
         $text = $this->createText('DANIEL ALEJANDRO PRADO MENDOZA', 1073240539, $complete_text, 'daniel.prado');
-        return $this->getPDF('PAZ_Y_SALVO_ALMACEN.pdf', $text, new Certification)->Output('I', 'PAZ_Y_SALVO_ALMACEN.pdf');
+
+        return $this->getPDF('PAZ_Y_SALVO.pdf', $text, new Certification)->Output('I', 'PAZ_Y_SALVO.pdf');
+        // return $this->createWarehouseCert( Certification::find(70) );
     }
     */
 }
