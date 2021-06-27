@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Agreements extends Model
+class Agreements extends Model implements Auditable
 {
-    use SoftDeletes;
+    use SoftDeletes, \OwenIt\Auditing\Auditable;
 
     /**
      * The connection name for the model.
@@ -47,6 +48,38 @@ class Agreements extends Model
         'rate_2',
         'rate_1'
     ];
+
+    /*
+   * ---------------------------------------------------------
+   * Data Change Auditor
+   * ---------------------------------------------------------
+   */
+
+    /**
+     * Attributes to include in the Audit.
+     *
+     * @var array
+     */
+    protected $auditInclude = [
+        'agreement',
+        'description',
+        'company_id',
+        'rate_5',
+        'rate_4',
+        'rate_3',
+        'rate_2',
+        'rate_1'
+    ];
+
+    /**
+     * Generating tags for each model audited.
+     *
+     * @return array
+     */
+    public function generateTags(): array
+    {
+        return ['vital_passport_agreements'];
+    }
 
     /*
      * ---------------------------------------------------------

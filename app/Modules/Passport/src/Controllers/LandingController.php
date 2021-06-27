@@ -125,14 +125,4 @@ class LandingController extends Controller
             $comment
         );
     }
-
-    /**
-     * @return JsonResponse
-     */
-    public function faq()
-    {
-        return $this->success_message(
-            FaqResource::collection( Faq::all() )
-        );
-    }
 }

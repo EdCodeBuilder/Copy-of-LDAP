@@ -143,6 +143,20 @@ class UserController extends LoginController
                 'exact' =>  true,
                 'can'   =>  auth('api')->user()->isAn(...Roles::all())
             ],
+            [
+                'icon'  =>  'mdi-help-circle',
+                'title' =>  'FAQ',
+                'to'    =>  [ 'name' => 'faq' ],
+                'exact' =>  true,
+                'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+            ],
+            [
+                'icon'  =>  'mdi-magnify',
+                'title' =>  'Auditoría',
+                'to'    =>  [ 'name' => 'audit' ],
+                'exact' =>  true,
+                'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+            ],
         ]);
         return $this->success_message( array_values( $menu->where('can', true)->toArray() ) );
     }

@@ -5,10 +5,14 @@ namespace App\Modules\Passport\src\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Arr;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Passport extends Model
+class Passport extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
+
     const SUPER_CADE_INTERNET = 8;
+    const SUPER_USER = 2811456;
 
     /**
      * The connection name for the model.
@@ -57,6 +61,48 @@ class Passport extends Model
         'i_pregunta4'
     ];
 
+    /*
+   * ---------------------------------------------------------
+   * Data Change Auditor
+   * ---------------------------------------------------------
+   */
+
+    /**
+     * Attributes to include in the Audit.
+     *
+     * @var array
+     */
+    protected $auditInclude = [
+        'i_fk_id_usuario_supercade',
+        'i_fk_id_usuario',
+        'i_fk_id_superCade',
+        'vc_pensionado',
+        'i_fk_id_localidad',
+        'i_fk_id_estrato',
+        'vc_direccion',
+        'vc_telefono',
+        'vc_celular',
+        'i_fk_id_actividades',
+        'i_fk_id_eps',
+        'email',
+        'downloads',
+        'tx_observacion',
+        'i_pregunta1',
+        'i_pregunta2',
+        'i_pregunta3',
+        'i_pregunta4'
+    ];
+
+    /**
+     * Generating tags for each model audited.
+     *
+     * @return array
+     */
+    public function generateTags(): array
+    {
+        return ['vital_passport_new_passport'];
+    }
+
     /**
      * @param array $request
      * @return array
@@ -64,7 +110,7 @@ class Passport extends Model
     public function transformRequest(array $request) {
         return [
             'i_fk_id_usuario_supercade' =>  0,
-            'i_fk_id_usuario'   => 0,
+            'i_fk_id_usuario'   => Passport::SUPER_USER,
             'i_fk_id_superCade' => Passport::SUPER_CADE_INTERNET,
             'vc_pensionado'     => Arr::get($request, 'pensionary', null),
             'i_fk_id_localidad' => Arr::get($request, 'locality_id', null),

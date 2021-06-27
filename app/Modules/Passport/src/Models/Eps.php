@@ -3,9 +3,11 @@
 namespace App\Modules\Passport\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Eps extends Model
+class Eps extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     /**
      * The connection name for the model.
      *
@@ -40,6 +42,31 @@ class Eps extends Model
      * @var bool
      */
     public $timestamps = false;
+
+    /*
+    * ---------------------------------------------------------
+    * Data Change Auditor
+    * ---------------------------------------------------------
+    */
+
+    /**
+     * Attributes to include in the Audit.
+     *
+     * @var array
+     */
+    protected $auditInclude = [
+        'vc_nombre', 'i_estado'
+    ];
+
+    /**
+     * Generating tags for each model audited.
+     *
+     * @return array
+     */
+    public function generateTags(): array
+    {
+        return ['vital_passport_eps'];
+    }
 
     /*
      * ---------------------------------------------------------

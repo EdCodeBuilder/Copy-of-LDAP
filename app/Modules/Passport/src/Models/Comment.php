@@ -5,9 +5,11 @@ namespace App\Modules\Passport\src\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Comment extends Model
+class Comment extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     /**
      * The connection name for the model.
      *
@@ -36,6 +38,30 @@ class Comment extends Model
      */
     protected $fillable = ['name', 'comment', 'agreement_id'];
 
+    /*
+    * ---------------------------------------------------------
+    * Data Change Auditor
+    * ---------------------------------------------------------
+    */
+
+    /**
+     * Attributes to include in the Audit.
+     *
+     * @var array
+     */
+    protected $auditInclude = [
+        'name', 'comment', 'agreement_id'
+    ];
+
+    /**
+     * Generating tags for each model audited.
+     *
+     * @return array
+     */
+    public function generateTags(): array
+    {
+        return ['vital_passport_comments'];
+    }
 
     /*
      * ---------------------------------------------------------

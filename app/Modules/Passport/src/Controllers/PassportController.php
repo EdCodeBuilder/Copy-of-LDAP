@@ -191,10 +191,8 @@ class PassportController extends Controller
         $pdf->Cell(160,10, utf8_decode($document_type.' '.$document),0,0,'L');
         $pdf->SetXY(58, 135);
         $pdf->Cell(160,10, utf8_decode('N. '.$passport),0,0,'L');
-        $path = env('APP_ENV') == 'local'
-            ? env('APP_PATH_DEV')
-            : env('APP_PATH_PROD');
-        $url = "https://sim.idrd.gov.co/{$path}/es/validar-documento?validate=$passport";
+        ;
+        $url = "https://sim.idrd.gov.co/pasaporte-vital-en-linea/es/validar-pasaporte?passport=$passport";
         QrCode::url($url)
             ->setErrorCorrectionLevel('H')
             ->setSize(10)

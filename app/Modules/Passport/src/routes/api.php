@@ -1,9 +1,11 @@
 <?php
 
 use App\Modules\Passport\src\Controllers\AgreementController;
+use App\Modules\Passport\src\Controllers\AuditController;
 use App\Modules\Passport\src\Controllers\CompanyController;
 use App\Modules\Passport\src\Controllers\DashboardController;
 use App\Modules\Passport\src\Controllers\EpsController;
+use App\Modules\Passport\src\Controllers\FaqController;
 use App\Modules\Passport\src\Controllers\HobbyController;
 use App\Modules\Passport\src\Controllers\LandingController;
 use App\Modules\Passport\src\Controllers\PassportController;
@@ -13,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('vital-passport')->group(function () {
     // Public routes
     Route::get('landing', [LandingController::class, 'index']);
-    Route::get('faq', [LandingController::class, 'faq']);
+    Route::get('faq', [FaqController::class, 'index']);
     Route::get('background', [LandingController::class, 'background']);
     Route::get('portfolio', [LandingController::class, 'portfolio']);
     Route::post('rate/{agreement}', [LandingController::class, 'rate']);
@@ -55,4 +57,8 @@ Route::prefix('vital-passport')->group(function () {
     Route::put('landing/{dashboard}', [ DashboardController::class, 'landing' ])->middleware('auth:api');
     Route::put('banner/{dashboard}', [ DashboardController::class, 'banner' ])->middleware('auth:api');
     Route::delete('banner/{dashboard}', [ DashboardController::class, 'destroyBanner' ])->middleware('auth:api');
+    Route::post('faq', [FaqController::class, 'store'])->middleware('auth:api');
+    Route::put('faq/{faq}', [FaqController::class, 'update'])->middleware('auth:api');
+    Route::delete('faq/{faq}', [FaqController::class, 'destroy'])->middleware('auth:api');
+    Route::get('audits', [AuditController::class, 'index'])->middleware('auth:api');
 });

@@ -4,9 +4,11 @@ namespace App\Modules\Passport\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Dashboard extends Model
+class Dashboard extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     /**
      * The connection name for the model.
      *
@@ -40,6 +42,35 @@ class Dashboard extends Model
         'text',
         'banner',
     ];
+
+    /*
+    * ---------------------------------------------------------
+    * Data Change Auditor
+    * ---------------------------------------------------------
+    */
+
+    /**
+     * Attributes to include in the Audit.
+     *
+     * @var array
+     */
+    protected $auditInclude = [
+        'background',
+        'title',
+        'icon',
+        'text',
+        'banner',
+    ];
+
+    /**
+     * Generating tags for each model audited.
+     *
+     * @return array
+     */
+    public function generateTags(): array
+    {
+        return ['vital_passport_dashboard'];
+    }
 
     /*
      * ---------------------------------------------------------

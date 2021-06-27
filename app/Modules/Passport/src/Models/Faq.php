@@ -3,9 +3,11 @@
 namespace App\Modules\Passport\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Faq extends Model
+class Faq extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
     /**
      * The connection name for the model.
      *
@@ -32,5 +34,30 @@ class Faq extends Model
      *
      * @var array
      */
-    protected $fillable = ['header', 'answer', 'url', 'video'];
+    protected $fillable = ['header', 'answer', 'to', 'url', 'video'];
+
+    /*
+    * ---------------------------------------------------------
+    * Data Change Auditor
+    * ---------------------------------------------------------
+    */
+
+    /**
+     * Attributes to include in the Audit.
+     *
+     * @var array
+     */
+    protected $auditInclude = [
+        'header', 'answer', 'to', 'url', 'video'
+    ];
+
+    /**
+     * Generating tags for each model audited.
+     *
+     * @return array
+     */
+    public function generateTags(): array
+    {
+        return ['vital_passport_faq'];
+    }
 }
