@@ -25,7 +25,7 @@ class StateLDAP extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'country_id'];
+    protected $fillable = ['name', 'country_id', 'sim_state_id'];
 
     public function cities()
     {

@@ -34,11 +34,23 @@ class Sex extends Model
      */
     protected $fillable = ['Nombre_Genero'];
 
+    /*
+     * ---------------------------------------------------------
+     * Accessors and Mutator
+     * ---------------------------------------------------------
+     */
+
+    /**
+     * @return int
+     */
     public function getIdAttribute()
     {
         return (int) $this->Id_Genero;
     }
 
+    /**
+     * @return mixed|string|null
+     */
     public function getNameAttribute()
     {
         return toUpper($this->Nombre_Genero);

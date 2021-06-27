@@ -25,7 +25,7 @@ class CityLDAP extends Model
      *
      * @var array
      */
-    protected $fillable = ['name', 'state_id'];
+    protected $fillable = ['name', 'state_id', 'sim_city_id'];
 
     public function state()
     {

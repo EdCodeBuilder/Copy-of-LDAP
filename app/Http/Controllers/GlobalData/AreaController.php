@@ -6,16 +6,36 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\GlobalData\AreaResource;
 use App\Http\Resources\GlobalData\SubdirectorateResource;
 use App\Models\Security\Subdirectorate;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 
 class AreaController extends Controller
 {
-    public function office()
+    /**
+     * Initialise common request params
+     */
+    public function __construct()
     {
-        return $this->success_response( SubdirectorateResource::collection( Subdirectorate::all() ) );
+        parent::__construct();
     }
 
+    /**
+     * @return JsonResponse
+     */
+    public function office()
+    {
+        return $this->success_response(
+            SubdirectorateResource::collection(
+                $this->setQuery(Subdirectorate::query(), 'id')->get()
+            )
+        );
+    }
+
+    /**
+     * @param Subdirectorate $office
+     * @return JsonResponse
+     */
     public function areas(Subdirectorate $office)
     {
         return $this->success_response(

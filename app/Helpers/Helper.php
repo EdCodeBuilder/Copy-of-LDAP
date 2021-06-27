@@ -246,3 +246,17 @@ if ( ! function_exists('format_contract') ) {
         return toUpper("IDRD-CTO-{$contract_number}-{$year}");
     }
 }
+
+if ( ! function_exists('random_img_name') ) {
+    /**
+     * @return string
+     */
+    function random_img_name() {
+        $s = strtoupper(md5(uniqid(rand(),true)));
+        return substr($s,0,8) . '-' .
+                substr($s,8,4) . '-' .
+                substr($s,12,4). '-' .
+                substr($s,16,4). '-' .
+                substr($s,20);
+    }
+}

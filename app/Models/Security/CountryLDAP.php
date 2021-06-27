@@ -25,7 +25,7 @@ class CountryLDAP extends Model
      *
      * @var array
      */
-    protected $fillable = ['name'];
+    protected $fillable = ['code', 'name', 'phone_code', 'sim_country_id'];
 
     public function states()
     {

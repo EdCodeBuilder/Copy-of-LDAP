@@ -11,6 +11,7 @@ use App\Modules\Parks\src\Resources\LocationResource;
 use App\Modules\Parks\src\Resources\NeighborhoodResource;
 use App\Modules\Parks\src\Resources\UpzResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class LocationController extends Controller
@@ -26,11 +27,13 @@ class LocationController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Request $request
      * @return JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        return $this->success_response( LocationResource::collection( Location::all() ) );
+        $data = $this->setQuery(Location::query(), 'Id_Localidad')->get();
+        return $this->success_response( LocationResource::collection( $data ) );
     }
 
     /**

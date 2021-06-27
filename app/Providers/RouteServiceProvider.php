@@ -46,6 +46,8 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapContractorsRoutes();
 
         $this->mapPayrollRoutes();
+
+        $this->mapPassportRoutes();
     }
 
     /**
@@ -101,5 +103,12 @@ class RouteServiceProvider extends ServiceProvider
             ->prefix('api')
             ->group(base_path('routes/sub_routes/payroll/payroll.php'));
     }
-    
+
+    public function mapPassportRoutes()
+    {
+        Route::middleware('api')
+            ->prefix('api')
+            ->group(base_path('app/Modules/Passport/src/routes/api.php'));
+    }
+
 }

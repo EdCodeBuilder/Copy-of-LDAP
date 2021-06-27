@@ -26,13 +26,13 @@ class DocumentTypeController extends Controller
      */
     public function index(Request $request)
     {
-        $data = DocumentType::query()
-            ->when($request->has('document_types'), function ($query) use($request) {
-                $types = $request->get('document_types');
-                return is_array($types)
-                    ? $query->whereIn('Id_TipoDocumento', $types)
-                    : $query->where('Id_TipoDocumento', $types);
-            })->get();
+        $data = $this->setQuery(DocumentType::query(), 'Id_TipoDocumento')
+                    ->when($request->has('document_types'), function ($query) use($request) {
+                        $types = $request->get('document_types');
+                        return is_array($types)
+                            ? $query->whereIn('Id_TipoDocumento', $types)
+                            : $query->where('Id_TipoDocumento', $types);
+                    })->get();
         return $this->success_response(
             DocumentTypeResource::collection($data)
         );

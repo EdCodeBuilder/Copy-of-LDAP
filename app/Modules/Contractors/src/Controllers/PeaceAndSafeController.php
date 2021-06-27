@@ -559,6 +559,16 @@ class PeaceAndSafeController extends Controller
 
             if ($this->doesntHaveOrfeo($user)) {
                 if ($this->doesntHaveLDAP($document, 'postalcode')) {
+                    /*
+                    $sub_day = Carbon::parse($expires_at)->subDay();
+                    if (isset($expires_at) && now()->lessThanOrEqualTo( $sub_day )) {
+                        return $this->error_response(
+                            "El Servicio de Paz y Salvo del Área de Sistemas estará disponible a partir de la fecha {$sub_day}.",
+                            Response::HTTP_UNPROCESSABLE_ENTITY,
+                            'Usuario sin cuenta de ORFEO Y sin Cuentas Institucionales'
+                        );
+                    }
+                    */
                     $text = $this->createText($name, $document, $complete_text);
                     return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
                 }
