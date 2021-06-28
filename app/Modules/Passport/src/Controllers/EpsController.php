@@ -6,8 +6,10 @@ namespace App\Modules\Passport\src\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Passport\src\Models\Eps;
+use App\Modules\Passport\src\Request\StoreEpsRequest;
 use App\Modules\Passport\src\Resources\EpsResource;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class EpsController extends Controller
 {
@@ -28,6 +30,39 @@ class EpsController extends Controller
             EpsResource::collection(
                 $this->setQuery(Eps::query(), 'i_pk_id')->get()
             )
+        );
+    }
+
+    public function store(StoreEpsRequest $request)
+    {
+        $form = new Eps();
+        $form->vc_nombre = $request->get('name');
+        $form->i_estado = 1;
+        $form->save();
+        return $this->success_message(
+            __('validation.handler.success'),
+            Response::HTTP_CREATED
+        );
+    }
+
+    public function update(StoreEpsRequest $request, Eps $eps)
+    {
+        $eps->vc_nombre = $request->get('name');
+        $eps->save();
+        return $this->success_message(
+            __('validation.handler.updated')
+        );
+    }
+
+    public function destroy(Eps $eps)
+    {
+        $eps->i_estado = 0;
+        $eps->save();
+        $eps->delete();
+        return $this->success_message(
+            __('validation.handler.deleted'),
+            Response::HTTP_OK,
+            Response::HTTP_NO_CONTENT
         );
     }
 }

@@ -38,6 +38,14 @@ Route::prefix('vital-passport')->group(function () {
         Route::delete('/roles/{user}', [UserController::class, 'destroy']);
         Route::get('/find', [UserController::class, 'findUsers']);
     });
+    Route::resource('hobbies', HobbyController::class, [
+        'only'    => ['store', 'update', 'destroy'],
+        'parameters' => ['hobbies' => 'hobby']
+    ])->middleware('auth:api');
+    Route::resource('eps', HobbyController::class, [
+        'only'    => ['store', 'update', 'destroy'],
+        'parameters' => ['eps' => 'eps']
+    ])->middleware('auth:api');
     Route::resource('companies', CompanyController::class, [
         'only'    => ['index', 'store', 'update', 'destroy'],
         'parameters' => ['companies' => 'company']

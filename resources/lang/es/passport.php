@@ -12,12 +12,14 @@ return [
     |
     */
     'menu'  =>  [
-        'users'     =>  'Usuarios',
+        'users'         =>  'Usuarios',
+        'activities'    =>  'Actividades de Interés',
+        'eps'           =>  'EPS',
         'dashboard'     =>  'Tablero',
         'companies'     =>  'Empresas',
         'portfolio'     =>  'Servicios',
-        'faq'     =>  'Preguntas Frecuentes',
-        'audit'     =>  'Auditoria',
+        'faq'           =>  'Preguntas Frecuentes',
+        'audit'         =>  'Auditoria',
     ],
 
     'classes' => [

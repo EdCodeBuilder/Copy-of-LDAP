@@ -3,11 +3,12 @@
 namespace App\Modules\Passport\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Hobby extends Model implements Auditable
 {
-    use \OwenIt\Auditing\Auditable;
+    use \OwenIt\Auditing\Auditable, SoftDeletes;
     /**
      * The connection name for the model.
      *
@@ -35,13 +36,6 @@ class Hobby extends Model implements Auditable
      * @var array
      */
     protected $fillable = ['vc_nombre', 'i_estado'];
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
 
     /*
     * ---------------------------------------------------------

@@ -13,6 +13,8 @@ return [
     */
     'menu'  =>  [
         'users'     =>  'Users',
+        'activities'    =>  'Hobbies',
+        'eps'           =>  'Health Companies',
         'dashboard'     =>  'Dashboard',
         'companies'     =>  'Companies',
         'portfolio'     =>  'Portfolio',

@@ -123,6 +123,20 @@ class UserController extends LoginController
                 'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
             ],
             [
+                'icon'  =>  'mdi-pine-tree',
+                'title' =>  __('passport.menu.activities'),
+                'to'    =>  [ 'name' => 'hobbies' ],
+                'exact' =>  true,
+                'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+            ],
+            [
+                'icon'  =>  'mdi-hospital-box',
+                'title' =>  __('passport.menu.eps'),
+                'to'    =>  [ 'name' => 'eps' ],
+                'exact' =>  true,
+                'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+            ],
+            [
                 'icon'  =>  'mdi-view-dashboard',
                 'title' =>  __('passport.menu.dashboard'),
                 'to'    =>  [ 'name' => 'home' ],
