@@ -39,6 +39,22 @@ class HobbyController extends Controller
     }
 
     /**
+     * @return JsonResponse
+     */
+    public function table()
+    {
+        return $this->success_response(
+            HobbyResource::collection(
+                $this->setQuery(Hobby::query(), 'i_pk_id')
+                    ->when(isset($this->query), function ($query) {
+                        return $query->where('vc_nombre', 'like', "%{$this->query}%");
+                    })
+                    ->paginate($this->per_page)
+            )
+        );
+    }
+
+    /**
      * @param StoreHobbyRequest $request
      * @return JsonResponse
      */
