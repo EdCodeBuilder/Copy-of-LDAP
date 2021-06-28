@@ -50,7 +50,11 @@ class HobbyController extends Controller
                         return $query->where('vc_nombre', 'like', "%{$this->query}%");
                     })
                     ->paginate($this->per_page)
-            )
+            ),
+            Response::HTTP_OK,
+            [
+                'headers'   => HobbyResource::headers()
+            ]
         );
     }
 
