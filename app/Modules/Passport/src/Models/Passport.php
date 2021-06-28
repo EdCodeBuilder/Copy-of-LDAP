@@ -109,8 +109,8 @@ class Passport extends Model implements Auditable
      */
     public function transformRequest(array $request) {
         return [
-            'i_fk_id_usuario_supercade' =>  0,
-            'i_fk_id_usuario'   => Passport::SUPER_USER,
+            'i_fk_id_usuario_supercade' =>  Passport::SUPER_USER,
+            'i_fk_id_usuario'   => null,
             'i_fk_id_superCade' => Passport::SUPER_CADE_INTERNET,
             'vc_pensionado'     => Arr::get($request, 'pensionary', null),
             'i_fk_id_localidad' => Arr::get($request, 'locality_id', null),
