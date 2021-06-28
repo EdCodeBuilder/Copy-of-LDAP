@@ -26,6 +26,7 @@ return [
         "App\Modules\Passport\src\Models\Comment"  => 'Comentarios',
         "App\Modules\Passport\src\Models\Company" => 'Empresas',
         "App\Modules\Passport\src\Models\Dashboard" => 'Dashboard',
+        "App\Modules\Passport\src\Models\Image" => 'Imágen de Servicios',
         "App\Modules\Passport\src\Models\Eps"    => 'EPS',
         "App\Modules\Passport\src\Models\Faq"    => 'Preguntas Frecuentes',
         "App\Modules\Passport\src\Models\Hobby"    => 'Actividades de Interés',

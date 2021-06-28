@@ -26,6 +26,7 @@ return [
         "App\Modules\Passport\src\Models\Comment"  => 'Comments',
         "App\Modules\Passport\src\Models\Company" => 'Company',
         "App\Modules\Passport\src\Models\Dashboard" => 'Dashboard',
+        "App\Modules\Passport\src\Models\Image" => 'Portfolio Image',
         "App\Modules\Passport\src\Models\Eps"    => 'EPS',
         "App\Modules\Passport\src\Models\Faq"    => 'FAQ',
         "App\Modules\Passport\src\Models\Hobby"    => 'Hobbies',
