@@ -117,42 +117,42 @@ class UserController extends LoginController
         $menu = collect([
             [
                 'icon'  =>  'mdi-account-multiple-plus',
-                'title' =>  'Usuarios',
+                'title' =>  __('passport.menu.users'),
                 'to'    =>  [ 'name' => 'user-admin' ],
                 'exact' =>  true,
                 'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
             ],
             [
                 'icon'  =>  'mdi-view-dashboard',
-                'title' =>  'Dashboard',
+                'title' =>  __('passport.menu.dashboard'),
                 'to'    =>  [ 'name' => 'home' ],
                 'exact' =>  true,
                 'can'   =>  auth('api')->user()->isAn(...Roles::all())
             ],
             [
                 'icon'  =>  'mdi-domain',
-                'title' =>  'Entidades',
+                'title' =>  __('passport.menu.companies'),
                 'to'    =>  [ 'name' => 'companies' ],
                 'exact' =>  true,
                 'can'   =>  auth('api')->user()->isAn(...Roles::all())
             ],
             [
                 'icon'  =>  'mdi-briefcase-variant',
-                'title' =>  'Portafolio',
+                'title' =>  __('passport.menu.portfolio'),
                 'to'    =>  [ 'name' => 'services' ],
                 'exact' =>  true,
                 'can'   =>  auth('api')->user()->isAn(...Roles::all())
             ],
             [
                 'icon'  =>  'mdi-help-circle',
-                'title' =>  'FAQ',
+                'title' =>  __('passport.menu.faq'),
                 'to'    =>  [ 'name' => 'faq' ],
                 'exact' =>  true,
                 'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
             ],
             [
                 'icon'  =>  'mdi-magnify',
-                'title' =>  'Auditoría',
+                'title' =>  __('passport.menu.audit'),
                 'to'    =>  [ 'name' => 'audit' ],
                 'exact' =>  true,
                 'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)

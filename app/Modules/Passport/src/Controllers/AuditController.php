@@ -5,10 +5,8 @@ namespace App\Modules\Passport\src\Controllers;
 
 
 use App\Http\Controllers\Controller;
-use App\Modules\Parks\src\Resources\AuditResource;
+use App\Modules\Passport\src\Resources\AuditResource;
 use App\Modules\Passport\src\Constants\Roles;
-use App\Modules\Passport\src\Models\Eps;
-use App\Modules\Passport\src\Resources\EpsResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use OwenIt\Auditing\Models\Audit;
