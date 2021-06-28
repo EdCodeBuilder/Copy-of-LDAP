@@ -28,7 +28,11 @@ class EpsController extends Controller
     {
         return $this->success_response(
             EpsResource::collection(
-                $this->setQuery(Eps::query(), 'i_pk_id')->get()
+                $this->setQuery(Eps::query(), 'i_pk_id')
+                    ->when(isset($this->query), function ($query) {
+                        return $query->where('vc_nombre', 'like', "%{$this->query}%");
+                    })
+                    ->get()
             )
         );
     }

@@ -28,7 +28,13 @@ class HobbyController extends Controller
     public function index()
     {
         return $this->success_response(
-            HobbyResource::collection(Hobby::all())
+            HobbyResource::collection(
+                $this->setQuery(Hobby::query(), 'i_pk_id')
+                    ->when(isset($this->query), function ($query) {
+                        return $query->where('vc_nombre', 'like', "%{$this->query}%");
+                    })
+                    ->get()
+            )
         );
     }
 

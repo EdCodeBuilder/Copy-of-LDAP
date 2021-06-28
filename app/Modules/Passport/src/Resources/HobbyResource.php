@@ -24,4 +24,40 @@ class HobbyResource extends JsonResource
             'updated_at'    =>  isset($this->updated_at) ? $this->updated_at->format('Y-m-d H:i:s') : null,
         ];
     }
+
+    public static function headers()
+    {
+        return [
+            [
+                'align' => "right",
+                'text' => "ID",
+                'value'  =>  "id",
+                'sortable' => false
+            ],
+            [
+                'align' => "left",
+                'text' => "Nombre",
+                'value'  =>  "name",
+                'sortable' => false
+            ],
+            [
+                'align' => "right",
+                'text' => "Fecha de creación",
+                'value'  =>  "created_at",
+                'sortable' => false
+            ],
+            [
+                'align' => "right",
+                'text' => "Fecha de actualización",
+                'value'  =>  "created_at",
+                'sortable' => false
+            ],
+            [
+                'align' => "right",
+                'text' => "Acciones",
+                'value'  =>  "actions",
+                'sortable' => false
+            ],
+        ];
+    }
 }
