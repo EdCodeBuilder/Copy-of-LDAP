@@ -458,7 +458,7 @@ class PeaceAndSafeController extends Controller
             });
             $response->setStatusCode(200);
             $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            $response->headers->set('Content-Disposition', 'attachment; filename="INVENTARIO_ALMACEN.xlsx"');
+            $response->headers->set('Content-Disposition', 'attachment; filename="TRASLADO_ELEMENTOS.xlsx"');
             return $response->send();
 
         } catch (Exception $exception) {
