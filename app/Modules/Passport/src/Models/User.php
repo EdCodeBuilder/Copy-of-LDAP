@@ -180,7 +180,7 @@ class User extends Model
      */
     public function passport_old()
     {
-        return $this->hasOnePassport(PassportOldView::class, 'user_id', 'Id_Persona');
+        return $this->hasOne(PassportOldView::class, 'user_id', 'Id_Persona');
     }
 
     /**
