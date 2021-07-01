@@ -24,6 +24,8 @@ class DashboardResource extends JsonResource
             'text'  => isset($this->text) ? (string) $this->text : null,
             'banner'    =>  isset($this->banner) ? (string) $this->banner : null,
             'cards'     => CardResource::collection( $this->cards ),
+            'created_at'    =>  isset($this->created_at) ? $this->created_at->format('Y-m-d H:i:s') : null,
+            'updated_at'    =>  isset($this->updated_at) ? $this->updated_at->format('Y-m-d H:i:s') : null,
         ];
     }
 }

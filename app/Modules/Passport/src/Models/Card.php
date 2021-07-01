@@ -3,6 +3,7 @@
 namespace App\Modules\Passport\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Card extends Model implements Auditable
@@ -37,6 +38,7 @@ class Card extends Model implements Auditable
     protected $fillable = [
         'title',
         'description',
+        'btn_text',
         'lottie',
         'flex',
         'src',
@@ -59,6 +61,7 @@ class Card extends Model implements Auditable
     protected $auditInclude = [
         'title',
         'description',
+        'btn_text',
         'lottie',
         'flex',
         'src',
@@ -75,6 +78,42 @@ class Card extends Model implements Auditable
     public function generateTags(): array
     {
         return ['vital_passport_card'];
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * Accessors and Mutators
+     * ---------------------------------------------------------
+     */
+
+    /**
+     * @param $value
+     * @return null|string
+     */
+    public function getSrcAttribute($value)
+    {
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return $value;
+        }
+        if ( !is_null($value) && Storage::disk('public')->exists("passport-services/$value") ) {
+            return Storage::disk('public')->url("passport-services/$value");
+        }
+        return null;
+    }
+
+    /**
+     * @param $value
+     * @return null|string
+     */
+    public function getLottieAttribute($value)
+    {
+        if ( !is_null($value) && Storage::disk('public')->exists("lottie/$value") ) {
+            return json_decode( file_get_contents( storage_path("app/public/lottie/$value") ) );
+        }
+        if ( !is_null($value) && !Storage::disk('public')->exists("lottie/$value") ) {
+            return json_decode( file_get_contents( storage_path("app/public/lottie/404.json") ) );
+        }
+        return null;
     }
 
     /*

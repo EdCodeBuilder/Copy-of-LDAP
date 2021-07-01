@@ -2,6 +2,7 @@
 
 use App\Modules\Passport\src\Controllers\AgreementController;
 use App\Modules\Passport\src\Controllers\AuditController;
+use App\Modules\Passport\src\Controllers\CardController;
 use App\Modules\Passport\src\Controllers\CompanyController;
 use App\Modules\Passport\src\Controllers\DashboardController;
 use App\Modules\Passport\src\Controllers\EpsController;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('vital-passport')->group(function () {
     // Public routes
     Route::get('landing', [LandingController::class, 'index']);
+    Route::get('card-image', [LandingController::class, 'passport']);
     Route::get('faq', [FaqController::class, 'index']);
     Route::get('background', [LandingController::class, 'background']);
     Route::get('portfolio', [LandingController::class, 'portfolio']);
@@ -31,6 +33,10 @@ Route::prefix('vital-passport')->group(function () {
         Route::get('/menu', [UserController::class, 'drawer']);
         Route::get('/permissions', [UserController::class, 'permissions']);
     });
+    Route::resource('dashboard.cards', CardController::class, [
+        'only'    => ['index', 'store', 'update', 'destroy'],
+        'parameters' => ['dashboard' => 'dashboard', 'cards' => 'card']
+    ])->middleware('auth:api');
     Route::middleware(['auth:api'])->prefix('users')->group(function () {
         Route::get('', [UserController::class, 'index']);
         Route::get('/roles', [UserController::class, 'roles']);

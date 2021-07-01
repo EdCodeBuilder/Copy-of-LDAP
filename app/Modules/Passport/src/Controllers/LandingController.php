@@ -22,6 +22,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use function GuzzleHttp\Psr7\str;
 
 class LandingController extends Controller
@@ -46,6 +47,16 @@ class LandingController extends Controller
         return $this->success_message(
             [
                 'background' => $bg
+            ]
+        );
+    }
+
+    public function passport()
+    {
+        return $this->success_message(
+            [
+                'background' => url()->asset('storage/passport-template/PP-0000-0000-0000.png').'?v='.Str::random(6),
+                'dark'  => false,
             ]
         );
     }

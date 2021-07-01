@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\NotificationController;
 use App\Http\Controllers\Auth\UserModuleController;
+use App\Http\Controllers\GlobalData\AnimationsController;
 use App\Http\Controllers\GlobalData\AreaController;
 use App\Http\Controllers\GlobalData\ContributionController;
 use App\Http\Controllers\GlobalData\CountryStateCityController;
@@ -31,6 +32,9 @@ Route::prefix('password')->group( function () {
 });
 
 Route::prefix('api')->group(function () {
+    Route::get('animations', [AnimationsController::class, 'index']);
+    Route::get('animations/{file}', [AnimationsController::class, 'show'])->name('animations.show');
+
     Route::get('document-types', [DocumentTypeController::class, 'index']);
     Route::get('countries', [CountryStateCityController::class, 'countries']);
     Route::get('countries/{country}/states', [CountryStateCityController::class, 'states']);
@@ -49,6 +53,7 @@ Route::prefix('api')->group(function () {
 });
 
 Route::middleware('auth:api')->prefix('api')->group( function () {
+    Route::post('animations', [AnimationsController::class, 'store']);
     Route::get('user', [LoginController::class, 'user'])->name('passport.user');
     Route::get('notifications', [NotificationController::class, 'index']);
     Route::post('notifications', [NotificationController::class, 'markAllAsRead']);

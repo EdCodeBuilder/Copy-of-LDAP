@@ -62,6 +62,15 @@ class Image extends Model implements Auditable
         return ['vital_passport_image'];
     }
 
+    /*
+     * ---------------------------------------------------------
+     * Accessors and Mutators
+     * ---------------------------------------------------------
+     */
+
+    /**
+     * @return null|string
+     */
     public function getUrlAttribute()
     {
         if ( Storage::disk('public')->exists("passport-services/{$this->name}") ) {

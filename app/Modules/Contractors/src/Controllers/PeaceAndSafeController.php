@@ -250,7 +250,11 @@ class PeaceAndSafeController extends Controller
     {
         try {
             $certification = $this->saveInDatabase($request, 'ALM');
-            if (isset($certification->token)) {
+            if (
+                isset($certification->token) &&
+                isset($certification->expires_at) &&
+                $certification->expires_at->subDays(5)->gte( now() )
+            ) {
                 return $this->createWarehouseCert($certification);
             }
             $http = new Client();
