@@ -176,6 +176,14 @@ class User extends Model
     }
 
     /**
+     * @return HasOne
+     */
+    public function passport_old()
+    {
+        return $this->hasOnePassport(PassportOldView::class, 'user_id', 'Id_Persona');
+    }
+
+    /**
      * @return BelongsToMany
      */
     public function type()

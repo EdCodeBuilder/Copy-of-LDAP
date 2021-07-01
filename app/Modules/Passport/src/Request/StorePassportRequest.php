@@ -39,6 +39,9 @@ class StorePassportRequest extends FormRequest
                     if (isset($user->Id_Persona) && $user->passport()->count() > 0) {
                         $fail("El número de documento $value ya se encuentra registrado en Pasaporte Vital");
                     }
+                    if (isset($user->Id_Persona) && $user->passport_old()->count() > 0) {
+                        $fail("El número de documento $value ya se encuentra registrado en Pasaporte Vital");
+                    }
                 },
             ],
             'first_name' =>  'required|min:3|max:45',

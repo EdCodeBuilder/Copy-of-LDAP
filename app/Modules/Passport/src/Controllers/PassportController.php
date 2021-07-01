@@ -10,6 +10,8 @@ use App\Models\Security\CityLDAP;
 use App\Models\Security\CountryLDAP;
 use App\Models\Security\StateLDAP;
 use App\Modules\Passport\src\Models\Passport;
+use App\Modules\Passport\src\Models\PassportOld;
+use App\Modules\Passport\src\Models\PassportOldView;
 use App\Modules\Passport\src\Models\PassportView;
 use App\Modules\Passport\src\Models\User;
 use App\Modules\Passport\src\Request\ShowPassportRequest;
@@ -89,12 +91,28 @@ class PassportController extends Controller
                 })
                 ->when($request->get('criterion') == 'passport', function ($query) use ($request) {
                     return $query->where('id', $request->get('param'));
-                })->firstOrFail([
+                })->first([
                     'id',
                     'card_name',
                     'document',
                     'document_type_name',
                 ]);
+
+            if (!isset($passport->id)){
+                $passport = PassportOldView::query()
+                    ->when($request->get('criterion') == 'document', function ($query) use ($request) {
+                        return $query->where('document', $request->get('param'));
+                    })
+                    ->when($request->get('criterion') == 'passport', function ($query) use ($request) {
+                        return $query->where('id', $request->get('param'));
+                    })->firstOrFail([
+                        'id',
+                        'card_name',
+                        'document',
+                        'document_type_name',
+                    ]);
+            }
+
             $data = [
                 'passport'      => isset($passport->id) ? (int) $passport->id : null,
                 'full_name'     => isset($passport->card_name) ? (string) $passport->card_name : null,
@@ -117,7 +135,10 @@ class PassportController extends Controller
     public function download($id)
     {
         try {
-            $passport = PassportView::findOrFail($id);
+            $passport = PassportView::find($id);
+            if ( !isset($passport->id) ) {
+                $passport = PassportOldView::findOrFail($id);
+            }
             return $this->createCard(
                 $passport->id,
                 $passport->card_name,
@@ -204,6 +225,9 @@ class PassportController extends Controller
             Storage::disk('local')->delete("templates/$passport.png");
         }
         $downloads = Passport::query()->where('i_pk_id', $passport)->first();
+        if ( !isset($downloads->i_pk_id) ) {
+            $downloads = PassportOld::query()->where('idPasaporte', $passport)->first();
+        }
         $downloads->increment('downloads');
         return $pdf;
     }
