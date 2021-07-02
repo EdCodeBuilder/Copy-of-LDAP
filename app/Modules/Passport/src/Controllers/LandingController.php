@@ -10,6 +10,7 @@ use App\Modules\Passport\src\Models\Company;
 use App\Modules\Passport\src\Models\Dashboard;
 use App\Modules\Passport\src\Models\Eps;
 use App\Modules\Passport\src\Models\Faq;
+use App\Modules\Passport\src\Models\PassportConfig;
 use App\Modules\Passport\src\Request\StoreCommentRequest;
 use App\Modules\Passport\src\Request\StoreRateRequest;
 use App\Modules\Passport\src\Resources\AgreementResource;
@@ -53,11 +54,34 @@ class LandingController extends Controller
 
     public function passport()
     {
+        $config = PassportConfig::query()->latest()->first();
         return $this->success_message(
             [
-                'background' => url()->asset('storage/passport-template/PP-0000-0000-0000.png').'?v='.Str::random(6),
-                'dark'  => false,
+                'background' => isset( $config->file )
+                                ? (string) $config->file
+                                : url()->asset('storage/passport-template/PP-0000-0000-0000.png').'?v='.Str::random(6),
+                'dark'  => isset($config->dark) && (bool) $config->dark,
+                'template' => auth('api')->check() ? url()->route('passport.template', ['v' => Str::random(6)]) : null,
+                'current' => auth('api')->check() ? url()->route('passport.current.template', ['v' => Str::random(6)]) : null,
             ]
+        );
+    }
+
+    public function template()
+    {
+        return response()->file(
+            storage_path("app/templates/PASAPORTE_VITAL_TEMPLATE.pdf")
+        );
+    }
+
+    public function templateFile()
+    {
+        $config = PassportConfig::query()->latest()->firstOrFail();
+        if ( !is_null( $config->template) ) {
+            return response()->file(storage_path("app/templates/$config->template"));
+        }
+        return response()->file(
+            storage_path("app/templates/PASAPORTE_VITAL.pdf")
         );
     }
 

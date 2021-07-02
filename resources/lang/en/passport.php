@@ -16,6 +16,7 @@ return [
         'activities'    =>  'Hobbies',
         'eps'           =>  'Health Companies',
         'dashboard'     =>  'Dashboard',
+        'card'          =>  'Card',
         'companies'     =>  'Companies',
         'portfolio'     =>  'Portfolio',
         'faq'     =>  'FAQ',

@@ -10,6 +10,7 @@ use App\Models\Security\CityLDAP;
 use App\Models\Security\CountryLDAP;
 use App\Models\Security\StateLDAP;
 use App\Modules\Passport\src\Models\Passport;
+use App\Modules\Passport\src\Models\PassportConfig;
 use App\Modules\Passport\src\Models\PassportOld;
 use App\Modules\Passport\src\Models\PassportOldView;
 use App\Modules\Passport\src\Models\PassportView;
@@ -186,19 +187,35 @@ class PassportController extends Controller
                 base_path('vendor/setasign/fpdf/font/SourceCodePro-Bold.z')
             );
         }
-
+        $config = PassportConfig::query()->latest()->first();
         $pdf = new FPDF("L", "mm", "Letter");
         $pdf->AddFont('SourceCodePro-Bold', 'B', 'SourceCodePro-Bold.php');
         $pdf->SetFont('SourceCodePro-Bold', 'B', 13);
         // add a page
         $pdf->AddPage();
         // set the source file
-        $pdf->setSourceFile(storage_path("app/templates/PASAPORTE_VITAL.pdf"));
+        if (isset($config->id)) {
+            if ( !is_null($config->template) && Storage::disk('local')->exists("app/templates/$config->template") ) {
+                $pdf->setSourceFile(storage_path("app/templates/$config->template"));
+            } else {
+                $pdf->setSourceFile(storage_path("app/templates/PASAPORTE_VITAL.pdf"));
+            }
+        } else {
+            $pdf->setSourceFile(storage_path("app/templates/PASAPORTE_VITAL.pdf"));
+        }
         // import page 1
         $tplId = $pdf->importPage(1);
         // use the imported page and place it at point 10,10 with a width of 100 mm
         $pdf->useTemplate($tplId, 0, 0, null, null, true);
-        $pdf->SetTextColor(255, 255, 255);
+        if ( isset($config->id) ) {
+            if ( $config->dark ) {
+                $pdf->SetTextColor(0, 0, 0);
+            } else {
+                $pdf->SetTextColor(255, 255, 255);
+            }
+        } else {
+            $pdf->SetTextColor(0, 0, 0);
+        }
         /*
         $pdf->SetXY(60, 125);
         $pdf->Cell(160,10, utf8_decode($data['full_name']),0,0,'L');

@@ -17,6 +17,8 @@ Route::prefix('vital-passport')->group(function () {
     // Public routes
     Route::get('landing', [LandingController::class, 'index']);
     Route::get('card-image', [LandingController::class, 'passport']);
+    Route::get('template', [LandingController::class, 'template'])->name('passport.template');
+    Route::get('current-template', [LandingController::class, 'templateFile'])->name('passport.current.template');
     Route::get('faq', [FaqController::class, 'index']);
     Route::get('background', [LandingController::class, 'background']);
     Route::get('portfolio', [LandingController::class, 'portfolio']);
@@ -73,6 +75,8 @@ Route::prefix('vital-passport')->group(function () {
     Route::put('landing/{dashboard}', [ DashboardController::class, 'landing' ])->middleware('auth:api');
     Route::put('banner/{dashboard}', [ DashboardController::class, 'banner' ])->middleware('auth:api');
     Route::delete('banner/{dashboard}', [ DashboardController::class, 'destroyBanner' ])->middleware('auth:api');
+    Route::post('card-config', [ DashboardController::class, 'updateCardImage' ])->middleware('auth:api');
+    Route::post('card-template', [ DashboardController::class, 'updateCardTemplate' ])->middleware('auth:api');
     Route::post('faq', [FaqController::class, 'store'])->middleware('auth:api');
     Route::put('faq/{faq}', [FaqController::class, 'update'])->middleware('auth:api');
     Route::delete('faq/{faq}', [FaqController::class, 'destroy'])->middleware('auth:api');

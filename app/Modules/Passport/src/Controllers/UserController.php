@@ -144,6 +144,13 @@ class UserController extends LoginController
                 'can'   =>  auth('api')->user()->isAn(...Roles::all())
             ],
             [
+                'icon'  =>  'mdi-card-account-details-star',
+                'title' =>  __('passport.menu.card'),
+                'to'    =>  [ 'name' => 'card' ],
+                'exact' =>  true,
+                'can'   =>  auth('api')->user()->isAn(...Roles::all())
+            ],
+            [
                 'icon'  =>  'mdi-domain',
                 'title' =>  __('passport.menu.companies'),
                 'to'    =>  [ 'name' => 'companies' ],

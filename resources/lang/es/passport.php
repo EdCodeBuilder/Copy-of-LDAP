@@ -16,6 +16,7 @@ return [
         'activities'    =>  'Actividades de Interés',
         'eps'           =>  'EPS',
         'dashboard'     =>  'Tablero',
+        'card'          =>  'Tarjeta',
         'companies'     =>  'Empresas',
         'portfolio'     =>  'Servicios',
         'faq'           =>  'Preguntas Frecuentes',
