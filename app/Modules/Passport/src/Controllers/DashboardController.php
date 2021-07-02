@@ -11,6 +11,7 @@ use App\Modules\Passport\src\Models\Company;
 use App\Modules\Passport\src\Models\Dashboard;
 use App\Modules\Passport\src\Models\Eps;
 use App\Modules\Passport\src\Models\Passport;
+use App\Modules\Passport\src\Models\PassportOld;
 use App\Modules\Passport\src\Request\StoreBackgroundRequest;
 use App\Modules\Passport\src\Request\StoreLandingRequest;
 use App\Modules\Passport\src\Resources\EpsResource;
@@ -38,7 +39,7 @@ class DashboardController extends Controller
             [
                 'companies' =>  Company::count(),
                 'services'  =>  Agreements::count(),
-                'downloads' =>  (int) Passport::query()->sum('downloads')
+                'downloads' =>  (int) Passport::query()->sum('downloads') + (int) PassportOld::query()->sum('downloads')
             ]
         );
     }
