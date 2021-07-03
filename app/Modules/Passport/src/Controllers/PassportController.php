@@ -195,7 +195,7 @@ class PassportController extends Controller
         $pdf->AddPage();
         // set the source file
         if (isset($config->id)) {
-            if ( !is_null($config->template) && Storage::disk('local')->exists("app/templates/$config->template") ) {
+            if ( !is_null($config->template) && Storage::disk('local')->exists("templates/$config->template") ) {
                 $pdf->setSourceFile(storage_path("app/templates/$config->template"));
             } else {
                 $pdf->setSourceFile(storage_path("app/templates/PASAPORTE_VITAL.pdf"));
