@@ -27,7 +27,7 @@ return [
         "App\Modules\Passport\src\Models\Agreements" => 'Servicios',
         "App\Modules\Passport\src\Models\Card" => 'Tarjetas',
         "App\Modules\Passport\src\Models\Comment"  => 'Comentarios',
-        "App\Modules\Passport\src\Models\PassportConfig"  => 'Configuración Imágen Pasaporte',
+        "App\Modules\Passport\src\Models\PassportConfig"  => 'Configuración Imagen Pasaporte',
         "App\Modules\Passport\src\Models\Company" => 'Empresas',
         "App\Modules\Passport\src\Models\Dashboard" => 'Dashboard',
         "App\Modules\Passport\src\Models\Image" => 'Imágen de Servicios',
