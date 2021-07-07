@@ -39,9 +39,9 @@ class AgreementResource extends JsonResource
     {
         $data = isset($this->description) ? json_decode($this->description, true) : [];
         $data = isset($data['content']) ? collect($data['content']) : collect([]);
-        $text = $data->where('content.type', 'paragraph')->first();
-        $text = array_values($text);
-        $text = isset( $text['content'] ) ? (string) $text['content'] : null;
+        $text = $data->where('type', 'paragraph')->first();
+        $text = is_null($text) ? [] : array_values($text);
+        $text = isset( $text['content']['text'] ) ? (string) $text['content']['text'] : null;
         return is_string($text) && strlen($text) > 100
             ? Str::substr($text, 0, 100)."..."
             : $text;
