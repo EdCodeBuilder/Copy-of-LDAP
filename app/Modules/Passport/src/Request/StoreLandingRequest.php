@@ -32,7 +32,7 @@ class StoreLandingRequest extends FormRequest
     {
         return [
             'title'  =>  'required|string|min:3|max:80',
-            'text'  =>  'required|string|min:3|max:2500',
+            'text'  =>  'required',
         ];
     }
 

@@ -17,7 +17,7 @@ class CreateDashboardTable extends Migration
             $table->bigIncrements('id');
             $table->string('title')->nullable();
             $table->string('icon')->nullable();
-            $table->text('text')->nullable();
+            $table->longText('text')->nullable();
             $table->text('banner')->nullable();
             $table->timestamps();
         });
