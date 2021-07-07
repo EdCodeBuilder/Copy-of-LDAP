@@ -82,7 +82,7 @@ class DashboardController extends Controller
     public function landing(StoreLandingRequest $request, Dashboard $dashboard)
     {
         $dashboard->title = $request->get('title');
-        $dashboard->text = $request->get('text');
+        $dashboard->text = json_encode($request->get('text'));
         $dashboard->save();
         return $this->success_message(__('validation.handler.updated'));
     }
