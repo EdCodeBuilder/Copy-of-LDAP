@@ -23,8 +23,8 @@ class AgreementResource extends JsonResource
             'agreement'     =>  isset($this->agreement) ? (string) $this->agreement : null,
             'company_id'    =>  isset($this->company_id) ? (int) $this->company_id : null,
             'entity'        =>  isset($this->company->name) ? (string) $this->company->name : null,
-            'summary'       =>  isset($this->description) ? Str::substr($this->description, 0, 100)."..." : null,
-            'description'   =>  isset($this->description) ? (string) $this->description : null,
+            'summary'       =>  $this->getSummary(),
+            'description'   =>  isset($this->description) ? json_decode($this->description, true) : null,
             'comments_count'=>  isset($this->comments_count) ? (int) $this->comments_count : 0,
             'rating'        =>  isset($this->rate) ? (float) number_format($this->rate, 1) : 0,
             'raters'        =>  isset($this->raters) ? (int) $this->raters : 0,
@@ -33,5 +33,17 @@ class AgreementResource extends JsonResource
             'created_at'    =>  isset($this->created_at) ? $this->created_at->format('Y-m-d H:i:s') : null,
             'updated_at'    =>  isset($this->updated_at) ? $this->updated_at->format('Y-m-d H:i:s') : null,
         ];
+    }
+
+    public function getSummary()
+    {
+        $data = isset($this->description) ? json_decode($this->description, true) : [];
+        $data = isset($data['content']) ? collect($data['content']) : collect([]);
+        $text = $data->where('content.type', 'paragraph')->first();
+        $text = array_values($text);
+        $text = isset( $text['content'] ) ? (string) $text['content'] : null;
+        return is_string($text) && strlen($text) > 100
+            ? Str::substr($text, 0, 100)."..."
+            : $text;
     }
 }

@@ -32,7 +32,7 @@ class StoreAgreementRequest extends FormRequest
     {
         return [
             'agreement'     =>  'required|string|min:3|max:191',
-            'description'   =>  'required|string|min:3',
+            'description'   =>  'required',
             'company_id'    =>  'required|numeric|exists:mysql_passport.tbl_company,id',
         ];
     }

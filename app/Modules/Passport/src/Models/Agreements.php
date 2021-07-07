@@ -127,6 +127,14 @@ class Agreements extends Model implements Auditable
         return toUpper( "{$this->agreement}" );
     }
 
+    /**
+     * Set the description field in text.
+     */
+    public function setDescriptionAttribute($value)
+    {
+        $this->attributes['description'] = json_encode($value);
+    }
+
     /*
      * ---------------------------------------------------------
      * Eloquent Relationships
