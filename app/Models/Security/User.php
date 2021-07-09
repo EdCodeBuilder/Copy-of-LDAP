@@ -7,6 +7,7 @@ use Adldap\Auth\PasswordRequiredException;
 use Adldap\Auth\UsernameRequiredException;
 use Adldap\Laravel\Facades\Adldap;
 use Adldap\Laravel\Traits\HasLdapUser;
+use App\Modules\Contractors\src\Models\Contractor;
 use App\Notifications\Auth\ResetPassword;
 use App\Traits\FullTextSearch;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -261,7 +262,7 @@ class User extends Authenticatable implements Auditable
      */
     public function sendPasswordResetNotification( $token )
     {
-        $this->notify( new ResetPassword( $token, request()->get('email'), $this, request()->ip() ) );
+        $this->notify( new ResetPassword( $token, session()->get('reset_email'), $this, request()->ip() ) );
     }
 
     /*

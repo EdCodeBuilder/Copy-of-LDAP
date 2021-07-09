@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 
 use App\Helpers\GlpiTicket;
+use App\Models\Security\PlantOfficials;
 use App\Models\Security\User;
+use App\Modules\Contractors\src\Models\Contractor;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -25,21 +27,29 @@ class ForgotPasswordController extends Controller
      */
     public function sendResetLinkEmail(Request $request)
     {
-        $this->validateEmail($request);
+        try {
+            $this->validateEmail($request);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
+            // We will send the password reset link to this user. Once we have attempted
+            // to send the link, we will examine the response then see the message we
+            // need to show to the user. Finally, we'll send out a proper response.
 
-        $token = $this->broker()->getRepository();
+            $token = $this->broker()->getRepository();
 
-        $response = $this->sendResetLink(
-            $request->only('username', 'document', 'email')
-        );
+            $response = $this->sendResetLink(
+                $request->only('document')
+            );
 
-        return $response == Password::RESET_LINK_SENT
-            ? $this->sendResetLinkResponse($request, $response)
-            : $this->sendResetLinkFailedResponse($request, $response);
+            return $response == Password::RESET_LINK_SENT
+                ? $this->sendResetLinkResponse($request, $response)
+                : $this->sendResetLinkFailedResponse($request, $response);
+        } catch (\Exception $exception) {
+            return $this->error_response(
+                __('validation.handler.service_unavailable'),
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                $exception->getMessage()
+            );
+        }
     }
 
     /**
@@ -50,11 +60,7 @@ class ForgotPasswordController extends Controller
      */
     protected function validateEmail(Request $request)
     {
-        $request->validate([
-            'email'     => 'required|email|confirmed',
-            'username'  =>  'required|exists:mysql_ldap.users',
-            'document'  =>  'required|exists:mysql_ldap.users',
-        ]);
+        $request->validate(['document'  =>  'required|exists:mysql_ldap.users']);
     }
 
     /**
@@ -66,9 +72,15 @@ class ForgotPasswordController extends Controller
      */
     protected function sendResetLinkResponse(Request $request, $response)
     {
+        $email = mask_email( session()->get('reset_email') );
+        session()->forget('reset_email');
         return $this->success_message(
             __($response),
-            Response::HTTP_OK
+            Response::HTTP_OK,
+            Response::HTTP_OK,
+            [
+                'email' => "Hemos enviado un correo a $email para restablecer la contraseña de tu cuenta"
+            ]
         );
     }
 
@@ -98,22 +110,45 @@ class ForgotPasswordController extends Controller
         // First we will check to see if we found a user at the given credentials and
         // if we did not we will redirect back to this current URI with a piece of
         // "flash" data in the session to indicate to the developers the errors.
-        $user = User::where([
-            ['username', $credentials['username']],
-            ['document', $credentials['document']]
-        ])->first();
+        $user = User::where('document', $credentials['document'])->first();
 
         if (is_null($user)) {
             return Password::INVALID_USER;
         }
+        $contractor = Contractor::query()->where('document', $credentials['document'])->first();
+        $email = null;
+        if (isset($contractor->email)) {
+            $email = $contractor->email;
+        } else {
+            $plant = PlantOfficials::query()->where('document', $credentials['document'])->first();
+            if (isset($plant->email)) {
+                $email = $plant->email;
+            }
+        }
+        if (is_null($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return Password::INVALID_USER;
+        }
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $not_allowed = ['idrd.gov.co', 'adidrd.local'];
+            // Separate string by @ characters (there should be only one)
+            $parts = explode('@', $email);
+            // Remove and return the last part, which should be the domain
+            $domain = array_pop($parts);
+            // Check if the domain is in our list
+            if ( in_array($domain, $not_allowed) ) {
+                return 'passwords.email';
+            }
+        }
 
-        $glpi = new GlpiTicket( $user,  $credentials['email']);
+        $glpi = new GlpiTicket($user,  $email);
         $glpi->verifyIfLatestTicketsExists();
 
         // Once we have the reset token, we are ready to send the message out to this
         // user with a link to reset their password. We will then redirect back to
         // the current URI having nothing set in the session to indicate errors.
         $token = $this->broker()->getRepository();
+
+        session('reset_email', $email);
 
         $user->sendPasswordResetNotification(
             $token->create($user)

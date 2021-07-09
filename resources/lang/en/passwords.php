@@ -20,4 +20,5 @@ return [
     'user' => "We can't find a user with that e-mail address.",
     'expired'  => 'Your password has expired, please change it and try again later.',
     'inactive' => 'Your account is inactive, please contact the systems area to reactivate it.',
+    'email'    => 'We cannot find an email address other than the institutional one, please contact support to change the password.',
 ];

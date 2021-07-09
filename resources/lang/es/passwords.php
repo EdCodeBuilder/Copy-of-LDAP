@@ -19,4 +19,5 @@ return [
     'user'     => 'No podemos encontrar ningún usuario con ese correo electrónico.',
     'expired'  => 'Tu contraseña ha expirado, por favor cámbiala y vuelve a intentarlo más tarde.',
     'inactive' => 'Tu cuenta está inactiva, por favor comunícate con el área de sistemas para reactivarla.',
+    'email'    => 'No encontramos una dirección de correo distinta a la institucional, por favor contacta a soporte para realizar el cambio de contraseña.',
 ];
