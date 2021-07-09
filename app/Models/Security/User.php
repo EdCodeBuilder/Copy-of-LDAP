@@ -8,6 +8,7 @@ use Adldap\Auth\UsernameRequiredException;
 use Adldap\Laravel\Facades\Adldap;
 use Adldap\Laravel\Traits\HasLdapUser;
 use App\Notifications\Auth\ResetPassword;
+use App\Traits\FullTextSearch;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,7 +22,7 @@ use Silber\Bouncer\Database\HasRolesAndAbilities;
 
 class User extends Authenticatable implements Auditable
 {
-    use Notifiable, HasApiTokens, SoftDeletes, HasLdapUser, HasRolesAndAbilities, \OwenIt\Auditing\Auditable, CanResetPassword;
+    use Notifiable, HasApiTokens, SoftDeletes, HasLdapUser, HasRolesAndAbilities, \OwenIt\Auditing\Auditable, CanResetPassword, FullTextSearch;
 
     /**
      * The connection name for the model.
@@ -54,6 +55,19 @@ class User extends Authenticatable implements Auditable
         'vacation_final_date',
         'expires_at',
         'sim_id',
+    ];
+
+    /**
+     * The columns of the full text index
+     *
+     * @var array
+     */
+    protected $searchable = [
+        'name',
+        'surname',
+        'document',
+        'email',
+        'username',
     ];
 
     /**

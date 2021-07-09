@@ -16,6 +16,7 @@ use App\Modules\Passport\src\Request\RoleRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\Http\Controllers\AccessTokenController;
 use Silber\Bouncer\Database\Role;
@@ -201,15 +202,7 @@ class UserController extends LoginController
 
     public function findUsers(Request $request)
     {
-        $users = User::when($request->has('username'), function ($query) use ($request) {
-            $username = toLower( $request->get('username') );
-            return $query->where('username', 'like', "%{$username}%")
-                ->orWhere('name', 'like', "%{$username}%")
-                ->orWhere('surname', 'like', "%{$username}%")
-                ->orWhere('document', 'like', "%{$username}%");
-        })
-            ->take(50)
-            ->get();
+        $users = User::search($request->get('username'))->take(50)->get();
         return $this->success_response(
             UserResource::collection( $users )
         );

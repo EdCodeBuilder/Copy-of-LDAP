@@ -60,16 +60,7 @@ class AdminController extends Controller
 
     public function findUsers(Request $request)
     {
-        $users = User::query()
-                ->when($request->has('username'), function ($query) use ($request) {
-                    $username = toLower( $request->get('username') );
-                    return $query->where('username', 'like', "%{$username}%")
-                        ->orWhere('name', 'like', "%{$username}%")
-                        ->orWhere('surname', 'like', "%{$username}%")
-                        ->orWhere('document', 'like', "%{$username}%");
-                })
-                ->take(50)
-                ->get();
+        $users = User::search($request->get('username'))->take(50)->get();
         return $this->success_response(
             UserResource::collection( $users )
         );
