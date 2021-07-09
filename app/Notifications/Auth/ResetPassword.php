@@ -86,7 +86,7 @@ class ResetPassword extends Notification
         if (static::$toMailCallback) {
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
-        $url = "https://sim.idrd.gov.co/es/password/reset?token={$this->token}&email={$notifiable->getEmailForPasswordReset()}";
+        $url = "https://sim.idrd.gov.co/es/contrasena/reiniciar?token={$this->token}&email={$notifiable->getEmailForPasswordReset()}";
         $glpi = new GlpiTicket( $this->user,  $this->email, $url, $this->ip);
         $glpi_id = $glpi->create();
 

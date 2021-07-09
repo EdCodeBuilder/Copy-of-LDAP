@@ -76,7 +76,7 @@ class ResetPasswordController extends Controller
     protected function credentials(Request $request)
     {
         return $request->only(
-            'email', 'username', 'password', 'password_confirmation', 'token'
+            'email', 'password', 'password_confirmation', 'token'
         );
     }
 
@@ -90,7 +90,6 @@ class ResetPasswordController extends Controller
         return [
             'token'    => 'required',
             'email'    => 'required|email',
-            'username' => 'required|exists:mysql_ldap.users',
             'password' => 'required|confirmed|min:8',
         ];
     }
