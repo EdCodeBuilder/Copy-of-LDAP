@@ -20,6 +20,13 @@ class ForgotPasswordController extends Controller
     use SendsPasswordResetEmails;
 
     /**
+     * The email to reset password.
+     *
+     * @var string|null
+     */
+    private $reset_email = null;
+
+    /**
      * Send a reset link to the given user.
      *
      * @param Request $request
@@ -72,8 +79,7 @@ class ForgotPasswordController extends Controller
      */
     protected function sendResetLinkResponse(Request $request, $response)
     {
-        $email = mask_email( session()->get('reset_email') );
-        session()->forget('reset_email');
+        $email = mask_email( $this->reset_email );
         return $this->success_message(
             __($response),
             Response::HTTP_OK,
@@ -140,6 +146,8 @@ class ForgotPasswordController extends Controller
             }
         }
 
+        $this->reset_email = $email;
+
         $glpi = new GlpiTicket($user,  $email);
         $glpi->verifyIfLatestTicketsExists();
 
@@ -148,8 +156,7 @@ class ForgotPasswordController extends Controller
         // the current URI having nothing set in the session to indicate errors.
         $token = $this->broker()->getRepository();
 
-        session('reset_email', $email);
-
+        $user->setResetEmail($email);
         $user->sendPasswordResetNotification(
             $token->create($user)
         );

@@ -26,6 +26,13 @@ class User extends Authenticatable implements Auditable
     use Notifiable, HasApiTokens, SoftDeletes, HasLdapUser, HasRolesAndAbilities, \OwenIt\Auditing\Auditable, CanResetPassword, FullTextSearch;
 
     /**
+     * The email to reset password.
+     *
+     * @var string|null
+     */
+    private $reset_email = null;
+
+    /**
      * The connection name for the model.
      *
      * @var string|null
@@ -255,6 +262,14 @@ class User extends Authenticatable implements Auditable
     */
 
     /**
+     * @param $email
+     */
+    public function setResetEmail($email)
+    {
+        $this->reset_email = $email;
+    }
+
+    /**
      * Send the password reset notification.
      *
      * @param  string  $token
@@ -262,7 +277,7 @@ class User extends Authenticatable implements Auditable
      */
     public function sendPasswordResetNotification( $token )
     {
-        $this->notify( new ResetPassword( $token, session()->get('reset_email'), $this, request()->ip() ) );
+        $this->notify( new ResetPassword( $token, $this->reset_email, $this, request()->ip() ) );
     }
 
     /*
