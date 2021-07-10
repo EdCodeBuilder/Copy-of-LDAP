@@ -44,7 +44,10 @@ class ResetPasswordController extends Controller
     public function reset(Request $request)
     {
         $request->validate($this->rules(), $this->validationErrorMessages());
-
+        $username = explode('@', $request->get('email'));
+        $request->request->add([
+            'username' => isset($username[0]) ? (string) $username[0] : null
+        ]);
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
         // database. Otherwise we will parse the error and return the response.
@@ -76,7 +79,7 @@ class ResetPasswordController extends Controller
     protected function credentials(Request $request)
     {
         return $request->only(
-            'email', 'password', 'password_confirmation', 'token'
+            'email', 'username', 'password', 'password_confirmation', 'token'
         );
     }
 
