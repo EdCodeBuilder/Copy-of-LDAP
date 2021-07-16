@@ -20,6 +20,8 @@ use Maatwebsite\Excel\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Str;
 use Exception;
+use GuzzleHttp\Client;
+
 
 class UserSevenController extends Controller
 {
@@ -55,15 +57,50 @@ class UserSevenController extends Controller
     public function getUserSevenList(Request $request)
     {
         //$data = [];
-        $data = UserSeven::query()
+        /* $data = UserSeven::query()
                 ->when(true, function ($query) use ($request) {
                   return $query->whereIn('TER_CODI', $request->listDocuments);
                 })
+                ->orderBy('TER_NOCO')
+                ->paginate(10000); */
+        $data = UserSeven::query()
+                ->whereIn('TER_CODI', $request->listDocuments)
                 ->orderBy('TER_NOCO')
                 ->paginate(10000);
         return  $this->success_response(
             UserSevenResource::collection( $data )
         );
+    }
+    /**
+     * @param Request $request
+     * @return JsonResponse|string
+     */
+    public function consultUserSevenList(Request $request)
+    {
+        try {
+            $http = new Client();
+            $response = $http->post("http://66.70.171.168/api/payroll/getUserSevenList", [
+                'json' => [
+                    'listDocuments' => $request->get('listDocuments'),
+                ],
+                'headers' => [
+                    'Accept'    => 'application/json',
+                    'Content-type' => 'application/json'
+                ],
+            ]);
+            $data = json_decode($response->getBody()->getContents(), true);
+            return  response()->json($data);
+            /* if ( isset( $data['data'] ) && count($data['data']) > 0 ) {
+                return $this->error_response($data);
+            } */
+            //return $this->createWarehouseCert($certification);
+        } catch (Exception $exception) {
+            return $this->error_response(
+                'No podemos realizar la consulta en este momento, por favor intente más tarde.',
+                422,
+                $exception->getMessage()
+            );
+        }
     }
     /**
      * @param CertificateComplianceRequest $request
