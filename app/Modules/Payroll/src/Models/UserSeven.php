@@ -3,6 +3,7 @@
 namespace App\Modules\Payroll\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class UserSeven extends Model
 {
@@ -25,7 +26,7 @@ class UserSeven extends Model
      *
      * @var string
      */
-    protected $primaryKey = 'TER_NOCO';
+    protected $primaryKey = 'TER_CODI';
 
     /**
      * The attributes that are mass assignable.
@@ -33,11 +34,23 @@ class UserSeven extends Model
      * @var array
      */
     protected $fillable = [
+        'TER_CODI',
         'TER_NOCO',
         'CON_OBJT',
         'CON_NCON',
-        'rubro',
-        'fuente',
-        'concepto',
+        'RUBRO',
+        'FUENTE',
+        'CONCEPTO',
     ];
+    //Add extra attribute
+    protected $attributes = ['id_aux'];
+
+    //Make it available in the json response
+    protected $appends = ['id_aux'];
+
+    //implement the attribute
+    public function getIdAuxAttribute()
+    {
+        return Str::random(9);
+    }
 }
