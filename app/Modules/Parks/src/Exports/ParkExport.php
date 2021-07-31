@@ -45,12 +45,8 @@ class ParkExport implements FromQuery, WithMapping, WithHeadings
 
                         return $query;
                     })->when($this->request->has('query'), function ($query) {
-                        $query->where(function ($query) {
-                            return $query
-                                ->where('Id_IDRD', 'LIKE', "%{$this->request->get('query')}%")
-                                ->orWhere('Nombre', 'LIKE', "%{$this->request->get('query')}%")
-                                ->orWhere('Direccion', 'LIKE', "%{$this->request->get('query')}%");
-                        });
+                        $query->search($this->request->get('query'))
+                            ->orWhere('Id_IDRD', 'like', "%{$this->request->get('query')}%");
                     })
                     ->when($this->request->has('vigilance'), function ($query) {
                         if ($this->request->get('vigilance') != null)

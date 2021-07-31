@@ -47,12 +47,8 @@ class ParkController extends Controller
         $parks = Park::query()
             ->select( ['Id', 'Id_IDRD', 'Nombre', 'Direccion', 'Upz', 'Id_Localidad', 'Id_Tipo'] )
             ->when($this->query, function ($query) {
-                $query->where(function ($query) {
-                    return $query
-                        ->where('Id_IDRD', 'LIKE', "%{$this->query}%")
-                        ->orWhere('Nombre', 'LIKE', "%{$this->query}%")
-                        ->orWhere('Direccion', 'LIKE', "%{$this->query}%");
-                });
+                $query->search($this->query)
+                    ->orWhere('Id_IDRD', 'like', "%{$this->query}%");
             })
             ->when(request()->has('locality_id'), function ($query) use ($request) {
                 $localities = $request->get('locality_id');
@@ -180,12 +176,8 @@ class ParkController extends Controller
                 ->whereKey($owned)
                 ->select( ['Id', 'Id_IDRD', 'Nombre', 'Direccion', 'Upz', 'Id_Localidad', 'Id_Tipo'] )
                 ->when($this->query, function ($query) {
-                    $query->where(function ($query) {
-                        return $query
-                            ->where('Id_IDRD', 'LIKE', "%{$this->query}%")
-                            ->orWhere('Nombre', 'LIKE', "%{$this->query}%")
-                            ->orWhere('Direccion', 'LIKE', "%{$this->query}%");
-                    });
+                    $query->search($this->query)
+                           ->orWhere('Id_IDRD', 'like', "%{$this->query}%");
                 })
                 ->when(request()->has('locality_id'), function ($query) use ($request) {
                     $localities = $request->get('locality_id');

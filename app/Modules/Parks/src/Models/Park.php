@@ -2,6 +2,7 @@
 
 namespace App\Modules\Parks\src\Models;
 
+use App\Traits\FullTextSearch;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -13,7 +14,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class Park extends Model implements Auditable
 {
-    use \OwenIt\Auditing\Auditable;
+    use \OwenIt\Auditing\Auditable, FullTextSearch;
 
     /**
      * The connection name for the model.
@@ -84,6 +85,17 @@ class Park extends Model implements Auditable
         'RecibidoIdrd',
         'Id_Tipo_Escenario',
         'Id_Vocacion',
+    ];
+
+    /**
+     * The columns of the full text index
+     *
+     * @var array
+     */
+    protected $searchable = [
+        'Id_IDRD',
+        'Nombre',
+        'Direccion',
     ];
 
     /**

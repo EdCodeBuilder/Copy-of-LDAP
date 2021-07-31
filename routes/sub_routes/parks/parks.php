@@ -2,6 +2,7 @@
 
 use App\Modules\Parks\src\Controllers\AuditController;
 use App\Modules\Parks\src\Controllers\EnclosureController;
+use App\Modules\Parks\src\Controllers\MapController;
 use App\Modules\Parks\src\Controllers\NeighborhoodController;
 use App\Modules\Parks\src\Controllers\PermissionsController;
 use App\Modules\Parks\src\Controllers\RoleController;
@@ -21,6 +22,9 @@ use App\Modules\Parks\src\Controllers\VocationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('api')->group( function () {
+    Route::prefix('esri')->group(function () {
+       Route::get('config', [MapController::class, 'map']);
+    });
     Route::resource('localities', LocationController::class, [
         'only'     =>     ['index', 'store', 'update'],
         'parameters' =>     ['localities' => 'location']

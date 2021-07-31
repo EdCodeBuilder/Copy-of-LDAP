@@ -260,7 +260,7 @@ class CountriesTableSeeder extends Seeder
             array('id' => 246,'code' => 'ZW','name' => "Zimbabwe",'phone_code' => 263),
         );
         foreach ($countries as $country) {
-            $data = new \App\Entities\World\Country();
+            $data = new \App\Models\Security\CountryLDAP();
             $data->fill($country);
             $data->save();
         }

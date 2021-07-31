@@ -6329,7 +6329,7 @@ class CitiesPart8TableSeeder extends \Illuminate\Database\Seeder
             array('name' => "Summersville",'state_id' => 3976),
         );
         foreach ($cities8 as $city) {
-            $data = new \App\Entities\World\City();
+            $data = new \App\Models\Security\CityLDAP();
             $data->fill($city);
             $data->save();
         }

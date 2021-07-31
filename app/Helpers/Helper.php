@@ -266,3 +266,32 @@ if ( ! function_exists('random_img_name') ) {
                 substr($s,20);
     }
 }
+
+if ( ! function_exists('template_exist') ) {
+    /**
+     * @param $file
+     * @param string $disk
+     * @param string $path
+     * @return bool
+     */
+    function template_exist($file, string $disk = 'local', string $path = 'templates/') {
+        return \Illuminate\Support\Facades\Storage::disk($disk)->exists("{$path}{$file}");
+    }
+}
+
+if ( ! function_exists('get_template') ) {
+    /**
+     * @param $file
+     * @param string $disk
+     * @param string $path
+     * @return string
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    function get_template($file, string $disk = 'local', string $path = 'templates/') {
+        try {
+            return \Illuminate\Support\Facades\Storage::disk($disk)->get("{$path}{$file}");
+        } catch (\Illuminate\Contracts\Filesystem\FileNotFoundException $exception) {
+            return false;
+        }
+    }
+}

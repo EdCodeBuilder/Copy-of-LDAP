@@ -4135,7 +4135,7 @@ class StatesTableSeeder extends Seeder
             array('name' => "Midlands",'country_id' => 246)
         );
         foreach ($states as $state) {
-            $data = new \App\Entities\World\State();
+            $data = new \App\Models\Security\StateLDAP();
             $data->fill($state);
             $data->save();
         }

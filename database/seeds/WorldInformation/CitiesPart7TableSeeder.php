@@ -6016,7 +6016,7 @@ class CitiesPart7TableSeeder extends \Illuminate\Database\Seeder
 
         );
         foreach ($cities7 as $city) {
-            $data = new \App\Entities\World\City();
+            $data = new \App\Models\Security\CityLDAP();
             $data->fill($city);
             $data->save();
         }
