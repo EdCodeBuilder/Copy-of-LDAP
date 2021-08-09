@@ -95,7 +95,10 @@ class PassportController extends Controller
                             });
                         })
                         ->when($this->column && $this->order, function ($query) {
-                            return $query->orderBy($this->column, $this->order);
+                            $column = $this->column == 'birthdate'
+                                ? 'birthday'
+                                : $this->column;
+                            return $query->orderBy($column, $this->order);
                         })
                         ->paginate($this->per_page)
                 ),
