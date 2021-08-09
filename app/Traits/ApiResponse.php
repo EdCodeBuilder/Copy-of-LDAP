@@ -152,20 +152,20 @@ trait ApiResponse
 
     public function __construct()
     {
-        $this->column   =  \request()->has( 'column' ) ? \request()->get('column')[0] : 'id';
-        $this->order    =  \request()->has( 'order' ) && isset(\request()->get('order')[0]) ? (boolean) \request()->get('order')[0] : false;
-        $this->per_page =  \request()->has( 'per_page' ) ? \request()->get('per_page') : 10;
-        $this->query    =  \request()->has( 'query' ) ? \request()->get('query') : null;
-        $this->where    =  \request()->has( 'where' ) ? \request()->get('where') : null;
-        $this->where_in    =  \request()->has( 'where_in' ) ? \request()->get('where_in') : null;
-        $this->where_not_in    =  \request()->has( 'where_not_in' ) ? \request()->get('where_not_in') : null;
-        $this->where_between    =  \request()->has( 'where_between' ) ? \request()->get('where_between') : null;
-        $this->where_not_between    =  \request()->has( 'where_not_between' ) ? \request()->get('where_not_between') : null;
-        $this->or_where    =  \request()->has( 'or_where' ) ? \request()->get('or_where') : null;
-        $this->or_where_in    =  \request()->has( 'or_where_in' ) ? \request()->get('or_where_in') : null;
-        $this->or_where_not_in    =  \request()->has( 'or_where_not_in' ) ? \request()->get('or_where_not_in') : null;
-        $this->or_where_between    =  \request()->has( 'or_where_between' ) ? \request()->get('or_where_between') : null;
-        $this->or_where_not_between    =  \request()->has( 'or_where_not_between' ) ? \request()->get('or_where_not_between') : null;
+        $this->column   =  request()->has( 'column' ) ? request()->get('column')[0] : 'id';
+        $this->order    = request()->has('order') && isset(request()->get('order')[0]) && request()->get('order')[0] == 'true';
+        $this->per_page =  request()->has( 'per_page' ) ? request()->get('per_page') : 10;
+        $this->query    =  request()->has( 'query' ) ? request()->get('query') : null;
+        $this->where    =  request()->has( 'where' ) ? request()->get('where') : null;
+        $this->where_in    =  request()->has( 'where_in' ) ? request()->get('where_in') : null;
+        $this->where_not_in    =  request()->has( 'where_not_in' ) ? request()->get('where_not_in') : null;
+        $this->where_between    =  request()->has( 'where_between' ) ? request()->get('where_between') : null;
+        $this->where_not_between    =  request()->has( 'where_not_between' ) ? request()->get('where_not_between') : null;
+        $this->or_where    =  request()->has( 'or_where' ) ? request()->get('or_where') : null;
+        $this->or_where_in    =  request()->has( 'or_where_in' ) ? request()->get('or_where_in') : null;
+        $this->or_where_not_in    =  request()->has( 'or_where_not_in' ) ? request()->get('or_where_not_in') : null;
+        $this->or_where_between    =  request()->has( 'or_where_between' ) ? request()->get('or_where_between') : null;
+        $this->or_where_not_between    =  request()->has( 'or_where_not_between' ) ? request()->get('or_where_not_between') : null;
         $this->order    =  ( $this->order ) ? 'asc' : 'desc';
     }
 

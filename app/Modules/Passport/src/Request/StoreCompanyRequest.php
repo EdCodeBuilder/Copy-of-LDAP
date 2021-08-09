@@ -43,7 +43,7 @@ class StoreCompanyRequest extends FormRequest
     public function attributes()
     {
         return [
-            'company' =>  'empresa',
+            'company' =>  __('passport.validations.company'),
         ];
     }
 }

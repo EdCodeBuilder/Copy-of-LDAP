@@ -43,7 +43,7 @@ class StoreBannerRequest extends FormRequest
     public function attributes()
     {
         return [
-            'banner' =>  'anuncio',
+            'banner' =>  __('passport.validations.banner'),
         ];
     }
 }

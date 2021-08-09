@@ -43,8 +43,8 @@ class ShowPassportRequest extends FormRequest
     public function attributes()
     {
         return [
-            'criterion' =>  'criterio',
-            'param'  =>  'parámetro',
+            'criterion' =>  __('passport.validations.criterion'),
+            'param'  =>  __('passport.validations.param'),
         ];
     }
 }

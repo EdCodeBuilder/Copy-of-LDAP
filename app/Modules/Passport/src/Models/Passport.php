@@ -52,13 +52,34 @@ class Passport extends Model implements Auditable
         'vc_celular',
         'i_fk_id_actividades',
         'i_fk_id_eps',
+        'printed',
         'email',
         'downloads',
+        'file',
         'tx_observacion',
         'i_pregunta1',
         'i_pregunta2',
         'i_pregunta3',
         'i_pregunta4'
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'i_fk_id_usuario_supercade' => 'int',
+        'i_fk_id_usuario'   => 'int',
+        'i_fk_id_superCade' => 'int',
+        'i_fk_id_localidad' => 'int',
+        'i_fk_id_estrato'   => 'int',
+        'vc_telefono'   => 'int',
+        'vc_celular'    => 'int',
+        'i_fk_id_actividades'   => 'int',
+        'i_fk_id_eps'   => 'int',
+        'printed'   => 'bool',
+        'downloads' => 'int',
     ];
 
     /*
@@ -84,8 +105,10 @@ class Passport extends Model implements Auditable
         'vc_celular',
         'i_fk_id_actividades',
         'i_fk_id_eps',
+        'printed',
         'email',
         'downloads',
+        'file',
         'tx_observacion',
         'i_pregunta1',
         'i_pregunta2',
@@ -140,6 +163,11 @@ class Passport extends Model implements Auditable
         return (int) $this->i_pk_id;
     }
 
+    public function getUserIdAttribute()
+    {
+        return isset($this->i_fk_id_usuario) ? (int) $this->i_fk_id_usuario : null;
+    }
+
     /*
      * ---------------------------------------------------------
      * Eloquent Relationships
@@ -152,5 +180,13 @@ class Passport extends Model implements Auditable
     public function user()
     {
         return $this->belongsTo(User::class, 'i_fk_id_usuario', 'Id_Persona');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function renewals()
+    {
+        return $this->hasMany(Renew::class, 'i_fk_id_pasaporte', 'i_pk_id');
     }
 }

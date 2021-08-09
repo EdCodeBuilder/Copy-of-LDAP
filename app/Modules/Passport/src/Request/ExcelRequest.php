@@ -5,13 +5,9 @@ namespace App\Modules\Passport\src\Request;
 
 
 use App\Modules\Passport\src\Constants\Roles;
-use App\Modules\Passport\src\Models\Passport;
-use App\Modules\Passport\src\Models\User;
-use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class StoreCardTemplateRequest extends FormRequest
+class ExcelRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,7 +16,7 @@ class StoreCardTemplateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->user()->isAn(...Roles::all());
+        return auth()->user()->isA(...Roles::all());
     }
 
     /**
@@ -31,7 +27,10 @@ class StoreCardTemplateRequest extends FormRequest
     public function rules()
     {
         return [
-            'file'  =>  'required|file|mimes:pdf',
+            'passport'  => 'nullable|numeric',
+            'find_old'  => 'nullable',
+            'start_date'  => 'nullable|date|before_or_equal:final_date',
+            'final_date'  => 'nullable|date|after_or_equal:start_date',
         ];
     }
 
@@ -43,7 +42,10 @@ class StoreCardTemplateRequest extends FormRequest
     public function attributes()
     {
         return [
-            'file' =>  __('passport.validations.file'),
+            'passport' =>  __('passport.validations.passport'),
+            'start_date'  => __('passport.validations.start_date'),
+            'final_date'  => __('passport.validations.final_date'),
+            'find_old'  => __('passport.validations.find_old'),
         ];
     }
 }

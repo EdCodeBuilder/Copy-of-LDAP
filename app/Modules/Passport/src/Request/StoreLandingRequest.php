@@ -44,8 +44,8 @@ class StoreLandingRequest extends FormRequest
     public function attributes()
     {
         return [
-            'title' =>  'título',
-            'text' =>  'descripción',
+            'title' =>  __('passport.validations.title'),
+            'text' =>  __('passport.validations.description'),
         ];
     }
 }

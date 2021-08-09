@@ -42,7 +42,7 @@ class StoreRateRequest extends FormRequest
     public function attributes()
     {
         return [
-            'rate' =>  'calificación',
+            'rate' =>  __('passport.validations.rate'),
         ];
     }
 }

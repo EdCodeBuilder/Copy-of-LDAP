@@ -89,17 +89,17 @@ class User extends Model
         Arr::set(
             $request,
             'country_id',
-            isset($country->sim_country_id) ? $country->sim_country_id : User::COLOMBIA
+            isset($country->sim_country_id) ? (int) $country->sim_country_id : User::COLOMBIA
         );
         Arr::set(
             $request,
             'state_id',
-            isset($state->sim_state_id) ? $state->sim_state_id : User::BOGOTA_DC
+            isset($state->sim_state_id) ? (int) $state->sim_state_id : User::BOGOTA_DC
         );
         Arr::set(
             $request,
             'city_id',
-            isset($city->sim_city_id) ? $city->sim_city_id : User::BOGOTA
+            isset($city->sim_city_id) ? (int) $city->sim_city_id : User::BOGOTA
         );
         Arr::set(
             $request,
@@ -143,10 +143,26 @@ class User extends Model
         $n4 = toUpper($this->Segundo_Apellido);
         $name = $n1.' '.$n3;
         if (strlen($n2) > 0) {
+            $name = $n1.' '.$n2." ".$n3;
+        }
+        if (strlen($n4) > 0) {
+            $name = $n1.' '.$n2." ".$n3.' '.$n4;
+        }
+        return $name;
+    }
+
+    public function getCardNameAttribute()
+    {
+        $n1 = toUpper($this->Primer_Nombre);
+        $n2 = toUpper($this->Segundo_Nombre);
+        $n3 = toUpper($this->Primer_Apellido);
+        $n4 = toUpper($this->Segundo_Apellido);
+        $name = $n1.' '.$n3;
+        if (strlen($n2) > 0) {
             $name = $n1.' '.substr($n2, 0, 1).". ".$n3;
         }
         if (strlen($n4) > 0) {
-            $name = $n1.' '.substr($n2, 0, 1).". ".$n3.' '.substr($n4, 0, 1).'.';
+            $name = $n1.' '.substr($n2, 0, 1)." ".$n3.' '.substr($n4, 0, 1).'.';
         }
         return $name;
     }
@@ -189,6 +205,14 @@ class User extends Model
     public function type()
     {
         return $this->belongsToMany(Type::class, 'persona_tipo', 'Id_Persona', 'Id_Tipo');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function social_population()
+    {
+        return $this->belongsToMany(SocialPopulation::class, 'personas_grupos_sociales_poblacionales', 'Id_Persona', 'id');
     }
 
     /**

@@ -43,7 +43,7 @@ class StoreBackgroundRequest extends FormRequest
     public function attributes()
     {
         return [
-            'background' =>  'imagen',
+            'background' =>  __('passport.validations.background'),
         ];
     }
 }

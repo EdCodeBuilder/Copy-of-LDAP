@@ -117,25 +117,40 @@ class UserController extends LoginController
     {
         $menu = collect([
             [
-                'icon'  =>  'mdi-account-multiple-plus',
-                'title' =>  __('passport.menu.users'),
-                'to'    =>  [ 'name' => 'user-admin' ],
-                'exact' =>  true,
-                'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
-            ],
-            [
-                'icon'  =>  'mdi-pine-tree',
-                'title' =>  __('passport.menu.activities'),
-                'to'    =>  [ 'name' => 'hobbies' ],
-                'exact' =>  true,
-                'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
-            ],
-            [
-                'icon'  =>  'mdi-hospital-box',
-                'title' =>  __('passport.menu.eps'),
-                'to'    =>  [ 'name' => 'eps' ],
-                'exact' =>  true,
-                'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+                'icon'  =>  'mdi-security',
+                'title' =>  __('passport.menu.admin'),
+                'exact' =>  false,
+                'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN),
+                'children'  => [
+                    [
+                        'icon'  =>  'mdi-account-multiple-plus',
+                        'title' =>  __('passport.menu.users'),
+                        'to'    =>  [ 'name' => 'user-admin' ],
+                        'exact' =>  true,
+                        'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+                    ],
+                    [
+                        'icon'  =>  'mdi-pine-tree',
+                        'title' =>  __('passport.menu.activities'),
+                        'to'    =>  [ 'name' => 'hobbies' ],
+                        'exact' =>  true,
+                        'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+                    ],
+                    [
+                        'icon'  =>  'mdi-hospital-box',
+                        'title' =>  __('passport.menu.eps'),
+                        'to'    =>  [ 'name' => 'eps' ],
+                        'exact' =>  true,
+                        'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+                    ],
+                    [
+                        'icon'  =>  'mdi-domain',
+                        'title' =>  'SuperCades',
+                        'to'    =>  [ 'name' => 'cades' ],
+                        'exact' =>  true,
+                        'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+                    ],
+                ]
             ],
             [
                 'icon'  =>  'mdi-view-dashboard',
@@ -143,6 +158,34 @@ class UserController extends LoginController
                 'to'    =>  [ 'name' => 'home' ],
                 'exact' =>  true,
                 'can'   =>  auth('api')->user()->isAn(...Roles::all())
+            ],
+            [
+                'icon'  =>  'mdi-format-float-left',
+                'title' =>  __('passport.menu.page'),
+                'to'    =>  [ 'name' => 'page' ],
+                'exact' =>  true,
+                'can'   =>  auth('api')->user()->isAn(...Roles::all())
+            ],
+            [
+                'icon'  =>  'mdi-credit-card-search-outline',
+                'title' =>  __('passport.menu.passports'),
+                'to'    =>  [ 'name' => 'passports' ],
+                'exact' =>  true,
+                'can'   =>  auth('api')->user()->isAn(...Roles::all())
+            ],
+            [
+                'icon'  =>  'mdi-autorenew',
+                'title' =>  __('passport.menu.renewals'),
+                'to'    =>  [ 'name' => 'renewals' ],
+                'exact' =>  true,
+                'can'   =>  auth('api')->user()->isAn(...Roles::all())
+            ],
+            [
+                'icon'  =>  'mdi-printer',
+                'title' =>  __('passport.menu.printer'),
+                'to'    =>  [ 'name' => 'printer' ],
+                'exact' =>  true,
+                'can'   =>  auth('api')->user()->isAn('superadmin')
             ],
             [
                 'icon'  =>  'mdi-card-account-details-star',

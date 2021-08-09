@@ -5,6 +5,7 @@ namespace App\Modules\Passport\src\Resources;
 
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class HobbyResource extends JsonResource
 {
@@ -30,31 +31,31 @@ class HobbyResource extends JsonResource
         return [
             [
                 'align' => "right",
-                'text' => "ID",
+                'text' => "#",
                 'value'  =>  "id",
                 'sortable' => false
             ],
             [
                 'align' => "left",
-                'text' => "Nombre",
+                'text' => Str::ucfirst(__('passport.validations.name')),
                 'value'  =>  "name",
                 'sortable' => false
             ],
             [
                 'align' => "right",
-                'text' => "Fecha de creación",
+                'text' => Str::ucfirst(__('passport.validations.created_at')),
                 'value'  =>  "created_at",
                 'sortable' => false
             ],
             [
                 'align' => "right",
-                'text' => "Fecha de actualización",
-                'value'  =>  "created_at",
+                'text' => Str::ucfirst(__('passport.validations.updated_at')),
+                'value'  =>  "updated_at",
                 'sortable' => false
             ],
             [
                 'align' => "right",
-                'text' => "Acciones",
+                'text' => Str::ucfirst(__('passport.validations.actions')),
                 'value'  =>  "actions",
                 'sortable' => false
             ],

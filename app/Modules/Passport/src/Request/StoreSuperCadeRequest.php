@@ -11,7 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreCardTemplateRequest extends FormRequest
+class StoreSuperCadeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -31,7 +31,7 @@ class StoreCardTemplateRequest extends FormRequest
     public function rules()
     {
         return [
-            'file'  =>  'required|file|mimes:pdf',
+            'name'      =>  'required|string|min:3|max:50',
         ];
     }
 
@@ -43,7 +43,7 @@ class StoreCardTemplateRequest extends FormRequest
     public function attributes()
     {
         return [
-            'file' =>  __('passport.validations.file'),
+            'name' =>  __('passport.validations.name'),
         ];
     }
 }

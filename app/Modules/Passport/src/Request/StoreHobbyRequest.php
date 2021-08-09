@@ -43,7 +43,7 @@ class StoreHobbyRequest extends FormRequest
     public function attributes()
     {
         return [
-            'name' =>  'nombre',
+            'name' =>  __('passport.validations.name'),
         ];
     }
 }

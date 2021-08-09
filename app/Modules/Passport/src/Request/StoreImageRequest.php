@@ -43,7 +43,7 @@ class StoreImageRequest extends FormRequest
     public function attributes()
     {
         return [
-            'image' =>  'imagen',
+            'image' =>  __('passport.validations.image'),
         ];
     }
 }

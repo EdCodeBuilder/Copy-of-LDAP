@@ -3,6 +3,8 @@
 namespace App\Modules\Passport\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class PassportOld extends Model implements Auditable
@@ -91,12 +93,39 @@ class PassportOld extends Model implements Auditable
 
     /*
      * ---------------------------------------------------------
-     * Eloquent Relationships
+     * Accessors and Mutators
      * ---------------------------------------------------------
      */
 
     public function getIdAttribute()
     {
         return (int) $this->idPasaporte;
+    }
+
+    public function getUserIdAttribute()
+    {
+        return isset($this->user->Id_Persona) ? (int) $this->user->Id_Persona : null;
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * Eloquent Relationships
+     * ---------------------------------------------------------
+     */
+
+    /**
+     * @return BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'documento', 'Cedula');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function renewals()
+    {
+        return $this->hasMany(Renew::class, 'i_fk_id_pasaporte', 'idPasaporte');
     }
 }

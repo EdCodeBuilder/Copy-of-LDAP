@@ -67,7 +67,14 @@ class StoreCardRequest extends FormRequest
     public function attributes()
     {
         return [
-            'rate' =>  'calificación',
+            'title'         =>  __('passport.validations.title'),
+            'description'   =>  __('passport.validations.description'),
+            'btn_text'      =>  __('passport.validations.btn_text'),
+            'flex'           =>  __('passport.validations.flex'),
+            'lottie'        =>  __('passport.validations.lottie'),
+            'src'           =>  __('passport.validations.src'),
+            'to'            =>  __('passport.validations.to'),
+            'href'          =>  __('passport.validations.href'),
         ];
     }
 }

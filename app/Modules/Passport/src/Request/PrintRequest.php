@@ -7,7 +7,7 @@ namespace App\Modules\Passport\src\Request;
 use App\Modules\Passport\src\Constants\Roles;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RoleRequest extends FormRequest
+class PrintRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,7 +27,10 @@ class RoleRequest extends FormRequest
     public function rules()
     {
         return [
-            'roles'  => 'required|array',
+            'passports'  => 'required|array',
+            'passports.*.passport'  => 'required|numeric',
+            'passports.*.cade_id'   => 'required|numeric|exists:mysql_passport.tbl_supercades,i_pk_id',
+            'passports.*.denounce'  => 'nullable|string|max:80',
         ];
     }
 
@@ -39,7 +42,10 @@ class RoleRequest extends FormRequest
     public function attributes()
     {
         return [
-            'roles' =>  __('passport.validations.roles'),
+            'passports' =>  __('passport.validations.passport'),
+            'passports.*.passport'  => __('passport.validations.passport'),
+            'passports.*.cade_id'  => __('passport.validations.supercade_name'),
+            'passports.*.denounce'  => __('passport.validations.denounce'),
         ];
     }
 }

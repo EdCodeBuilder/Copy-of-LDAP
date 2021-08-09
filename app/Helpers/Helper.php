@@ -295,3 +295,26 @@ if ( ! function_exists('get_template') ) {
         }
     }
 }
+
+if ( ! function_exists('array_insert_in_position') ) {
+    /**
+     * @param array $array
+     * @param array $insertedArray
+     * @param int $position
+     * @return array
+     */
+    function array_insert_in_position(array $array, array $insertedArray, int $position = 0) {
+        $i = 0;
+        $new_array = [];
+        foreach ($array as $value) {
+            if ($i == $position) {
+                foreach ($insertedArray as $ivalue) {
+                    $new_array[] = $ivalue;
+                }
+            }
+            $new_array[] = $value;
+            $i++;
+        }
+        return $new_array;
+    }
+}

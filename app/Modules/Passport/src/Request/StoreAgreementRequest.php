@@ -45,9 +45,9 @@ class StoreAgreementRequest extends FormRequest
     public function attributes()
     {
         return [
-            'agreement' =>  'servicio',
-            'description' =>  'descripción',
-            'company_id' =>  'empresa',
+            'agreement' =>  __('passport.validations.agreement'),
+            'description' =>  __('passport.validations.description'),
+            'company_id' =>  __('passport.validations.company_id'),
         ];
     }
 }

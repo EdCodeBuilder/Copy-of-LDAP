@@ -5,13 +5,14 @@ namespace App\Modules\Passport\src\Request;
 
 
 use App\Modules\Forms\src\Models\Validation;
+use App\Modules\Passport\src\Constants\Roles;
 use App\Modules\Passport\src\Models\Passport;
 use App\Modules\Passport\src\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StorePassportRequest extends FormRequest
+class StorePassportAdminRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,7 +21,7 @@ class StorePassportRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return auth('api')->user()->isAn(...Roles::all());;
     }
 
     /**
@@ -67,30 +68,17 @@ class StorePassportRequest extends FormRequest
                 },
             ],
             'sex_id'  =>  'required|numeric|exists:mysql_sim.genero,Id_Genero',
-            'file'      => [
-                Rule::requiredIf(function () {
-                    $age = Carbon::parse($this->get('birthdate'))->age;
-                    $male_cant_create = $this->get('pensionary') == 'Si' && $age < 60 && (int) $this->get('sex_id') == 1;
-                    $female_cant_create = $this->get('pensionary') == 'Si' && $age < 55 && (int) $this->get('sex_id') == 2;
-                    return ($male_cant_create || $female_cant_create) && ! $this->hasFile('file');
-                }),
-                'nullable',
-                'file',
-                'mimes:pdf',
-                'max:5000'
-            ],
             'pensionary' =>  'required',
-            'email'   =>  'required|email',
+            'email'   =>  'email',
             'phone'  =>  'nullable|numeric|digits:7',
             'mobile'  =>  'required|numeric|digits:10',
             'country_id'   =>  'required|numeric|exists:mysql_ldap.countries,id',
             'state_id'   =>  'required|numeric|exists:mysql_ldap.states,id',
             'city_id' =>  'required|numeric|exists:mysql_ldap.cities,id',
             'locality_id'    =>  'required|numeric|exists:mysql_parks.localidad,Id_Localidad',
-            'upz_id'   =>  'required|numeric|exists:mysql_parks.upz,Id_Upz',
-            'neighborhood_id'   =>  'required|numeric|exists:mysql_parks.Barrios,IdBarrio',
             'address'   =>  'required|string|max:120',
             'stratum'   =>  'required|numeric|between:0,6',
+            'cade_id'   =>  'required|numeric|exists:mysql_passport.tbl_supercades,i_pk_id',
             'interest_id'   =>  'required|numeric|exists:mysql_passport.tbl_actividades_interes,i_pk_id',
             'eps_id'   =>  'required|numeric|exists:mysql_passport.tbl_eps,i_pk_id',
             'observations'   =>  'nullable|max:2500',
@@ -132,6 +120,7 @@ class StorePassportRequest extends FormRequest
             'stratum'   =>  __('passport.validations.stratum'),
             'interest_id'   =>  __('passport.validations.interest_id'),
             'eps_id'   =>  __('passport.validations.eps_id'),
+            'cade_id'   =>  'supercade',
             'observations'   =>  __('passport.validations.observations'),
             'question_1'   =>  __('passport.validations.question_1'),
             'question_2'   =>  __('passport.validations.question_2'),

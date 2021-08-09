@@ -13,6 +13,9 @@ use App\Modules\Passport\src\Models\Eps;
 use App\Modules\Passport\src\Models\Passport;
 use App\Modules\Passport\src\Models\PassportConfig;
 use App\Modules\Passport\src\Models\PassportOld;
+use App\Modules\Passport\src\Models\PassportView;
+use App\Modules\Passport\src\Models\Renew;
+use App\Modules\Passport\src\Models\SuperCade;
 use App\Modules\Passport\src\Request\StoreBackgroundRequest;
 use App\Modules\Passport\src\Request\StoreCardImageRequest;
 use App\Modules\Passport\src\Request\StoreCardTemplateRequest;
@@ -21,6 +24,7 @@ use App\Modules\Passport\src\Resources\EpsResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
@@ -38,11 +42,51 @@ class DashboardController extends Controller
      */
     public function stats()
     {
+        $new = (int) Passport::count();
+        $old = (int) PassportOld::count();
+        $renew = Renew::whereDate('created_at', '>=', '2019-05-09 00:00:00')->count();
+        $new_today = (int) PassportView::whereBetween('created_at', [ now()->startOfDay(), now()->endOfDay() ])->count();
+        $old_today = (int) PassportOld::whereBetween('fechaExpedicion', [ now()->startOfDay(), now()->endOfDay() ])->count();
+        $new_month = (int) PassportView::whereBetween('created_at', [ now()->startOfMonth(), now()->endOfMonth() ])->count();
+        $old_month = (int) PassportOld::whereBetween('fechaExpedicion', [ now()->startOfMonth(), now()->endOfMonth() ])->count();
+        $supercades = SuperCade::active()
+                        ->withCount([
+                            'passports' => function ($query) {
+                                return $query->whereBetween('created_at', [ now()->startOfMonth(), now()->endOfMonth() ]);
+                            }
+                        ])
+                        ->orderByDesc('passports_count')
+                        ->get()
+                        ->map(function ($model) {
+                           return [
+                               'id' => isset($model->i_pk_id) ? (int) $model->i_pk_id : null,
+                               'name' => isset($model->name) ? (string) $model->name : null,
+                               'passports_count' => isset($model->passports_count) ? (int) $model->passports_count : null,
+                           ];
+                        });
+        $mine = 0;
+        if (auth('api')->user()->sim_id) {
+            $mine = PassportView::query()
+                ->where('user_cade', auth('api')->user()->sim_id )
+                ->whereBetween('created_at', [ now()->startOfMonth(), now()->endOfMonth() ])
+                ->count();
+        }
+
+        $total = $new + $old;
+        $total_renew = $renew;
+        $total_today = $new_today + $old_today;
+        $total_month = $new_month + $old_month;
         return $this->success_message(
             [
                 'companies' =>  Company::count(),
                 'services'  =>  Agreements::count(),
-                'downloads' =>  (int) Passport::query()->sum('downloads') + (int) PassportOld::query()->sum('downloads')
+                'downloads' =>  (int) Passport::query()->sum('downloads') + (int) PassportOld::query()->sum('downloads'),
+                'total' => $total,
+                'renew' => (int) $total_renew,
+                'today' => $total_today,
+                'month' => $total_month,
+                'mine'  => $mine,
+                'supercades' => $supercades
             ]
         );
     }

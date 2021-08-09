@@ -43,8 +43,8 @@ class StoreCommentRequest extends FormRequest
     public function attributes()
     {
         return [
-            'name' =>  'nombre',
-            'comment' =>  'comentario',
+            'name' =>  __('passport.validations.name'),
+            'comment' =>  __('passport.validations.comment'),
         ];
     }
 }

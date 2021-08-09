@@ -10,6 +10,9 @@ use App\Modules\Passport\src\Controllers\FaqController;
 use App\Modules\Passport\src\Controllers\HobbyController;
 use App\Modules\Passport\src\Controllers\LandingController;
 use App\Modules\Passport\src\Controllers\PassportController;
+use App\Modules\Passport\src\Controllers\PrintController;
+use App\Modules\Passport\src\Controllers\RenewalController;
+use App\Modules\Passport\src\Controllers\SuperCadeController;
 use App\Modules\Passport\src\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,10 +29,23 @@ Route::prefix('vital-passport')->group(function () {
     Route::post('comments/{agreement}', [LandingController::class, 'comment']);
     Route::get('eps', [EpsController::class, 'index']);
     Route::get('hobbies', [HobbyController::class, 'index']);
-    Route::post('create', [PassportController::class, 'store']);
-    Route::post('show', [PassportController::class, 'show']);
+
+    Route::get('passports', [PassportController::class, 'index'])->middleware('auth:api');
+    Route::get('passports/{passport}', [PassportController::class, 'show'])
+        ->middleware('auth:api');
+    Route::delete('passports/{passport}', [PassportController::class, 'destroy'])
+        ->middleware('auth:api');
+    Route::get('passports/storage/{file}', [PassportController::class, 'file'])->name('passport.files');
+    Route::post('passports', [PassportController::class, 'store']);
+    Route::post('passports-admin', [PassportController::class, 'adminStore'])->middleware('auth:api');
+    Route::post('query', [PassportController::class, 'query']);
+    Route::post('excel', [PassportController::class, 'excel'])->middleware('auth:api');
     Route::post('download/{id}', [PassportController::class, 'download']);
     // Private routes
+    Route::get('renewals', [RenewalController::class, 'index'])->middleware('auth:api');
+    Route::post('renewals', [RenewalController::class, 'excel'])->middleware('auth:api');
+    Route::delete('renewals/{renewal}', [RenewalController::class, 'destroy'])->middleware('auth:api');
+    Route::post('printer', [PrintController::class, 'index'])->middleware('auth:api');
     Route::post('login', [UserController::class, 'login']);
     Route::prefix('user')->middleware('auth:api')->group( function () {
         Route::get('/menu', [UserController::class, 'drawer']);
@@ -55,6 +71,12 @@ Route::prefix('vital-passport')->group(function () {
     Route::resource('eps', HobbyController::class, [
         'only'    => ['store', 'update', 'destroy'],
         'parameters' => ['eps' => 'eps']
+    ])->middleware('auth:api');
+    Route::get('cades-table', [SuperCadeController::class, 'table'])->middleware('auth:api');
+    Route::post('cades/{cade}/status', [SuperCadeController::class, 'status'])->middleware('auth:api');
+    Route::resource('cades', SuperCadeController::class, [
+        'only'    => ['index', 'store', 'update', 'destroy'],
+        'parameters' => ['cades' => 'cade']
     ])->middleware('auth:api');
     Route::resource('companies', CompanyController::class, [
         'only'    => ['index', 'store', 'update', 'destroy'],
