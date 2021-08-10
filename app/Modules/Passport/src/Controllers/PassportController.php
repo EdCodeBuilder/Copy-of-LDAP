@@ -94,11 +94,15 @@ class PassportController extends Controller
                                     ->orWhere('document', 'like', "%{$this->query}%");
                             });
                         })
-                        ->when($this->column && $this->order, function ($query) {
-                            $column = $this->column == 'birthdate'
-                                ? 'birthday'
-                                : $this->column;
-                            return $query->orderBy($column, $this->order);
+                        ->when($this->column && $this->order, function ($query) use ($request) {
+                            if ($request->has('find_old')) {
+                                return $query;
+                            } else {
+                                $column = $this->column == 'birthdate'
+                                    ? 'birthday'
+                                    : $this->column;
+                                return $query->orderBy($column, $this->order);
+                            }
                         })
                         ->paginate($this->per_page)
                 ),
