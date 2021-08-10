@@ -75,7 +75,7 @@ class PassportResource extends JsonResource
         ];
     }
 
-    public static function table($lite = false)
+    public static function table($lite = false, $sortable = true)
     {
         $table = [
             'headers' => [
@@ -83,30 +83,35 @@ class PassportResource extends JsonResource
                     'align' => "right",
                     'text' => "#",
                     'value'  =>  "id",
+                    'sortable'    => $sortable,
                     'icon'  =>  'mdi-pound',
                 ],
                 [
                     'align' => "right",
                     'text' => Str::ucfirst(__('passport.validations.name')),
                     'value'  =>  "full_name",
+                    'sortable'    => $sortable,
                     'icon'  =>  'mdi-dots-horizontal',
                 ],
                 [
                     'align' => "right",
                     'text' => Str::ucfirst(__('passport.validations.document_type_id')),
                     'value'  =>  "document_type_name",
+                    'sortable'    => $sortable,
                     'icon'  =>  'mdi-card-account-details',
                 ],
                 [
                     'align' => "right",
                     'text' => Str::ucfirst(__('passport.validations.document')),
                     'value'  =>  "document",
+                    'sortable'    => $sortable,
                     'icon'  =>  'mdi-numeric',
                 ],
                 [
                     'align' => "right",
                     'text' => Str::ucfirst(__('passport.validations.birthdate')),
                     'value'  =>  "birthdate",
+                    'sortable'    => $sortable,
                     'icon'  =>  'mdi-calendar',
                 ],
                 [
@@ -120,6 +125,7 @@ class PassportResource extends JsonResource
                     'align' => "right",
                     'text' => Str::ucfirst(__('passport.validations.file')),
                     'value'  =>  "file",
+                    'sortable'    => false,
                     'icon'  =>  'mdi-paperclip',
                 ],
                 [

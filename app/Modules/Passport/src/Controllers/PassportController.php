@@ -103,7 +103,7 @@ class PassportController extends Controller
                         ->paginate($this->per_page)
                 ),
                 Response::HTTP_OK,
-                array_merge(PassportResource::table($request->has('lite')), [
+                array_merge(PassportResource::table($request->has('lite'), !$request->has('find_old')), [
                     'matches'   => $text,
                     'count'     => $count,
                     'order'     => $this->order,

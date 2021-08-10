@@ -140,7 +140,7 @@ class PassportExport implements FromQuery, WithMapping, WithHeadings, WithColumn
             'O' => isset($row->phone) ? (int) $row->phone : null,
             'P' => isset($row->email) ? (string) $row->email : null,
             'Q'   => isset($row->retired) ? Str::ucfirst($row->retired) : null,
-            'R'   => isset($row->hobbies) ? (int) $row->hobbies : null,
+            'R'   => isset($row->hobbies_name) ? (string) $row->hobbies_name : null,
             'S'  => isset($row->eps_name) ? (string) $row->eps_name : null,
             'T'    => isset($row->supercade_name) ? (string) $row->supercade_name : null,
             'U'  => isset($row->observations) ? (string) $row->observations : null,
