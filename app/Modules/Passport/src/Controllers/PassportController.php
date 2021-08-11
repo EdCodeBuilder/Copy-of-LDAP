@@ -76,13 +76,6 @@ class PassportController extends Controller
                     $count = PassportOld::query()
                         ->where(function ($q) {
                             return $q->where('idPasaporte', 'like', "%{$this->query}%")
-                                    ->orWhereHas('user', function ($query) {
-                                        return $query
-                                            ->where('Primer_Apellido', 'like', "%{$this->query}%")
-                                            ->orWhere('Segundo_Apellido', 'like', "%{$this->query}%")
-                                            ->orWhere('Primer_Nombre', 'like', "%{$this->query}%")
-                                            ->orWhere('Segundo_Nombre', 'like', "%{$this->query}%");
-                                    })
                                     ->orWhere('documento', 'like', "%{$this->query}%");
                         })->count();
                     if ($count > 0)
