@@ -133,12 +133,17 @@ class PassportExport implements FromQuery, WithMapping, WithHeadings, WithColumn
      */
     public function map($row): array
     {
+        try {
+            $birthdate = isset($row->birthday) ? Date::dateTimeToExcel($row->birthday) : null;
+        } catch (\Exception $exception) {
+            $birthdate = isset($row->birthday) ? $row->birthday->format('Y-m-d') : null;
+        }
         return [
             'A'  => isset($row->id) ? (int) $row->id : null,
             'B' => isset($row->full_name) ? (string) $row->full_name : null,
             'C'    => isset($row->document_type_name) ? (string) $row->document_type_name : null,
             'D'  => isset($row->document) ? (int) $row->document : null,
-            'E'  => isset($row->birthday) ? Date::dateTimeToExcel($row->birthday) : null,
+            'E'  => $birthdate,
             'F'  => "=INT((TODAY()-E".$this->rowNumb++.")/365)",
             'G'   => isset($row->gender_name) ? (string) $row->gender_name : null,
             'H'  => isset($row->country_name) ? (string) $row->country_name : null,
