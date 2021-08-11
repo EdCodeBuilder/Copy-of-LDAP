@@ -2,6 +2,7 @@
 
 namespace App\Modules\Passport\src\Exports;
 
+use App\Modules\Passport\src\Models\PassportOld;
 use App\Modules\Passport\src\Models\PassportOldView;
 use App\Modules\Passport\src\Models\PassportView;
 use Carbon\Carbon;
@@ -58,9 +59,19 @@ class PassportExport implements FromQuery, WithMapping, WithHeadings, WithColumn
             ? Carbon::parse($this->request->get('final_date'))->endOfDay()
             : now()->endOfMonth();
 
+
         return $this->request->has('passport')
             ? $query->where('id', $this->request->get('passport'))
-            : $query->whereBetween('created_at', [$start, $final]);
+            : $query
+                ->when($this->request->has('find_old'), function ($query) use ($start, $final) {
+                    $keys = PassportOld::query()
+                                ->whereBetween('fechaExpedicion', [$start, $final])
+                                ->get('idPasaporte')->pluck('idPasaporte')->toArray();
+                    return $query->whereIn('id', $keys);
+                })
+                ->when(!$this->request->has('find_old'), function ($query) use ($start, $final) {
+                  return $query->whereBetween('created_at', [$start, $final]);
+                });
     }
 
     /**
