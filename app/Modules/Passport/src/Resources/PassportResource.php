@@ -75,7 +75,7 @@ class PassportResource extends JsonResource
         ];
     }
 
-    public static function table()
+    public static function table($sortable = true)
     {
         $table = [
             'headers' => [
@@ -83,35 +83,35 @@ class PassportResource extends JsonResource
                     'align' => "right",
                     'text' => "#",
                     'value'  =>  "id",
-                    'sortable'    => true,
+                    'sortable'    => $sortable,
                     'icon'  =>  'mdi-pound',
                 ],
                 [
                     'align' => "right",
                     'text' => Str::ucfirst(__('passport.validations.name')),
                     'value'  =>  "full_name",
-                    'sortable'    => true,
+                    'sortable'    => $sortable,
                     'icon'  =>  'mdi-dots-horizontal',
                 ],
                 [
                     'align' => "right",
                     'text' => Str::ucfirst(__('passport.validations.document_type_id')),
                     'value'  =>  "document_type_name",
-                    'sortable'    => true,
+                    'sortable'    => $sortable,
                     'icon'  =>  'mdi-card-account-details',
                 ],
                 [
                     'align' => "right",
                     'text' => Str::ucfirst(__('passport.validations.document')),
                     'value'  =>  "document",
-                    'sortable'    => true,
+                    'sortable'    => $sortable,
                     'icon'  =>  'mdi-numeric',
                 ],
                 [
                     'align' => "right",
                     'text' => Str::ucfirst(__('passport.validations.birthdate')),
                     'value'  =>  "birthdate",
-                    'sortable'    => true,
+                    'sortable'    => $sortable,
                     'icon'  =>  'mdi-calendar',
                 ],
                 [

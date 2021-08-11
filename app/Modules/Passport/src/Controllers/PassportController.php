@@ -85,7 +85,15 @@ class PassportController extends Controller
             return $this->success_response(
                 PassportResource::collection(
                     $query
-                        ->when(isset($this->query), function ($query) {
+                        ->when(isset($this->query), function ($query) use ($request) {
+                            if ($request->has('find_old')) {
+                                $keys = PassportOld::query()
+                                    ->where(function ($q) {
+                                        return $q->where('idPasaporte', 'like', "%{$this->query}%")
+                                            ->orWhere('documento', 'like', "%{$this->query}%");
+                                    })->get()->pluck('idPasaporte')->toArray();
+                                return $query->whereIn('id', $keys);
+                            }
                             return $query->where(function ($q) {
                                 return $q->where('id', 'like', "%{$this->query}%")
                                     ->orWhere('full_name', 'like', "%{$this->query}%")
@@ -93,15 +101,24 @@ class PassportController extends Controller
                             });
                         })
                         ->when($this->column && $this->order, function ($query) use ($request) {
-                            return $query->orderBy($this->column, $this->order);
+                            return $request->has('find_old')
+                            ? $query
+                            : $query->orderBy($this->column, $this->order);
                         })
                         ->simplePaginate($this->per_page)
                 ),
                 Response::HTTP_OK,
-                array_merge(PassportResource::table(), [
+                array_merge(PassportResource::table(!$request->has('find_old')), [
                     'matches'   => $text,
                     'count'     => $count,
-                    'total'     => $request->has('find_old') ? PassportOld::count() : Passport::count(),
+                    'total'     => $request->has('find_old')
+                        ? PassportOld::query()
+                            ->when(isset($this->query), function ($query) {
+                                return $query->where('idPasaporte', 'like', "%{$this->query}%")
+                                    ->orWhere('documento', 'like', "%{$this->query}%");
+                            })
+                            ->count()
+                        : Passport::count(),
                     'order'     => $this->order,
                     'old'       => $request->has('find_old')
                 ])
