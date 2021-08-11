@@ -103,7 +103,7 @@ class PassportController extends Controller
                         ->when($this->column && $this->order, function ($query) use ($request) {
                             return $request->has('find_old')
                             ? $query
-                            : $query->orderBy($this->column, $this->order);
+                            : $query->orderBy($this->column == 'birthdate' ? 'birthday' : $this->column, $this->order);
                         })
                         ->simplePaginate($this->per_page)
                 ),
