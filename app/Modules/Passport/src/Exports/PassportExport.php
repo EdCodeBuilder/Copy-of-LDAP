@@ -65,7 +65,7 @@ class PassportExport implements FromQuery, WithMapping, WithHeadings, WithColumn
             : $query
                 ->when($this->request->has('find_old'), function ($query) use ($start, $final) {
                     $keys = PassportOld::query()
-                                ->whereBetween('fechaExpedicion', [$start, $final])
+                                ->whereBetween('fechaExpedicion', [$start->format('Y-m-d'), $final->format('Y-m-d')])
                                 ->get('idPasaporte')->pluck('idPasaporte')->toArray();
                     return $query->whereIn('id', $keys);
                 })
