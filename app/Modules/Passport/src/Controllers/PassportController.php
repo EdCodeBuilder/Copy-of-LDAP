@@ -85,7 +85,6 @@ class PassportController extends Controller
             return $this->success_response(
                 PassportResource::collection(
                     $query
-                        ->select(['id', 'full_name', 'document', 'document_type_name', 'birthday', 'file' ])
                         ->when(isset($this->query), function ($query) {
                             return $query->where(function ($q) {
                                 return $q->where('id', 'like', "%{$this->query}%")
@@ -94,21 +93,15 @@ class PassportController extends Controller
                             });
                         })
                         ->when($this->column && $this->order, function ($query) use ($request) {
-                            if ($request->has('find_old')) {
-                                return $query;
-                            } else {
-                                $column = $this->column == 'birthdate'
-                                    ? 'birthday'
-                                    : $this->column;
-                                return $query->orderBy($column, $this->order);
-                            }
+                            return $query->orderBy($this->column, $this->order);
                         })
-                        ->paginate($this->per_page)
+                        ->simplePaginate($this->per_page)
                 ),
                 Response::HTTP_OK,
-                array_merge(PassportResource::table($request->has('lite'), !$request->has('find_old')), [
+                array_merge(PassportResource::table(), [
                     'matches'   => $text,
                     'count'     => $count,
+                    'total'     => $request->has('find_old') ? PassportOld::count() : Passport::count(),
                     'order'     => $this->order,
                     'old'       => $request->has('find_old')
                 ])

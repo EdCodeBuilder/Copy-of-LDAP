@@ -75,7 +75,7 @@ class PassportResource extends JsonResource
         ];
     }
 
-    public static function table($lite = false, $sortable = true)
+    public static function table()
     {
         $table = [
             'headers' => [
@@ -83,35 +83,35 @@ class PassportResource extends JsonResource
                     'align' => "right",
                     'text' => "#",
                     'value'  =>  "id",
-                    'sortable'    => $sortable,
+                    'sortable'    => true,
                     'icon'  =>  'mdi-pound',
                 ],
                 [
                     'align' => "right",
                     'text' => Str::ucfirst(__('passport.validations.name')),
                     'value'  =>  "full_name",
-                    'sortable'    => $sortable,
+                    'sortable'    => true,
                     'icon'  =>  'mdi-dots-horizontal',
                 ],
                 [
                     'align' => "right",
                     'text' => Str::ucfirst(__('passport.validations.document_type_id')),
                     'value'  =>  "document_type_name",
-                    'sortable'    => $sortable,
+                    'sortable'    => true,
                     'icon'  =>  'mdi-card-account-details',
                 ],
                 [
                     'align' => "right",
                     'text' => Str::ucfirst(__('passport.validations.document')),
                     'value'  =>  "document",
-                    'sortable'    => $sortable,
+                    'sortable'    => true,
                     'icon'  =>  'mdi-numeric',
                 ],
                 [
                     'align' => "right",
                     'text' => Str::ucfirst(__('passport.validations.birthdate')),
                     'value'  =>  "birthdate",
-                    'sortable'    => $sortable,
+                    'sortable'    => true,
                     'icon'  =>  'mdi-calendar',
                 ],
                 [
@@ -276,6 +276,6 @@ class PassportResource extends JsonResource
                 ]
             ]
         ];
-        return $lite ? [ 'headers' => $table['headers'] ] : $table;
+        return $table;
     }
 }
