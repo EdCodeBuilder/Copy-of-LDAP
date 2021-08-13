@@ -47,22 +47,9 @@ class UserSevenController extends Controller
         //     ContractTypeResource::collection(ContractType::all())
         // );
     }
-    public function prueba(Request $request)
-    {
-        $collections = collect($request->contractorsList);
-        return  $this->success_message(
-            count($collections)
-        );
-    }
     public function getUserSevenList(Request $request)
     {
         //$data = [];
-        /* $data = UserSeven::query()
-                ->when(true, function ($query) use ($request) {
-                  return $query->whereIn('TER_CODI', $request->listDocuments);
-                })
-                ->orderBy('TER_NOCO')
-                ->paginate(10000); */
         $data = UserSeven::query()
                 ->whereIn('TER_CODI', $request->listDocuments)
                 ->orderBy('TER_NOCO')
@@ -90,10 +77,6 @@ class UserSevenController extends Controller
             ]);
             $data = json_decode($response->getBody()->getContents(), true);
             return  response()->json($data);
-            /* if ( isset( $data['data'] ) && count($data['data']) > 0 ) {
-                return $this->error_response($data);
-            } */
-            //return $this->createWarehouseCert($certification);
         } catch (Exception $exception) {
             return $this->error_response(
                 'No podemos realizar la consulta en este momento, por favor intente más tarde.',
@@ -116,33 +99,7 @@ class UserSevenController extends Controller
             $certificate->entry = $request->get('entry');
             $certificate->total_pay = $request->get('totalPay');
             $certificate->settlement_period = $request->get('settlementPeriod');
-            
-            //dd($certificate);
-            
-            /* 'component',
-            'funding_source',
-            'entry',
-            'total_pay',
-            'settlement_period', */
-
-            /* $contractor = Contractor::where('document', $request->get('document'))->first();
-            $http = new Client();
-            $response = $http->post("http://66.70.171.168/api/contractors-portal/oracle-excel", [
-                'json' => [
-                    'document' => $request->get('document'),
-                ],
-                'headers' => [
-                    'Accept'    => 'application/json',
-                    'Content-type' => 'application/json'
-                ],
-            ]);
-            $data = json_decode($response->getBody()->getContents(), true);
-            $collections = isset($data['data']) ? collect($data['data']) : collect([]);
-            $writer = new WareHouseExportTemplate($contractor, $collections); */
-            //$collections = isset($request->get('contractorsList')) ? collect($request->get('contractorsList')) : collect([]);
             $collections = collect($request->get('contractorsList'));
-            //dd($certificate->supervisor);
-            //dd($request->get('contractorsList'));
             
             $writer = new CertificateComplianceExportTemplate($certificate, $collections );
             

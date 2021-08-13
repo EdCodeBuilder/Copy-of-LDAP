@@ -58,17 +58,38 @@ class CertificateComplianceExportTemplate
             $style = array(
                 'alignment' => array(
                     'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
                 )
             );
             $this->worksheet->insertNewRowBefore(14, count($this->collections) - 1);
             $i = 13;
             $contador = 1;
             $total_pagar_aux = 0;
+
+            $collectionAux = collect([]); 
+            $countByIdentification = $this->collections->countBy('identification');
             foreach ($this->collections as $key => $collection) {
                 
                 $this->worksheet->mergeCells("D$i:E$i");
                 $this->worksheet->getStyle("C$i:U$i")->applyFromArray($style);
-                $this->worksheet->getCell("C$i")->setValue($contador);
+                //$this->worksheet->getCell("C$i")->setValue($contador);
+                //$contador++;
+
+                //combinar celdas por identificación
+                if(! $collectionAux->contains( $collection['identification'] ) ){
+                    $y = $i + $countByIdentification["{$collection['identification']}"];
+                    $y--;
+                    $this->worksheet->getCell("C$i")->setValue($contador);
+                    $this->worksheet->mergeCells("C$i:C$y");
+
+
+                    /* $this->worksheet->getCell("D$i")->setValue(isset($collection['person_name']) ? (string) $collection['person_name'] : null);
+                    $this->worksheet->mergeCells("D$i:D$y"); */
+                    
+                    $contador++;
+                    $collectionAux->push($collection['identification']);
+                }
+
                 $this->worksheet->getCell("D$i")->setValue(isset($collection['person_name']) ? (string) $collection['person_name'] : null);
                 $this->worksheet->getCell("F$i")->setValue(isset($collection['identification']) ? (string) $collection['identification'] : null);
                 $this->worksheet->getCell("G$i")->setValue(isset($collection['contract_object']) ? (string) $collection['contract_object'] : null);
@@ -81,21 +102,26 @@ class CertificateComplianceExportTemplate
                 $this->worksheet->getCell("M$i")->setValue('X');
                 $this->worksheet->getCell("O$i")->setValue('X');
                 $this->worksheet->getCell("Q$i")->setValue(isset($collection['pago_mensual']) ? (double) $collection['pago_mensual'] : null);
-                $this->worksheet->getCell("R$i")->setValue(toUpper($this->certificate->settlement_period));
+                //$this->worksheet->getCell("R$i")->setValue(toUpper($this->certificate->settlement_period));
+                $this->worksheet->getCell("R$i")->setValue("{$collection['startPeriod']} AL {$collection['finalPeriod']}"); 
                 $this->worksheet->getCell("S$i")->setValue(isset($collection['dias_trabajados']) ? (int) $collection['dias_trabajados'] : null);
                 //$this->worksheet->getCell("T$i")->setValue(isset($collection['total_pagar']) ? (double) $collection['total_pagar'] : null);
                 $this->worksheet->getCell("U$i")->setValue(toUpper($this->certificate->supervisor));
                 $aux_total = ( (int) $collection['dias_trabajados'] / 30 * (double) $collection['pago_mensual']);
-                $this->worksheet->getCell("T$i")->setValue($aux_total);
                 $total_pagar_aux += $aux_total;
-                //$SUMRANGE = 'D2:D'.$i;
+                $this->worksheet->getCell("T$i")->setValue($aux_total);
+                //$this->worksheet->setCellValue('T$i','=ROUND(Q$i/30*S$i;0)');
                 //$this->worksheet->getCell("T$i")->setValue('=ROUND(Q$i/30*S$i;0)');
-                
-                //$activeSheet->setCellValue('D'.$i ,'=REDONDEAR(Q$i/30*S$i,0)');
+                /* $this->worksheet->setCellValueExplicit(
+                    "T$i",
+                    '=ROUND(Q$i/30*S$i;0)',
+                    \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC
+                ); */
                 $i++;
-                $contador++;
             }
             $i++;
+            
+            //$collection->sum('pages');
             $this->worksheet->getCell("T$i")->setValue($total_pagar_aux);
             
             $i += 7;
@@ -106,15 +132,18 @@ class CertificateComplianceExportTemplate
             $security->setLockStructure(true); */
             //$security->setWorkbookPassword($this->contractor->document."-".now()->year);
 
-            /* $x = $i + 2;
-            $this->worksheet->getStyle("B7:M$x")
+            //$x = $i + 2;
+            
+            $protection = $this->worksheet->getProtection();
+            $protection->setSheet(true);
+            //$protection->setLocked(false);
+            $this->worksheet->getStyle("A13:U$i")
                 ->getProtection()
                 ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_PROTECTED);
-            */
-           /*  $protection = $this->worksheet->getProtection();
-            $protection->setSheet(true);
-            $protection->setSort(true);
-            $protection->setInsertRows(true); */
+           
+            //$protection->setSort(true);
+            //$protection->setInsertRows(true); 
+
             //$protection->setPassword($this->contractor->document."-".now()->year);
             $this->file->setActiveSheetIndex(0);
 
