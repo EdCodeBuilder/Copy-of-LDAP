@@ -17,7 +17,7 @@ class FindUserRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->user()->isAn(Roles::ROLE_ADMIN, 'superadmin');
+        return auth('api')->user()->isAn(...Roles::onlyAdmin());
     }
 
     /**

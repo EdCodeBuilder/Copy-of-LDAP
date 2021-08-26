@@ -23,7 +23,7 @@ class ProfileFilterRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->user()->isAn(...Roles::all());
+        return auth('api')->user()->isAn(...Roles::allAndRoot());
     }
 
     /**

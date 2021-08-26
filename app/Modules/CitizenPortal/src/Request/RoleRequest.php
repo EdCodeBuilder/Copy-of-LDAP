@@ -17,7 +17,7 @@ class RoleRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->check() && auth('api')->user()->isA(Roles::ROLE_ADMIN, 'superadmin');
+        return auth('api')->check() && auth('api')->user()->isA(...Roles::allAndRoot());
     }
 
     /**
