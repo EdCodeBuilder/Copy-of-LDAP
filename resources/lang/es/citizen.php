@@ -18,7 +18,7 @@ return [
         'stages'        =>  'Escenarios',
         'programs'      =>  'Programas',
         'activities'    =>  'Actividades',
-        'age_group'     =>  'Grupo Etáreo',
+        'age_group'     =>  'Grupo Etario',
         'week_days'     =>  'Días',
         'daily_hours'   =>  'Horas',
         'file_types'     =>  'Tipos de Archivos',
@@ -117,7 +117,7 @@ return [
 
     'classes' => [
         'App\Modules\CitizenPortal\src\Models\Activity' => 'Actividades',
-        'App\Modules\CitizenPortal\src\Models\AgeGroup' => 'Grupo Etáreo',
+        'App\Modules\CitizenPortal\src\Models\AgeGroup' => 'Grupo Etario',
         'App\Modules\CitizenPortal\src\Models\Citizen' => 'Ciudadano',
         'App\Modules\CitizenPortal\src\Models\CitizenSchedule' => 'Ciudadano - Inscripciones',
         'App\Modules\CitizenPortal\src\Models\Day' => 'Días',
