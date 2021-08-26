@@ -33,6 +33,7 @@ class PermissionController extends Controller
     {
         $abilities = Ability::query()
             ->where('name', 'like', '%citizen-portal%')
+            ->whereNull('entity_id')
             ->get();
         return $this->success_response(
             AbilityResource::collection( $abilities )
