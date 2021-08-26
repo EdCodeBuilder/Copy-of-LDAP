@@ -133,7 +133,7 @@ class Roles
             $ability->forbidden = auth('api')->user()->getForbiddenAbilities()->contains($ability);
         });
         $abilities = collect($abilities)->filter(function ($item) {
-            return false !== stristr($item->name, Roles::IDENTIFIER);
+            return false !== stristr($item->name, Roles::IDENTIFIER) || $item->name == '*';
         })->toArray();
         return [
             'id'    => auth('api')->user()->id,
