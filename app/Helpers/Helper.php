@@ -318,3 +318,26 @@ if ( ! function_exists('array_insert_in_position') ) {
         return $new_array;
     }
 }
+
+if ( ! function_exists('str_starts_with') ) {
+    function str_starts_with($haystack, $needle) {
+        $length = strlen($needle);
+        return substr($haystack, 0, $length) === $needle;
+    }
+}
+
+if ( ! function_exists('str_ends_with') ) {
+    function str_ends_with($haystack, $needle) {
+        $length = strlen($needle);
+        if (!$length) {
+            return true;
+        }
+        return substr($haystack, -$length) === $needle;
+    }
+}
+
+if ( ! function_exists('class_dash_name') ) {
+    function class_dash_name($class) {
+        return strtolower(preg_replace('/([a-zA-Z])(?=[A-Z])/', '$1-', class_basename($class)));
+    }
+}

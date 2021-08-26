@@ -44,7 +44,7 @@ class ParkController extends Controller
      */
     public function index(ParkFinderRequest $request)
     {
-        $parks = Park::query()
+        $parks = $this->setQuery(Park::query(), (new Park)->getSortableColumn($this->column))
             ->select( ['Id', 'Id_IDRD', 'Nombre', 'Direccion', 'Upz', 'Id_Localidad', 'Id_Tipo'] )
             ->when($this->query, function ($query) {
                 $query->search($this->query)
@@ -71,7 +71,7 @@ class ParkController extends Controller
                     ? $query->whereIn('Cerramiento', $types)
                     : $query->where('Cerramiento', $types);
             })
-
+            ->orderBy((new Park)->getSortableColumn($this->column), $this->order)
             ->paginate($this->per_page);
         return $this->success_response( ParkFinderResource::collection( $parks ) );
     }

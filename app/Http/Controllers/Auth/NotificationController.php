@@ -23,7 +23,12 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         return $this->success_message(
-            auth('api')->user()->notifications()->paginate($this->per_page)
+            auth('api')->user()
+                ->notifications()
+                ->when($request->has('type'), function ($query) use ($request) {
+                    return $query->where('type', $request->get('type'));
+                })
+                ->paginate($this->per_page)
         );
     }
 

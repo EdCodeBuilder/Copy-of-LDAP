@@ -7,6 +7,7 @@ use Illuminate\Database\Query\Builder as Query;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
@@ -64,6 +65,13 @@ trait ApiResponse
      */
     protected $where;
 
+    /**
+     * The value to filter in the table.
+     *
+     * @var string
+     */
+    protected $where_not;
+
 
     /**
      * The value to filter in the table.
@@ -91,6 +99,24 @@ trait ApiResponse
      * @var array
      */
     protected $where_between;
+
+    /**
+     * The value to filter in the table.
+     * E.g.
+     * where_columns_between=column_1,column_2|value_1,value_2
+     *
+     * @var array
+     */
+    protected $where_columns_between;
+
+    /**
+     * The value to filter in the table.
+     * E.g.
+     * where_columns_not_between=column_1:value_1,value_2|column_2:value_1,value_2
+     *
+     * @var array
+     */
+    protected $where_columns_not_between;
 
     /**
      * The value to filter in the table.
@@ -157,6 +183,7 @@ trait ApiResponse
         $this->per_page =  request()->has( 'per_page' ) ? request()->get('per_page') : 10;
         $this->query    =  request()->has( 'query' ) ? request()->get('query') : null;
         $this->where    =  request()->has( 'where' ) ? request()->get('where') : null;
+        $this->where_not    =  request()->has( 'where_not' ) ? request()->get('where_not') : null;
         $this->where_in    =  request()->has( 'where_in' ) ? request()->get('where_in') : null;
         $this->where_not_in    =  request()->has( 'where_not_in' ) ? request()->get('where_not_in') : null;
         $this->where_between    =  request()->has( 'where_between' ) ? request()->get('where_between') : null;
@@ -166,7 +193,30 @@ trait ApiResponse
         $this->or_where_not_in    =  request()->has( 'or_where_not_in' ) ? request()->get('or_where_not_in') : null;
         $this->or_where_between    =  request()->has( 'or_where_between' ) ? request()->get('or_where_between') : null;
         $this->or_where_not_between    =  request()->has( 'or_where_not_between' ) ? request()->get('or_where_not_between') : null;
+        // Multiple Columns
+        $this->where_columns_between    =  $this->setColumnParams('where_columns_between');
+        $this->where_columns_not_between    =  $this->setColumnParams('where_columns_not_between');
         $this->order    =  ( $this->order ) ? 'asc' : 'desc';
+    }
+
+    public function setColumnParams($key)
+    {
+        $request = request()->has( $key )
+            ? explode('|', request()->get( $key ))
+            : null;
+        $columns = isset($request[0]) ? explode(',', $request[0]) : [];
+        $values =  isset($request[1]) ? explode(',', $request[1]) : [];
+        $params = [
+            'columns' => [
+                Arr::first($columns),
+                Arr::last($columns)
+            ],
+            'values' => [
+                Arr::first($values),
+                Arr::last($values)
+            ]
+        ];
+        return count($columns) == 2 && count($values) == 2 ? $params : [];
     }
 
     /**
@@ -183,6 +233,9 @@ trait ApiResponse
         return $query
                 ->when(request()->has('where'), function ($query) use ($column) {
                     return $query->where($column, $this->where);
+                })
+                ->when(request()->has('where_not'), function ($query) use ($column) {
+                    return $query->where($column, '!=', $this->where_not);
                 })
                 ->when(request()->has('where_in'), function ($query) use ($column) {
                     return is_array($this->where_in)

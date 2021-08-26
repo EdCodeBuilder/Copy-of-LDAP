@@ -53,6 +53,12 @@ return [
             'root' => storage_path('app/contractor'),
         ],
 
+        'citizen_portal'    => [
+            'driver'  => 'local',
+            'root'    => "/home1/idrdgov/public_html/Portal-Ciudadano/storage/app/documentos_natacion_cefes",
+            'url'     => "/home1/idrdgov/public_html/Portal-Ciudadano/storage/app/documentos_natacion_cefes"
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

@@ -178,6 +178,66 @@ class Park extends Model implements Auditable
      */
 
     /**
+     * @param $column
+     * @return string
+     */
+    public function getSortableColumn($column)
+    {
+        switch ($column) {
+            default:
+                return in_array($this->getFillableValues($column), $this->fillable)
+                    ? $column
+                    : $this->primaryKey;
+        }
+    }
+
+    public function getFillableValues($value)
+    {
+        $attrs = [
+        'id' => 'Id',
+        'code' => 'Id_IDRD',
+        'name' => 'Nombre',
+        'address'  => 'Direccion',
+        'stratum'  => 'Estrato',
+        'locality_id'  => 'Id_Localidad',
+        'upz_code' => 'Upz',
+        'neighborhood_id'  => 'Id_Barrio',
+        'urbanization' => 'Urbanizacion',
+        'latitude' => 'Latitud',
+        'longitude'    => 'Longitud',
+        'area_hectare' => 'Areageo_enHa',
+        'area' => 'Area',
+        'grey_area'    => 'AreaZDura',
+        'green_area'   => 'AreaZVerde',
+        'capacity' => 'Aforo',
+        'children_population'  => 'PoblacionInfantil',
+        'youth_population' => 'PoblacionJuvenil',
+        'older_population' => 'PoblacionMayor',
+        'enclosure'    => 'Cerramiento',
+        'households'   => 'Viviendas',
+        'walking_trails'   => 'CantidadSenderos',
+        'walking_trails_status'    => 'EstadoSendero',
+        'access_roads' => 'ViasAcceso',
+        'access_roads_status'  => 'EstadoVias',
+        'zone_type'    => 'TipoZona',
+        'scale_id' => 'Id_Tipo',
+        'concern'  => 'CompeteIDRD',
+        'visited_at'   => 'FechaVisita',
+        'general_status'   => 'EstadoGeneral',
+        'stage_type_id'    => 'Id_Tipo_Escenario',
+        'status_id'    => 'Estado',
+        'admin'    => 'Administracion',
+        'phone'    => 'TelefonoParque',
+        'email'    => 'Email',
+        'admin_name'   => 'NomAdministrador',
+        'vigilance'    => 'Vigilancia',
+        'received' => 'RecibidoIdrd',
+        'vocation_id'  => 'Id_Vocacion',
+    ];
+        return Arr::get($attrs, $value, $value);
+    }
+
+    /**
      * Set value in uppercase
      *
      * @param $value
