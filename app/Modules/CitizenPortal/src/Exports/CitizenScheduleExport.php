@@ -199,7 +199,7 @@ class CitizenScheduleExport implements FromQuery, WithMapping, WithHeadings, Wit
     {
         $formula = null;
         if (isset($row->birthdate)) {
-            $formula = "=INT((TODAY()-K".$this->rowNumb++.")/365)";
+            $formula = "=INT((TODAY()-L".$this->rowNumb++.")/365)";
         } else {
             $this->rowNumb++;
         }
