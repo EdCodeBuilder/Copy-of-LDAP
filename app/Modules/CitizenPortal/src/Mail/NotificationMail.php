@@ -44,16 +44,14 @@ class NotificationMail extends Mailable
 
         $observation = $this->user->observations()->latest()->first();
 
-        $status_id = isset($this->user->status_id) ? (int) $this->user->status_id : Profile::PENDING;
-        $status = Status::find($status_id);
-        $status = isset( $status->name ) ? (string) $status->name : '';
+        $status = isset($this->user->status) ? (string)$this->user->status : '';
 
         $observation = isset( $observation->observation )
             ? (string) $observation->observation
             : '';
 
         $observation_created_at = isset( $observation->created_at )
-            ? (string) $observation->created_at->format('Y-m-d H:i:s')
+            ? $observation->created_at->format('Y-m-d H:i:s')
             : '';
 
         return $this->view('mail.mail')
