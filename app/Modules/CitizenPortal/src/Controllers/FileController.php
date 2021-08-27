@@ -132,9 +132,13 @@ class FileController extends Controller
     {
         try {
             if (Storage::disk('citizen_portal')->exists($file->file) ) {
-                Storage::disk('citizen_portal')->delete($file->file);
+                if (env('APP_ENV') != 'production') {
+                    Storage::disk('citizen_portal')->delete($file->file);
+                }
             }
-            // $file->delete();
+            if (env('APP_ENV') != 'production') {
+                $file->delete();
+            }
             return $this->success_message(
                 __('validation.handler.deleted'),
                 Response::HTTP_OK,
