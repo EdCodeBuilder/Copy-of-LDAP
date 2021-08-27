@@ -24,13 +24,20 @@ class ConfirmStatusCitizen implements ShouldQueue
     private $user;
 
     /**
+     * @var string
+     */
+    private $observation;
+
+    /**
      * Create a new job instance.
      *
      * @param ProfileView $profile
+     * @param $observation
      */
-    public function __construct(ProfileView $profile)
+    public function __construct(ProfileView $profile, $observation)
     {
         $this->user = $profile;
+        $this->observation = $observation;
     }
 
     /**
@@ -48,7 +55,7 @@ class ConfirmStatusCitizen implements ShouldQueue
              : env('SAMPLE_EMAIL');
         }
         if ( $email  && filter_var( $email, FILTER_VALIDATE_EMAIL) ) {
-            $mailer->to($email)->send( new NotificationMail( $this->user ) );
+            $mailer->to($email)->send( new NotificationMail( $this->user, $this->observation ) );
         }
     }
 }

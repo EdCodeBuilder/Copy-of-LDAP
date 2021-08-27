@@ -23,13 +23,20 @@ class NotificationMail extends Mailable
     private $user;
 
     /**
+     * @var string
+     */
+    private $observation;
+
+    /**
      * Create a new job instance.
      *
      * @param ProfileView $user
+     * @param $observation
      */
-    public function __construct(ProfileView $user)
+    public function __construct(ProfileView $user, $observation)
     {
         $this->user = $user;
+        $this->observation = $observation;
     }
 
     /**
@@ -41,18 +48,8 @@ class NotificationMail extends Mailable
     {
         $id = isset( $this->user->id ) ? (int) $this->user->id : '';
         $name = isset( $this->user->full_name ) ? (string) $this->user->full_name : '';
-
-        $observation = $this->user->observations()->latest()->first();
-
         $status = isset($this->user->status) ? (string)$this->user->status : '';
-
-        $observation_text = isset( $observation->observation )
-            ? (string) $observation->observation
-            : '';
-
-        $observation_created_at = isset( $observation->created_at )
-            ? $observation->created_at->format('Y-m-d H:i:s')
-            : '';
+        $observation_created_at = now()->format('Y-m-d H:i:s');
 
         return $this->view('mail.mail')
             ->subject('Estado de Verificación de Datos - Portal Ciudadano')
@@ -64,7 +61,7 @@ class NotificationMail extends Mailable
                         <p>Número de Registro: {$id}</p>
                         <p>Nombre: {$name}</p>
                         <p>Estado de Validación de Usuario: {$status}</p>
-                        <p>Observación: {$observation_text}</p>
+                        <p>Observación: {$this->observation}</p>
                         <p>Fecha de observación: {$observation_created_at}</p>
                         ",
                 // 'hide_btn'  => true,
