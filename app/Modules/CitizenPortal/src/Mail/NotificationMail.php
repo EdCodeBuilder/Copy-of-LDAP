@@ -46,7 +46,7 @@ class NotificationMail extends Mailable
 
         $status = isset($this->user->status) ? (string)$this->user->status : '';
 
-        $observation = isset( $observation->observation )
+        $observation_text = isset( $observation->observation )
             ? (string) $observation->observation
             : '';
 
@@ -64,7 +64,7 @@ class NotificationMail extends Mailable
                         <p>Número de Registro: {$id}</p>
                         <p>Nombre: {$name}</p>
                         <p>Estado de Validación de Usuario: {$status}</p>
-                        <p>Observación: {$observation}</p>
+                        <p>Observación: {$observation_text}</p>
                         <p>Fecha de observación: {$observation_created_at}</p>
                         ",
                 // 'hide_btn'  => true,
