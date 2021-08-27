@@ -67,6 +67,7 @@ class NotificationSubscriptionMail extends Mailable
                         <p>Observación: {$this->observation}</p>
                 ",
                 // 'hide_btn'  => true,
+                'btn_text'  => 'Ir al Portal',
                 'url'       =>  "https://idrd.gov.co/Portal-Ciudadano/login",
                 'info'      =>  "Puede ingresar a la plataforma para conocer más servicios que el IDRD tiene para usted.",
                 'year'      =>  Carbon::now()->year
