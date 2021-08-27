@@ -21,7 +21,7 @@ class NotificationFileMail extends Mailable
     /**
      * @var ProfileView
      */
-    private $mail;
+    private $user;
     /**
      * @var Status
      */
@@ -42,7 +42,7 @@ class NotificationFileMail extends Mailable
      */
     public function __construct(ProfileView $user, Status $status, File $file, $observation)
     {
-        $this->mail = $user;
+        $this->user = $user;
         $this->status = $status;
         $this->file = $file;
         $this->observation = $observation;

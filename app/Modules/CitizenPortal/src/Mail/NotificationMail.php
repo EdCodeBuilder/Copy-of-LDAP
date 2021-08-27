@@ -20,7 +20,7 @@ class NotificationMail extends Mailable
     /**
      * @var ProfileView
      */
-    private $mail;
+    private $user;
 
     /**
      * Create a new job instance.
@@ -29,7 +29,7 @@ class NotificationMail extends Mailable
      */
     public function __construct(ProfileView $user)
     {
-        $this->mail = $user;
+        $this->user = $user;
     }
 
     /**

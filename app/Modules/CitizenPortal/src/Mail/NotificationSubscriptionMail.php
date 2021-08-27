@@ -18,7 +18,7 @@ class NotificationSubscriptionMail extends Mailable
     /**
      * @var ProfileView
      */
-    private $mail;
+    private $user;
 
     /**
      * @var string
@@ -39,7 +39,7 @@ class NotificationSubscriptionMail extends Mailable
      */
     public function __construct(ProfileView $user, Status $status, $observation)
     {
-        $this->mail = $user;
+        $this->user = $user;
         $this->observation = $observation;
         $this->status = $status;
     }
