@@ -31,9 +31,12 @@ class NeighborhoodRequest extends FormRequest
     {
         $neighborhood = new Neighborhood();
         $upz = new Upz();
+        $method = toLower($this->getMethod());
+        $id = $neighborhood->getKeyName();
+        $action = in_array($method, ['put', 'patch']) ? ",{$this->route('neighborhood')->{$id}},$id" : '';
         return [
             'name'          => 'required|string|max:500',
-            'neighborhood_code'      =>  "nullable|unique:{$neighborhood->getConnectionName()}.{$neighborhood->getTable()},CodBarrio",
+            'neighborhood_code'      =>  "nullable|unique:{$neighborhood->getConnectionName()}.{$neighborhood->getTable()},CodBarrio".$action,
             'upz_code'      =>  "required|exists:{$upz->getConnectionName()}.{$upz->getTable()},cod_upz",
         ];
     }
