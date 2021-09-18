@@ -274,7 +274,7 @@ class UserController extends Controller
             $parks = AssignedPark::where('user_id', $user->id)->get();
             foreach ($parks as $park) {
                 $p = Park::find($park->park_id);
-                $user->disallow('manage-assigned-parks', $p);
+                $user->disallow(Roles::can(Park::class, 'update'), $p);
             }
             AssignedPark::where('user_id', $user->id)->delete();
         }
