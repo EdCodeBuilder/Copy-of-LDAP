@@ -2,6 +2,7 @@
 
 namespace App\Modules\Parks\src\Request;
 
+use App\Modules\Parks\src\Models\Park;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ParkDetailRequest extends FormRequest
@@ -23,8 +24,9 @@ class ParkDetailRequest extends FormRequest
      */
     public function rules()
     {
+        $park = new Park();
         return [
-            'code'  =>  'required|exist:mysql_parks.parque,Id_IDRD'
+            'code'  =>  "required|exist:exists:{$park->getConnectionName()}.{$park->getTable()},Id_IDRD"
         ];
     }
 }

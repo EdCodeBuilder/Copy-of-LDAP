@@ -39,8 +39,8 @@ class DayExport implements FromQuery, WithMapping, WithHeadings, WithColumnForma
      */
     public function headings(): array {
         return [
-            'ID',
             toUpper(__('citizen.validations.name')),
+            'ID',
         ];
     }
 
@@ -50,7 +50,7 @@ class DayExport implements FromQuery, WithMapping, WithHeadings, WithColumnForma
     public function columnFormats(): array
     {
         return [
-            'A' => NumberFormat::FORMAT_NUMBER,
+            'B' => NumberFormat::FORMAT_NUMBER,
         ];
     }
 
@@ -62,8 +62,8 @@ class DayExport implements FromQuery, WithMapping, WithHeadings, WithColumnForma
     {
         $id = isset( $row->id ) ? (int) $row->id : null;
         return [
-            'A'    =>  isset( $row->id ) ? (int) $row->id : null,
             'B'    =>  isset($row->name) ? "$id - $row->name" : null,
+            'A'    =>  $id,
         ];
     }
 

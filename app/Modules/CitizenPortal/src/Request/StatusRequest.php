@@ -6,6 +6,8 @@ namespace App\Modules\CitizenPortal\src\Request;
 
 
 use App\Modules\CitizenPortal\src\Constants\Roles;
+use App\Modules\CitizenPortal\src\Models\Hour;
+use App\Modules\CitizenPortal\src\Models\Status;
 use App\Modules\Parks\src\Models\Park;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -18,7 +20,10 @@ class StatusRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->user()->isAn(...Roles::onlyAdmin());
+        $permission = toLower($this->getMethod()) == 'post'
+            ? Roles::can(Status::class,'create_or_manage', true)
+            : Roles::can(Status::class,'update_or_manage', true);
+        return auth('api')->user()->hasAnyPermission($permission);
     }
 
     /**

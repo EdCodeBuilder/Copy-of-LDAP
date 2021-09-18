@@ -5,11 +5,12 @@ namespace App\Modules\Parks\src\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Upz extends Model implements Auditable
 {
-    use \OwenIt\Auditing\Auditable;
+    use \OwenIt\Auditing\Auditable, SoftDeletes;
 
     /**
      * The connection name for the model.
@@ -37,14 +38,7 @@ class Upz extends Model implements Auditable
      *
      * @var array
      */
-    protected $fillable = ['Upz', 'cod_upz', 'IdLocalidad'];
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
+    protected $fillable = ['Upz', 'cod_upz', 'IdLocalidad', 'Tipo'];
 
     /*
   * ---------------------------------------------------------
@@ -58,7 +52,7 @@ class Upz extends Model implements Auditable
      * @var array
      */
     protected $auditInclude = [
-        'Upz', 'cod_upz', 'IdLocalidad',
+        'Upz', 'cod_upz', 'IdLocalidad', 'Tipo',
     ];
 
     /**
@@ -131,5 +125,15 @@ class Upz extends Model implements Auditable
     public function locality()
     {
         return $this->belongsTo(Location::class, 'IdLocalidad', 'Id_Localidad');
+    }
+
+    /**
+     * A Neighborhood Belongs To UPZ
+     *
+     * @return BelongsTo
+     */
+    public function upz_type()
+    {
+        return $this->belongsTo(UpzType::class, 'Tipo', 'Id');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Modules\Parks\src\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Parks\src\Constants\Roles;
 use App\Modules\Parks\src\Models\Park;
 use App\Modules\Parks\src\Models\Rupi;
 use App\Modules\Parks\src\Request\RupiRequest;
@@ -18,6 +19,10 @@ class RupiController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->middleware('auth:api')->except('index');
+        $this->middleware(Roles::actions(Rupi::class, 'create_or_manage'))->only('store');
+        $this->middleware(Roles::actions(Rupi::class, 'update_or_manage'))->only('update');
+        $this->middleware(Roles::actions(Rupi::class, 'destroy_or_manage'))->only('destroy');
     }
 
     /**

@@ -6,7 +6,9 @@ namespace App\Modules\CitizenPortal\src\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\CitizenPortal\src\Constants\Roles;
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
 use App\Modules\CitizenPortal\src\Models\Program;
+use App\Modules\CitizenPortal\src\Models\Schedule;
 use App\Modules\CitizenPortal\src\Request\ProgramRequest;
 use App\Modules\CitizenPortal\src\Resources\ProgramResource;
 use Exception;
@@ -21,11 +23,26 @@ class ProgramController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware(Roles::actions(Program::class, 'create'))
+        $this->middleware(
+            Roles::canAny([
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => Program::class
+                ],
+                ['model' => CitizenSchedule::class, 'actions' => 'status'],
+                ['model' => CitizenSchedule::class, 'actions' => 'view_or_manage'],
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => Schedule::class
+                ],
+            ], true, true)
+        )
+            ->only('index');
+        $this->middleware(Roles::actions(Program::class, 'create_or_manage'))
             ->only('store');
-        $this->middleware(Roles::actions(Program::class, 'update'))
+        $this->middleware(Roles::actions(Program::class, 'update_or_manage'))
             ->only('update');
-        $this->middleware(Roles::actions(Program::class, 'destroy'))
+        $this->middleware(Roles::actions(Program::class, 'destroy_or_manage'))
             ->only('destroy');
     }
 

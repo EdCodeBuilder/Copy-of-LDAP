@@ -27,6 +27,7 @@ class ParkFinderRequest extends FormRequest
         return [
             'query'        => [ new ParkFinderRule() ],
             'locality_id'  => [ new ParkFinderRule() ],
+            'upz_id'  => [ new ParkFinderRule() ],
             'type_id'      => [ new ParkFinderRule() ],
         ];
     }

@@ -122,7 +122,7 @@ class IncompatibleAccess extends Model
      */
     public function module()
     {
-        return $this->belongsTo(Module::class, 'Id_Modulo', 'id');
+        return $this->belongsTo(Module::class, 'Id_Modulo', 'Id_Modulo');
     }
 
     /**

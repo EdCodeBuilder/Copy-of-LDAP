@@ -6,6 +6,8 @@ namespace App\Modules\CitizenPortal\src\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\CitizenPortal\src\Constants\Roles;
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
+use App\Modules\CitizenPortal\src\Models\Schedule;
 use App\Modules\CitizenPortal\src\Models\Stage;
 use App\Modules\CitizenPortal\src\Request\StageRequest;
 use App\Modules\CitizenPortal\src\Resources\StageResource;
@@ -21,11 +23,26 @@ class StageController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware(Roles::actions(Stage::class, 'create'))
+        $this->middleware(
+            Roles::canAny([
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => Stage::class
+                ],
+                ['model' => CitizenSchedule::class, 'actions' => 'status'],
+                ['model' => CitizenSchedule::class, 'actions' => 'view_or_manage'],
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => Schedule::class
+                ],
+            ], true, true)
+        )
+            ->only('index');
+        $this->middleware(Roles::actions(Stage::class, 'create_or_manage'))
             ->only('store');
-        $this->middleware(Roles::actions(Stage::class, 'update'))
+        $this->middleware(Roles::actions(Stage::class, 'update_or_manage'))
             ->only('update');
-        $this->middleware(Roles::actions(Stage::class, 'destroy'))
+        $this->middleware(Roles::actions(Stage::class, 'destroy_or_manage'))
             ->only('destroy');
     }
 

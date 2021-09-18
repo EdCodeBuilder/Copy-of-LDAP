@@ -6,6 +6,7 @@ namespace App\Modules\CitizenPortal\src\Request;
 
 
 use App\Modules\CitizenPortal\src\Constants\Roles;
+use App\Modules\CitizenPortal\src\Models\ProfileType;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProfileTypeRequest extends FormRequest
@@ -17,7 +18,10 @@ class ProfileTypeRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->user()->isAn(...Roles::onlyAdmin());
+        $permission = toLower($this->getMethod()) == 'post'
+            ? Roles::can(ProfileType::class,'create_or_manage', true)
+            : Roles::can(ProfileType::class,'update_or_manage', true);
+        return auth('api')->user()->hasAnyPermission($permission);
     }
 
     /**

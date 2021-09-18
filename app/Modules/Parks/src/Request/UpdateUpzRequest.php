@@ -2,7 +2,9 @@
 
 namespace App\Modules\Parks\src\Request;
 
-use App\Modules\Parks\src\Rules\ParkFinderRule;
+use App\Modules\Parks\src\Constants\Roles;
+use App\Modules\Parks\src\Models\Location;
+use App\Modules\Parks\src\Models\Upz;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateUpzRequest extends FormRequest
@@ -14,7 +16,8 @@ class UpdateUpzRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return auth('api')->user()->can(Roles::can(Upz::class, 'update'), Upz::class) ||
+            auth('api')->user()->can(Roles::can(Upz::class, 'manage'), Upz::class);
     }
 
     /**
@@ -24,10 +27,12 @@ class UpdateUpzRequest extends FormRequest
      */
     public function rules()
     {
+        $locality = new Location();
+        $upz = new Upz();
         return [
             'name'      => 'required|string|max:50',
-            'upz_code'  =>  'required|max:20|unique:mysql_parks.upz,cod_upz,'.$this->route('upz')->id.',Id_Upz',
-            'locality_id'   =>  'required|numeric|exists:mysql_parks.localidad,Id_Localidad',
+            'upz_code'  =>  "required|max:20|unique:{$upz->getConnectionName()}.{$upz->getTable()},cod_upz,".$this->route('upz')->id.",{$upz->getKeyName()}",
+            'locality_id'   =>  "required|numeric|exists:{$locality->getConnectionName()}.{$locality->getTable()},{$locality->getKeyName()}",
         ];
     }
 }

@@ -4,9 +4,9 @@
 namespace App\Modules\Parks\src\Request;
 
 
-use App\Modules\Parks\src\Models\Park;
+use App\Models\Security\User;
+use App\Modules\Parks\src\Constants\Roles;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class RoleRequest extends FormRequest
 {
@@ -17,7 +17,10 @@ class RoleRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check() && auth()->user()->can('manage-users-parks', Park::class);
+        $permission = toLower($this->getMethod()) == 'delete'
+            ? Roles::can(User::class,'destroy_or_manage', true)
+            : Roles::can(User::class,'create_or_manage', true);
+        return auth('api')->user()->hasAnyPermission($permission);
     }
 
     /**

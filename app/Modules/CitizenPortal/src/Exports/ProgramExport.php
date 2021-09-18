@@ -37,8 +37,8 @@ class ProgramExport implements FromQuery, WithMapping, WithHeadings, WithColumnF
      */
     public function headings(): array {
         return [
-            'ID',
             toUpper(__('citizen.validations.name')),
+            'ID',
         ];
     }
 
@@ -48,7 +48,7 @@ class ProgramExport implements FromQuery, WithMapping, WithHeadings, WithColumnF
     public function columnFormats(): array
     {
         return [
-            'A' => NumberFormat::FORMAT_NUMBER,
+            'B' => NumberFormat::FORMAT_NUMBER,
         ];
     }
 
@@ -60,8 +60,8 @@ class ProgramExport implements FromQuery, WithMapping, WithHeadings, WithColumnF
     {
         $id = isset( $row->id ) ? (int) $row->id : null;
         return [
-            'A'    =>  isset( $row->id ) ? (int) $row->id : null,
             'B'    =>  isset($row->name) ? "$id - $row->name" : null,
+            'A'    =>  isset( $row->id ) ? (int) $row->id : null,
         ];
     }
 

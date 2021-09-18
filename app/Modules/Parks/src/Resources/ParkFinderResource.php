@@ -22,10 +22,13 @@ class ParkFinderResource extends JsonResource
             'scale'     =>  isset( $this->scale->Tipo ) ? toUpper($this->scale->Tipo) : null,
             'locality'  =>  isset( $this->location->Localidad ) ? toUpper($this->location->Localidad) : null,
             'address'   =>  isset( $this->Direccion ) ? toUpper($this->Direccion) : null,
-            'upz_code'  =>  isset( $this->Upz ) ? (int) $this->Upz : null,
+            'upz_code'  =>  isset( $this->Upz ) ? (string) $this->Upz : null,
             'upz'       =>  isset( $this->upz_name->Upz ) ? toUpper($this->upz_name->Upz) : null,
             'color'     =>  isset( $this->Id_Tipo ) ? $this->getColor((int) $this->Id_Tipo) : 'grey',
-            'status_id' =>  isset( $this->Estado ) ? (bool) $this->Estado : false,
+            'status_id' =>  isset( $this->Estado ) && $this->Estado != 0 ? (int) $this->Estado : null,
+            'created_at'    => isset($this->created_at) ? $this->created_at->format('Y-m-d H:i:s') : null,
+            'updated_at'    => isset($this->updated_at) ? $this->updated_at->format('Y-m-d H:i:s') : null,
+            'deleted_at'    => isset($this->deleted_at) ? $this->deleted_at->format('Y-m-d H:i:s') : null,
             'sectors'   =>  SectorResource::collection( $this->whenLoaded('sectors') )
         ];
     }

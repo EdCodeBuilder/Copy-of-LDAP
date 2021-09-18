@@ -108,6 +108,7 @@ return [
         'email'          =>  'email',
         'observations_count'          =>  'cantidad de observaciones',
         'files_count'          =>  'cantidad de archivos',
+        'pending_files_count'          =>  'cantidad de archivos pendientes por validación',
         'verified_at'          =>  'verificado',
         'citizen_portal'      =>  'portal ciudadano',
         'generated_by' => 'generado por',

@@ -6,6 +6,7 @@ namespace App\Modules\CitizenPortal\src\Request;
 
 
 use App\Modules\CitizenPortal\src\Constants\Roles;
+use App\Modules\CitizenPortal\src\Models\Stage;
 use App\Modules\Parks\src\Models\Park;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -18,7 +19,10 @@ class StageRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->user()->isAn(...Roles::onlyAdmin());
+        $permission = toLower($this->getMethod()) == 'post'
+            ? Roles::can(Stage::class,'create_or_manage', true)
+            : Roles::can(Stage::class,'update_or_manage', true);
+        return auth('api')->user()->hasAnyPermission($permission);
     }
 
     /**

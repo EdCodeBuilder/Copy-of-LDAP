@@ -46,7 +46,15 @@ class ProfilesExport implements FromQuery, WithMapping, WithHeadings, WithColumn
     {
         $request = $this->request;
         return ProfileView::query()
-            ->withCount(['observations', 'files'])
+            ->withCount(
+                [
+                    'observations',
+                    'files',
+                    'files as pending_files_count' => function($query) {
+                        return $query->where('status_id', "!=", Profile::VERIFIED);
+                    },
+                ]
+            )
             ->when($request->has('query'), function ($query) use ($request) {
                 $keys = Profile::search($request->get('query'))->get(['id'])->pluck('id')->toArray();
                 return $query->whereKey($keys);
@@ -140,6 +148,7 @@ class ProfilesExport implements FromQuery, WithMapping, WithHeadings, WithColumn
             toUpper(__('citizen.validations.checker_document')),
             toUpper(__('citizen.validations.observations_count')),
             toUpper(__('citizen.validations.files_count')),
+            toUpper(__('citizen.validations.pending_files_count')),
             toUpper(__('citizen.validations.created_at')),
             toUpper(__('citizen.validations.updated_at')),
         ];
@@ -161,10 +170,11 @@ class ProfilesExport implements FromQuery, WithMapping, WithHeadings, WithColumn
             'AN' => NumberFormat::FORMAT_NUMBER,
             'AO' => NumberFormat::FORMAT_NUMBER,
             'AP' => NumberFormat::FORMAT_NUMBER,
+            'AQ' => NumberFormat::FORMAT_NUMBER,
             'AI' => NumberFormat::FORMAT_DATE_YYYYMMDD2.' h'.NumberFormat::FORMAT_DATE_TIME4,
             'AL' => NumberFormat::FORMAT_DATE_YYYYMMDD2.' h'.NumberFormat::FORMAT_DATE_TIME4,
-            'AQ' => NumberFormat::FORMAT_DATE_YYYYMMDD2.' h'.NumberFormat::FORMAT_DATE_TIME4,
             'AR' => NumberFormat::FORMAT_DATE_YYYYMMDD2.' h'.NumberFormat::FORMAT_DATE_TIME4,
+            'AS' => NumberFormat::FORMAT_DATE_YYYYMMDD2.' h'.NumberFormat::FORMAT_DATE_TIME4,
         ];
     }
 
@@ -223,6 +233,7 @@ class ProfilesExport implements FromQuery, WithMapping, WithHeadings, WithColumn
             'checker_document'      =>  isset($row->checker_document) ? (string) $row->checker_document : null,
             'observations_count'      =>  isset($row->observations_count) ? (int) $row->observations_count : 0,
             'files_count'      =>  isset($row->files_count) ? (int) $row->files_count : 0,
+            'pending_files_count'      =>  isset($row->pending_files_count) ? (int) $row->pending_files_count : 0,
             'created_at'    =>  isset($row->created_at) ? $this->dateToExcel($row->created_at) : null,
             'updated_at'    =>  isset($row->updated_at) ? $this->dateToExcel($row->updated_at) : null,
         ];
@@ -236,7 +247,7 @@ class ProfilesExport implements FromQuery, WithMapping, WithHeadings, WithColumn
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $event->sheet->getDelegate()->insertNewRowBefore(1, 6);
-                $event->sheet->getDelegate()->mergeCells("A1:AR1");
+                $event->sheet->getDelegate()->mergeCells("A1:AS1");
                 $event->sheet->getDelegate()->getCell("A1")
                     ->setValue(toUpper(__('citizen.validations.citizen_portal')))
                     ->getStyle()
@@ -315,14 +326,14 @@ class ProfilesExport implements FromQuery, WithMapping, WithHeadings, WithColumn
                 foreach (range('A', 'Z') as $col) {
                     $event->sheet->getDelegate()->getColumnDimension($col)->setAutoSize(true);
                 }
-                foreach (range('A', 'R') as $col) {
+                foreach (range('A', 'S') as $col) {
                     $event->sheet->getDelegate()->getColumnDimension("A$col")->setAutoSize(true);
                 }
                 // $row = $this->rowNumb-1;
-                $row = $event->sheet->getDelegate()->getHighestDataRow('AR');
-                $event->sheet->getDelegate()->getStyle("A7:AR$row")
+                $row = $event->sheet->getDelegate()->getHighestDataRow('AS');
+                $event->sheet->getDelegate()->getStyle("A7:AS$row")
                     ->applyFromArray($styleArray);
-                $cells = "A7:AR7";
+                $cells = "A7:AS7";
                 $event->sheet->getDelegate()
                     ->getStyle($cells)
                     ->getFont()

@@ -6,6 +6,9 @@ namespace App\Modules\CitizenPortal\src\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\CitizenPortal\src\Constants\Roles;
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
+use App\Modules\CitizenPortal\src\Models\File;
+use App\Modules\CitizenPortal\src\Models\Profile;
 use App\Modules\CitizenPortal\src\Models\Status;
 use App\Modules\CitizenPortal\src\Request\StatusRequest;
 use App\Modules\CitizenPortal\src\Resources\StatusResource;
@@ -22,11 +25,30 @@ class StatusController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware(Roles::actions(Status::class, 'create'))
+        $this->middleware(
+            Roles::canAny([
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => Status::class
+                ],
+                ['model' => CitizenSchedule::class, 'actions' => 'status'],
+                ['model' => CitizenSchedule::class, 'actions' => 'view_or_manage'],
+                [
+                    'actions'   => ['status'],
+                    'model'     => File::class
+                ],
+                [
+                    'actions'   => ['status', 'view_or_manage', 'validator'],
+                    'model'     => Profile::class
+                ],
+            ], true, true)
+        )
+            ->only('index');
+        $this->middleware(Roles::actions(Status::class, 'create_or_manage'))
             ->only('store');
-        $this->middleware(Roles::actions(Status::class, 'update'))
+        $this->middleware(Roles::actions(Status::class, 'update_or_manage'))
             ->only('update');
-        $this->middleware(Roles::actions(Status::class, 'destroy'))
+        $this->middleware(Roles::actions(Status::class, 'destroy_or_manage'))
             ->only('destroy');
     }
 

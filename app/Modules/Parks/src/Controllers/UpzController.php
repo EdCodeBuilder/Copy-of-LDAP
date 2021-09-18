@@ -3,6 +3,7 @@
 namespace App\Modules\Parks\src\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Parks\src\Constants\Roles;
 use App\Modules\Parks\src\Models\Location;
 use App\Modules\Parks\src\Models\Upz;
 use App\Modules\Parks\src\Request\LocationRequest;
@@ -23,6 +24,10 @@ class UpzController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->middleware('auth:api')->except('index');
+        $this->middleware(Roles::actions(Upz::class, 'create_or_manage'))->only('store');
+        $this->middleware(Roles::actions(Upz::class, 'update_or_manage'))->only('update');
+        $this->middleware(Roles::actions(Upz::class, 'destroy_or_manage'))->only('destroy');
     }
 
     /**
@@ -47,7 +52,8 @@ class UpzController extends Controller
             $location->upz()
                 ->create([
                     'Upz'       =>  $request->get('name'),
-                    'cod_upz'   =>  $request->get('upz_code')
+                    'cod_upz'   =>  $request->get('upz_code'),
+                    'Tipo'   =>  $request->get('upz_type_id'),
                 ]);
             return $this->success_message(
                 __('validation.handler.success'),
@@ -75,6 +81,7 @@ class UpzController extends Controller
                 'Upz'           =>  $request->get('name'),
                 'cod_upz'       =>  $request->get('upz_code'),
                 'IdLocalidad'   =>  $request->get('locality_id'),
+                'Tipo'   =>  $request->get('upz_type_id'),
             ]);
             $upz->saveOrFail();
             return $this->success_message(
@@ -87,5 +94,21 @@ class UpzController extends Controller
                 $e->getMessage()
             );
         }
+    }
+
+    /**
+     * @param $location
+     * @param Upz $upz
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function destroy($location, Upz $upz)
+    {
+        $upz->delete();
+        return $this->success_message(
+            __('validation.handler.deleted'),
+            Response::HTTP_OK,
+            Response::HTTP_NO_CONTENT
+        );
     }
 }

@@ -2,7 +2,9 @@
 
 namespace App\Modules\Parks\src\Request;
 
-use App\Modules\Parks\src\Rules\ParkFinderRule;
+use App\Modules\Parks\src\Constants\Roles;
+use App\Modules\Parks\src\Models\Neighborhood;
+use App\Modules\Parks\src\Models\Upz;
 use Illuminate\Foundation\Http\FormRequest;
 
 class NeighborhoodRequest extends FormRequest
@@ -14,7 +16,10 @@ class NeighborhoodRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        $method = toLower($this->getMethod());
+        $action = in_array($method, ['put', 'patch']) ? 'update' : 'create';
+        return auth('api')->user()->can(Roles::can(Neighborhood::class, $action), Neighborhood::class) ||
+            auth('api')->user()->can(Roles::can(Neighborhood::class, 'manage'), Neighborhood::class);
     }
 
     /**
@@ -24,9 +29,12 @@ class NeighborhoodRequest extends FormRequest
      */
     public function rules()
     {
+        $neighborhood = new Neighborhood();
+        $upz = new Upz();
         return [
             'name'          => 'required|string|max:500',
-            'upz_code'      =>  'required|exists:mysql_parks.upz,cod_upz',
+            'neighborhood_code'      =>  "nullable|unique:{$neighborhood->getConnectionName()}.{$neighborhood->getTable()},CodBarrio",
+            'upz_code'      =>  "required|exists:{$upz->getConnectionName()}.{$upz->getTable()},cod_upz",
         ];
     }
 }

@@ -24,7 +24,7 @@ class UpdateRoleRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'  =>  'required|string|max:191|unique:mysql_ldap.roles,name,id,'.$this->route('role')->id,
+            'name'  =>  'required|string|max:191|unique:mysql_ldap.roles,name,'.$this->route('role')->id.',id',
             'title' =>  'required|string|max:191',
         ];
     }

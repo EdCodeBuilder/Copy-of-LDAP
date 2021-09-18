@@ -13,6 +13,19 @@ use App\Http\Resources\Auth\RoleResource;
 use App\Http\Resources\Auth\UserResource;
 use App\Models\Security\User;
 use App\Modules\CitizenPortal\src\Constants\Roles;
+use App\Modules\CitizenPortal\src\Models\Activity;
+use App\Modules\CitizenPortal\src\Models\AgeGroup;
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
+use App\Modules\CitizenPortal\src\Models\Day;
+use App\Modules\CitizenPortal\src\Models\File;
+use App\Modules\CitizenPortal\src\Models\FileType;
+use App\Modules\CitizenPortal\src\Models\Hour;
+use App\Modules\CitizenPortal\src\Models\Profile;
+use App\Modules\CitizenPortal\src\Models\ProfileType;
+use App\Modules\CitizenPortal\src\Models\Program;
+use App\Modules\CitizenPortal\src\Models\Schedule;
+use App\Modules\CitizenPortal\src\Models\Stage;
+use App\Modules\CitizenPortal\src\Models\Status;
 use App\Modules\CitizenPortal\src\Request\FindUserRequest;
 use App\Modules\CitizenPortal\src\Request\RoleRequest;
 use Illuminate\Http\JsonResponse;
@@ -20,6 +33,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\Http\Controllers\AccessTokenController;
+use OwenIt\Auditing\Models\Audit;
 use Silber\Bouncer\Database\Role;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 
@@ -33,6 +47,9 @@ class UserController extends LoginController
     public function __construct(AdldapInterface $ldap)
     {
         parent::__construct($ldap);
+        $this->middleware(Roles::actions(User::class, 'view_or_manage'))->only('index', 'findUsers', 'roles');
+        $this->middleware(Roles::actions(User::class, 'create_or_manage'))->only('store');
+        $this->middleware(Roles::actions(User::class, 'destroy_or_manage'))->only('destroy');
     }
 
     /**
@@ -107,112 +124,232 @@ class UserController extends LoginController
      */
     public function menu()
     {
-        $admins = Roles::onlyAdmin();
-        $everybody = Roles::allAndRoot();
+        $manageActions = ['manage', 'view', 'create', 'update', 'destroy'];
+        $isAuth = auth('api')->check();
+        $superAdmin = auth('api')->user()->isA('superadmin');
         $menu = collect([
             [
                 'icon'  =>  'mdi-security',
                 'title' =>  __('citizen.menu.roles'),
                 'to'    =>  [ 'name' => 'roles-and-permissions' ],
                 'exact' =>  true,
-                'can'   =>  auth('api')->check() && auth('api')->user()->isA('superadmin'),
+                'can'   =>  $isAuth && $superAdmin,
             ],
             [
                 'icon'  =>  'mdi-account-multiple-plus',
                 'title' =>  __('passport.menu.users'),
                 'to'    =>  [ 'name' => 'user-admin' ],
                 'exact' =>  true,
-                'can'   =>  auth('api')->check() && auth('api')->user()->isAn(...$admins)
+                'can'   =>  Roles::authCan(
+                    ['manage', 'view', 'create', 'update', 'destroy'],
+                    User::class,
+                    'or'
+                ) || $superAdmin
             ],
             [
                 'icon'  =>  'mdi-form-dropdown',
                 'title' =>  __('citizen.menu.data-management'),
-                'exact' =>  false,
-                'can'   =>  auth('api')->check() && auth('api')->user()->isA(...$admins),
-                'children'  => [
-                    [
-                        'title' =>  __('citizen.menu.status'),
-                        'to'    =>  [ 'name' => 'status' ],
-                        'exact' =>  true,
-                        'can'   =>  auth('api')->check() && auth('api')->user()->isA(...$admins)
-                    ],
-                    [
-                        'title' =>  __('citizen.menu.stages'),
-                        'to'    =>  [ 'name' => 'stages' ],
-                        'exact' =>  true,
-                        'can'   =>  auth('api')->check() && auth('api')->user()->isA(...$admins)
-                    ],
-                    [
-                        'title' =>  __('citizen.menu.programs'),
-                        'to'    =>  [ 'name' => 'programs' ],
-                        'exact' =>  true,
-                        'can'   =>  auth('api')->check() && auth('api')->user()->isA(...$admins)
-                    ],
-                    [
-                        'title' =>  __('citizen.menu.activities'),
-                        'to'    =>  [ 'name' => 'activities' ],
-                        'exact' =>  true,
-                        'can'   =>  auth('api')->check() && auth('api')->user()->isA(...$admins)
-                    ],
-                    [
-                        'title' =>  __('citizen.menu.age_group'),
-                        'to'    =>  [ 'name' => 'age-groups' ],
-                        'exact' =>  true,
-                        'can'   =>  auth('api')->check() && auth('api')->user()->isA(...$admins)
-                    ],
-                    [
-                        'title' =>  __('citizen.menu.week_days'),
-                        'to'    =>  [ 'name' => 'weekdays' ],
-                        'exact' =>  true,
-                        'can'   =>  auth('api')->check() && auth('api')->user()->isA(...$admins)
-                    ],
-                    [
-                        'title' =>  __('citizen.menu.daily_hours'),
-                        'to'    =>  [ 'name' => 'daily-hours' ],
-                        'exact' =>  true,
-                        'can'   =>  auth('api')->check() && auth('api')->user()->isA(...$admins)
-                    ],
-                    [
-                        'title' =>  __('citizen.menu.file_types'),
-                        'to'    =>  [ 'name' => 'file-types' ],
-                        'exact' =>  true,
-                        'can'   =>  auth('api')->check() && auth('api')->user()->isA(...$admins)
-                    ],
-                    [
-                        'title' =>  __('citizen.menu.profile_types'),
-                        'to'    =>  [ 'name' => 'profile-types' ],
-                        'exact' =>  true,
-                        'can'   =>  auth('api')->check() && auth('api')->user()->isA(...$admins)
-                    ],
-                ],
+                'exact' =>  true,
+                'can'   =>  auth('api')->user()->hasAnyPermission(
+                    Roles::canAny(
+                        [
+                            [
+                                'actions'   => $manageActions,
+                                'model'     => Status::class
+                            ],
+                            [
+                                'actions'   => $manageActions,
+                                'model'     => Stage::class
+                            ],
+                            [
+                                'actions'   => $manageActions,
+                                'model'     => Program::class
+                            ],
+                            [
+                                'actions'   => $manageActions,
+                                'model'     => Activity::class
+                            ],
+                            [
+                                'actions'   => $manageActions,
+                                'model'     => AgeGroup::class
+                            ],
+                            [
+                                'actions'   => $manageActions,
+                                'model'     => Day::class
+                            ],
+                            [
+                                'actions'   => $manageActions,
+                                'model'     => Hour::class
+                            ],
+                            [
+                                'actions'   => $manageActions,
+                                'model'     => FileType::class
+                            ],
+                            [
+                                'actions'   => $manageActions,
+                                'model'     => ProfileType::class
+                            ],
+                        ],
+                        false,
+                        true
+                    )
+                ) || $superAdmin,
+                'children'  => array_values(
+                    collect([
+                        [
+                            'title' =>  __('citizen.menu.status'),
+                            'to'    =>  [ 'name' => 'status' ],
+                            'exact' =>  false,
+                            'can'   =>  Roles::authCan(
+                                $manageActions,
+                                Status::class,
+                                'or'
+                            ) || $superAdmin,
+                        ],
+                        [
+                            'title' =>  __('citizen.menu.stages'),
+                            'to'    =>  [ 'name' => 'stages' ],
+                            'exact' =>  false,
+                            'can'   =>  Roles::authCan(
+                                $manageActions,
+                                Stage::class,
+                                'or'
+                            ) || $superAdmin,
+                        ],
+                        [
+                            'title' =>  __('citizen.menu.programs'),
+                            'to'    =>  [ 'name' => 'programs' ],
+                            'exact' =>  false,
+                            'can'   =>  Roles::authCan(
+                                $manageActions,
+                                Program::class,
+                                'or'
+                            ) || $superAdmin,
+                        ],
+                        [
+                            'title' =>  __('citizen.menu.activities'),
+                            'to'    =>  [ 'name' => 'activities' ],
+                            'exact' =>  false,
+                            'can'   =>  Roles::authCan(
+                                $manageActions,
+                                Activity::class,
+                                'or'
+                            ) || $superAdmin,
+                        ],
+                        [
+                            'title' =>  __('citizen.menu.age_group'),
+                            'to'    =>  [ 'name' => 'age-groups' ],
+                            'exact' =>  false,
+                            'can'   =>  Roles::authCan(
+                                $manageActions,
+                                AgeGroup::class,
+                                'or'
+                            ) || $superAdmin,
+                        ],
+                        [
+                            'title' =>  __('citizen.menu.week_days'),
+                            'to'    =>  [ 'name' => 'weekdays' ],
+                            'exact' =>  false,
+                            'can'   =>  Roles::authCan(
+                                $manageActions,
+                                Day::class,
+                                'or'
+                            ) || $superAdmin,
+                        ],
+                        [
+                            'title' =>  __('citizen.menu.daily_hours'),
+                            'to'    =>  [ 'name' => 'daily-hours' ],
+                            'exact' =>  false,
+                            'can'   =>  Roles::authCan(
+                                $manageActions,
+                                Hour::class,
+                                'or'
+                            ) || $superAdmin,
+                        ],
+                        [
+                            'title' =>  __('citizen.menu.file_types'),
+                            'to'    =>  [ 'name' => 'file-types' ],
+                            'exact' =>  false,
+                            'can'   =>  Roles::authCan(
+                                $manageActions,
+                                FileType::class,
+                                'or'
+                            ) || $superAdmin,
+                        ],
+                        [
+                            'title' =>  __('citizen.menu.profile_types'),
+                            'to'    =>  [ 'name' => 'profile-types' ],
+                            'exact' =>  false,
+                            'can'   =>  Roles::authCan(
+                                $manageActions,
+                                ProfileType::class,
+                                'or'
+                            ) || $superAdmin,
+                        ],
+                    ])->where('can', true)->toArray()
+                ),
             ],
             [
                 'icon'  =>  'mdi-view-dashboard',
                 'title' =>  __('citizen.menu.dashboard'),
                 'to'    =>  [ 'name' => 'home' ],
                 'exact' =>  true,
-                'can'   =>  auth('api')->check() && auth('api')->user()->isA(...$everybody),
+                'can'   =>  true,
             ],
             [
                 'icon'  =>  'mdi-account-multiple',
                 'title' =>  __('citizen.menu.user_validation'),
                 'to'    =>  [ 'name' => 'user-validation' ],
-                'exact' =>  true,
-                'can'   =>  auth('api')->check() && auth('api')->user()->isA(...$everybody),
+                'exact' =>  false,
+                'can'   => auth('api')->user()->hasAnyPermission(
+                    Roles::canAny(
+                        [
+                            [
+                                'actions'   => array_merge($manageActions, ['status', 'validator']),
+                                'model'     => Profile::class
+                            ],
+                            [
+                                'actions'   => array_merge($manageActions, ['status']),
+                                'model'     => File::class
+                            ],
+                        ],
+                        false,
+                        true
+                    )
+                ) || $superAdmin,
             ],
             [
                 'icon'  =>  'mdi-calendar',
                 'title' =>  __('citizen.menu.schedules'),
                 'to'    =>  [ 'name' => 'schedules' ],
-                'exact' =>  true,
-                'can'   =>  auth('api')->check() && auth('api')->user()->isA(...$everybody)
+                'exact' =>  false,
+                'can'   => auth('api')->user()->hasAnyPermission(
+                    Roles::canAny(
+                        [
+                            [
+                                'actions'   => $manageActions,
+                                'model'     => Schedule::class
+                            ],
+                            [
+                                'actions'   => array_merge($manageActions, ['status']),
+                                'model'     => CitizenSchedule::class
+                            ],
+                        ],
+                        true,
+                        true
+                    )
+                )  || $superAdmin
             ],
             [
                 'icon'  =>  'mdi-magnify',
                 'title' =>  __('citizen.menu.audit'),
                 'to'    =>  [ 'name' => 'audit' ],
                 'exact' =>  true,
-                'can'   =>  auth('api')->check() && auth('api')->user()->isA(...$admins),
+                'can'   =>  Roles::authCan(
+                            ['view'],
+                            Audit::class,
+                            'or'
+                        )  || $superAdmin,
             ],
         ]);
 

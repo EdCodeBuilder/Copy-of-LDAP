@@ -1,9 +1,11 @@
 <?php
 
 use App\Modules\Parks\src\Controllers\AuditController;
+use App\Modules\Parks\src\Controllers\CertifiedStatusController;
 use App\Modules\Parks\src\Controllers\EnclosureController;
 use App\Modules\Parks\src\Controllers\MapController;
 use App\Modules\Parks\src\Controllers\NeighborhoodController;
+use App\Modules\Parks\src\Controllers\OriginController;
 use App\Modules\Parks\src\Controllers\PermissionsController;
 use App\Modules\Parks\src\Controllers\RoleController;
 use App\Modules\Parks\src\Controllers\RolePermissionsController;
@@ -17,6 +19,7 @@ use App\Modules\Parks\src\Controllers\StatsController;
 use App\Modules\Parks\src\Controllers\StatusController;
 use App\Modules\Parks\src\Controllers\StoryController;
 use App\Modules\Parks\src\Controllers\UpzController;
+use App\Modules\Parks\src\Controllers\UpzTypeController;
 use App\Modules\Parks\src\Controllers\UserController;
 use App\Modules\Parks\src\Controllers\VocationController;
 use Illuminate\Support\Facades\Route;
@@ -26,43 +29,52 @@ Route::prefix('api')->group( function () {
        Route::get('config', [MapController::class, 'map']);
     });
     Route::resource('localities', LocationController::class, [
-        'only'     =>     ['index', 'store', 'update'],
+        'only'     =>     ['index', 'store', 'update', 'destroy'],
         'parameters' =>     ['localities' => 'location']
     ]);
-    Route::resource('localities.upz', LocationController::class, [
-        'only'     =>     ['index', 'store', 'update'],
-        'parameters' =>     ['localities' => 'location', 'upz' => 'upz']
-    ]);
     Route::resource('localities.upz', UpzController::class, [
-        'only'     =>     ['index', 'store', 'update'],
+        'only'     =>     ['index', 'store', 'update', 'destroy'],
         'parameters' =>     ['localities' => 'location', 'upz' => 'upz']
     ]);
     Route::resource('localities.upz.neighborhoods', NeighborhoodController::class, [
-        'only'     =>  ['index', 'store', 'update'],
+        'only'     =>  ['index', 'store', 'update', 'destroy'],
         'parameters' =>  ['localities' => 'location', 'upz' => 'upz', 'neighborhoods' => 'neighborhood']
     ]);
 
     Route::resource('stage-types', StageTypeController::class, [
-        'only'     =>  ['index', 'store', 'update'],
+        'only'     =>  ['index', 'store', 'update', 'destroy'],
         'parameters' =>  ['stage-types' => 'stage']
     ]);
 
     Route::resource('scales', ScaleController::class, [
-        'only'     =>  ['index', 'store', 'update'],
+        'only'     =>  ['index', 'store', 'update', 'destroy'],
         'parameters' =>  ['scales' => 'scale']
     ]);
 
     Route::resource('enclosures', EnclosureController::class, [
-        'only'     =>  ['index', 'store', 'update'],
+        'only'     =>  ['index', 'store', 'update', 'destroy'],
         'parameters' =>  ['enclosures' => 'enclosure']
     ]);
 
     Route::resource('vocations', VocationController::class, [
-        'only'     =>  ['index', 'store', 'update'],
+        'only'     =>  ['index', 'store', 'update', 'destroy'],
         'parameters' =>  ['vocations' => 'vocation']
     ]);
 
-    Route::get('statuses', [StatusController::class, 'index']);
+    Route::resource('upz-types', UpzTypeController::class, [
+        'only'     =>  ['index', 'store', 'update', 'destroy'],
+        'parameters' =>  ['upz-types' => 'types']
+    ]);
+
+    Route::resource('certificate-status', CertifiedStatusController::class, [
+        'only'     =>  ['index', 'store', 'update', 'destroy'],
+        'parameters' =>  ['certificate-status' => 'certified']
+    ]);
+
+    Route::resource('statuses', StatusController::class, [
+        'only'     =>  ['index', 'store', 'update', 'destroy'],
+        'parameters' =>  ['statuses' => 'status']
+    ]);
     Route::get('type-zones', [StatusController::class, 'type_zones']);
     Route::get('concerns', [StatusController::class, 'concerns']);
     Route::get('vigilance', [StatusController::class, 'vigilance']);
@@ -97,7 +109,7 @@ Route::prefix('api')->group( function () {
         Route::get('{park}/sectors', [ParkController::class, 'sectors']);
         Route::get('{park}/equipment/{equipment}', [ParkController::class, 'fields']);
 
-        Route::middleware(['auth:api', 'can:manage-users-parks,App\Modules\Parks\src\Models\Park'])->prefix('users')->group(function () {
+        Route::middleware('auth:api')->prefix('users')->group(function () {
             Route::get('', [UserController::class, 'index']);
             Route::get('/roles', [UserController::class, 'roles']);
             Route::post('/roles/{user}', [UserController::class, 'store']);
@@ -137,5 +149,9 @@ Route::prefix('api')->group( function () {
     Route::resource('parks.stories', StoryController::class, [
         'only'  => ['index', 'store', 'update', 'destroy'],
         'parameters' => [ 'parks' => 'park', 'stories' => 'story' ]
+    ]);
+    Route::resource('parks.origin', OriginController::class, [
+        'only'  => ['index', 'store', 'update', 'destroy'],
+        'parameters' => [ 'parks' => 'park', 'origin' => 'origin' ]
     ]);
 });

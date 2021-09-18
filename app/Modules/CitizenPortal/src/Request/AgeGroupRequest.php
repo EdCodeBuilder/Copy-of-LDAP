@@ -6,6 +6,7 @@ namespace App\Modules\CitizenPortal\src\Request;
 
 
 use App\Modules\CitizenPortal\src\Constants\Roles;
+use App\Modules\CitizenPortal\src\Models\AgeGroup;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AgeGroupRequest extends FormRequest
@@ -17,7 +18,10 @@ class AgeGroupRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->user()->isAn(...Roles::onlyAdmin());
+        $permission = toLower($this->getMethod()) == 'post'
+            ? Roles::can(AgeGroup::class,'create_or_manage', true)
+            : Roles::can(AgeGroup::class,'update_or_manage', true);
+        return auth('api')->user()->hasAnyPermission($permission);
     }
 
     /**
@@ -29,8 +33,8 @@ class AgeGroupRequest extends FormRequest
     {
         return [
             'name'             =>  'required|string|min:3|max:50',
-            'min'      =>  'required|numeric|between:0,100|lte:max_age',
-            'max'      =>  'required|numeric|between:0,100|gte:min_age',
+            'min'      =>  'required|numeric|between:0,100|lte:max',
+            'max'      =>  'required|numeric|between:0,100|gte:min',
         ];
     }
 

@@ -6,7 +6,9 @@ namespace App\Modules\CitizenPortal\src\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\CitizenPortal\src\Constants\Roles;
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
 use App\Modules\CitizenPortal\src\Models\Day;
+use App\Modules\CitizenPortal\src\Models\Schedule;
 use App\Modules\CitizenPortal\src\Request\ActivityRequest;
 use App\Modules\CitizenPortal\src\Request\WeekDayRequest;
 use App\Modules\CitizenPortal\src\Resources\DayResource;
@@ -22,11 +24,26 @@ class WeekDayController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware(Roles::actions(Day::class, 'create'))
+        $this->middleware(
+            Roles::canAny([
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => Day::class
+                ],
+                ['model' => CitizenSchedule::class, 'actions' => 'status'],
+                ['model' => CitizenSchedule::class, 'actions' => 'view_or_manage'],
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => Schedule::class
+                ],
+            ], true, true)
+        )
+            ->only('index');
+        $this->middleware(Roles::actions(Day::class, 'create_or_manage'))
             ->only('store');
-        $this->middleware(Roles::actions(Day::class, 'update'))
+        $this->middleware(Roles::actions(Day::class, 'update_or_manage'))
             ->only('update');
-        $this->middleware(Roles::actions(Day::class, 'destroy'))
+        $this->middleware(Roles::actions(Day::class, 'destroy_or_manage'))
             ->only('destroy');
     }
 

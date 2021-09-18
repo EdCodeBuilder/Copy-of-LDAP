@@ -24,7 +24,7 @@ class UpdatePermissionRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'  =>  'required|string|max:191|unique:mysql_ldap.abilities,name,id,'.$this->route('permission')->id,
+            'name'  =>  'required|string|max:191|unique:mysql_ldap.abilities,name,'.$this->route('permission')->id.',id',
             'title' =>  'required|string|max:191',
             'entity_type' =>  'required|string|max:191',
         ];

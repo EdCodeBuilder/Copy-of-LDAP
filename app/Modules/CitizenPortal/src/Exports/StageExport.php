@@ -38,8 +38,8 @@ class StageExport implements FromQuery, WithMapping, WithHeadings, WithColumnFor
      */
     public function headings(): array {
         return [
-            'ID',
             toUpper(__('citizen.validations.name')),
+            'ID',
         ];
     }
 
@@ -49,7 +49,7 @@ class StageExport implements FromQuery, WithMapping, WithHeadings, WithColumnFor
     public function columnFormats(): array
     {
         return [
-            'A' => NumberFormat::FORMAT_NUMBER,
+            'B' => NumberFormat::FORMAT_NUMBER,
         ];
     }
 
@@ -61,8 +61,8 @@ class StageExport implements FromQuery, WithMapping, WithHeadings, WithColumnFor
     {
         $id = isset( $row->id ) ? (int) $row->id : null;
         return [
-            'A'    =>  isset( $row->id ) ? (int) $row->id : null,
             'B'    =>  isset($row->name) ? "$id - $row->name" : null,
+            'A'    =>  $id
         ];
     }
 

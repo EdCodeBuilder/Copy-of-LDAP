@@ -3,6 +3,7 @@
 namespace App\Modules\Parks\src\Controllers;
 
 use App\Modules\Parks\src\Exports\DashboardExport;
+use App\Modules\Parks\src\Exports\Excel as ExcelRaw;
 use App\Modules\Parks\src\Models\Location;
 use App\Modules\Parks\src\Models\Park;
 use App\Modules\Parks\src\Models\Scale;
@@ -112,7 +113,7 @@ class StatsController extends Controller
         return $this->success_message([
             'name'  =>  'Parques Certificados',
             'value' =>  $data,
-            'percent' => round($data * 100 / $total, 2)
+            'percent' => $total == 0 ? 0 : round($data * 100 / $total, 2)
         ]);
     }
 
@@ -160,21 +161,45 @@ class StatsController extends Controller
 
     /**
      * @param Request $request
-     * @return Response|BinaryFileResponse
+     * @return JsonResponse
      */
     public function excel(Request $request)
     {
-        return (new DashboardExport($request))->download('REPORTE_PARQUES.xlsx', Excel::XLSX);
+        $file = ExcelRaw::raw(new DashboardExport($request), Excel::XLSX);
+        $name = random_img_name();
+        $response =  array(
+            'name' => toUpper(str_replace(' ', '-', __('parks.excel.title')))."-$name.xlsx",
+            'file' => "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,".base64_encode($file),
+        );
+        return $this->success_message($response);
     }
 
+    /**
+     * @param $query
+     * @param Request $request
+     * @return mixed
+     */
     public function makeFilters($query, Request $request)
     {
+        $park = new Park();
         return $query
                 ->when($request->has('location'), function ($query) use ($request) {
-                    if (count($request->get('location')) > 0)
-                        return $query->whereIn('Id_Localidad', $request->get('location'));
-
-                    return $query;
+                    $localities = $request->get('location');
+                    return is_array($localities)
+                        ? $query->whereIn('Id_Localidad', $localities)
+                        : $query->where('Id_Localidad', $localities);
+                })
+                ->when($request->has('upz'), function ($query) use ($request,$park) {
+                    $upz = $request->get('upz');
+                    return is_array($upz)
+                        ? $query->whereIn("{$park->getTable()}.Upz", $upz)
+                        : $query->where("{$park->getTable()}.Upz", $upz);
+                })
+                ->when($request->has('neighborhood'), function ($query) use ($request) {
+                    $neighborhood = $request->get('neighborhood');
+                    return is_array($neighborhood)
+                        ? $query->whereIn('Id_Barrio', $neighborhood)
+                        : $query->where('Id_Barrio', $neighborhood);
                 })
                 ->when($request->has('certified'), function ($query) use ($request) {
                     if ($request->get('certified') == 'certified')
@@ -194,18 +219,6 @@ class StatsController extends Controller
                 ->when($request->has('park_type'), function ($query) use ($request) {
                     if (is_array($request->get('park_type')) && count($request->get('park_type')) > 0)
                         return $query->whereIn('Id_Tipo', $request->get('park_type'));
-                    return $query;
-                })
-                ->when($request->has('location'), function ($query) use ($request) {
-                    if (count($request->get('location')) > 0)
-                        return $query->whereIn('Id_Localidad', $request->get('location'));
-
-                    return $query;
-                })
-                ->when($request->has('upz'), function ($query) use ($request) {
-                    if (count($request->get('upz')) > 0)
-                        return $query->whereIn('Upz', $request->get('upz'));
-
                     return $query;
                 })
                 ->when($request->has('admin'), function ($query) use ($request) {

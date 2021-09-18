@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Park extends Model implements Auditable
 {
-    use \OwenIt\Auditing\Auditable, FullTextSearch;
+    use \OwenIt\Auditing\Auditable, FullTextSearch, SoftDeletes;
 
     /**
      * The connection name for the model.
@@ -99,11 +100,11 @@ class Park extends Model implements Auditable
     ];
 
     /**
-     * Indicates if the model should be timestamped.
+     * The attributes that should be mutated to dates.
      *
-     * @var bool
+     * @var array
      */
-    public $timestamps = false;
+    protected $dates = ['FechaVisita'];
 
     /*
     * ---------------------------------------------------------
@@ -255,18 +256,6 @@ class Park extends Model implements Auditable
     public function setDireccionAttribute($value)
     {
         $this->attributes['Direccion'] = toUpper($value);
-    }
-
-    /**
-     * Set value in uppercase
-     *
-     * @param $value
-     */
-    public function getFechaVisitaAttribute($value)
-    {
-        return valiateDate($value)
-            ? Carbon::parse($value)->format('Y-m-d')
-            : $value;
     }
 
     /*
@@ -422,6 +411,16 @@ class Park extends Model implements Auditable
     public function vocation()
     {
         return $this->hasOne(Vocation::class, 'id','Id_Vocacion');
+    }
+
+    /**
+     * Park has one history
+     *
+     * @return HasOne
+     */
+    public function history()
+    {
+        return $this->hasOne(Origin::class, 'IdParque','Id');
     }
 
     /**

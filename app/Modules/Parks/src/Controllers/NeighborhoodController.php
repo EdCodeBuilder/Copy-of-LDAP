@@ -3,6 +3,7 @@
 namespace App\Modules\Parks\src\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Parks\src\Constants\Roles;
 use App\Modules\Parks\src\Models\Location;
 use App\Modules\Parks\src\Models\Neighborhood;
 use App\Modules\Parks\src\Models\Upz;
@@ -24,6 +25,10 @@ class NeighborhoodController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->middleware('auth:api')->except('index');
+        $this->middleware(Roles::actions(Neighborhood::class, 'create_or_manage'))->only('store');
+        $this->middleware(Roles::actions(Neighborhood::class, 'update_or_manage'))->only('update');
+        $this->middleware(Roles::actions(Neighborhood::class, 'destroy_or_manage'))->only('destroy');
     }
 
     /**
@@ -50,7 +55,8 @@ class NeighborhoodController extends Controller
             $upz->neighborhoods()
                 ->create([
                     'Barrio'       =>  $request->get('name'),
-                    'CodUpz'   =>  $request->get('upz_code')
+                    'CodUpz'   =>  $request->get('upz_code'),
+                    'CodBarrio'   =>  $request->get('neighborhood_code'),
                 ]);
             return $this->success_message(
                 __('validation.handler.success'),
@@ -77,7 +83,8 @@ class NeighborhoodController extends Controller
         try {
             $neighborhood->fill([
                 'Barrio'       =>  $request->get('name'),
-                'CodUpz'  =>  $request->get('upz_code')
+                'CodUpz'  =>  $request->get('upz_code'),
+                'CodBarrio'   =>  $request->get('neighborhood_code'),
             ]);
             $neighborhood->saveOrFail();
             return $this->success_message(
@@ -90,5 +97,22 @@ class NeighborhoodController extends Controller
                 $e->getMessage()
             );
         }
+    }
+
+    /**
+     * @param $location
+     * @param $upz
+     * @param Neighborhood $neighborhood
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function destroy($location, $upz, Neighborhood $neighborhood)
+    {
+        $neighborhood->delete();
+        return $this->success_message(
+            __('validation.handler.deleted'),
+            Response::HTTP_OK,
+            Response::HTTP_NO_CONTENT
+        );
     }
 }

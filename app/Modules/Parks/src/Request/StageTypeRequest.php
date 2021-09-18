@@ -2,6 +2,8 @@
 
 namespace App\Modules\Parks\src\Request;
 
+use App\Modules\Parks\src\Constants\Roles;
+use App\Modules\Parks\src\Models\StageType;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StageTypeRequest extends FormRequest
@@ -13,7 +15,10 @@ class StageTypeRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        $method = toLower($this->getMethod());
+        $action = in_array($method, ['put', 'patch']) ? 'update' : 'create';
+        return auth('api')->user()->can(Roles::can(StageType::class, $action), StageType::class) ||
+            auth('api')->user()->can(Roles::can(StageType::class, 'manage'), StageType::class);
     }
 
     /**

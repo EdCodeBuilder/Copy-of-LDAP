@@ -5,6 +5,7 @@ namespace App\Modules\CitizenPortal\src\Request;
 
 
 
+use App\Models\Security\User;
 use App\Modules\CitizenPortal\src\Constants\Roles;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -17,7 +18,9 @@ class FindUserRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->user()->isAn(...Roles::onlyAdmin());
+        return auth('api')->user()->hasAnyPermission(
+            Roles::can(User::class, 'view_or_manage', true)
+        );
     }
 
     /**

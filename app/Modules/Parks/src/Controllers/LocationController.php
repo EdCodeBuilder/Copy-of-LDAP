@@ -3,6 +3,7 @@
 namespace App\Modules\Parks\src\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Parks\src\Constants\Roles;
 use App\Modules\Parks\src\Models\Location;
 use App\Modules\Parks\src\Models\Upz;
 use App\Modules\Parks\src\Request\LocationRequest;
@@ -22,6 +23,10 @@ class LocationController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->middleware('auth:api')->except('index');
+        $this->middleware(Roles::actions(Location::class, 'create_or_manage'))->only('store');
+        $this->middleware(Roles::actions(Location::class, 'update_or_manage'))->only('update');
+        $this->middleware(Roles::actions(Location::class, 'destroy_or_manage'))->only('destroy');
     }
 
     /**
@@ -78,5 +83,20 @@ class LocationController extends Controller
                 $e->getMessage()
             );
         }
+    }
+
+    /**
+     * @param Location $location
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function destroy(Location $location)
+    {
+        $location->delete();
+        return $this->success_message(
+            __('validation.handler.deleted'),
+            Response::HTTP_OK,
+            Response::HTTP_NO_CONTENT
+        );
     }
 }

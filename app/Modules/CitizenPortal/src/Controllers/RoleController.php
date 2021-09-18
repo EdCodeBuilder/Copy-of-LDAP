@@ -21,6 +21,8 @@ class RoleController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->middleware('role:superadmin')
+            ->only('index', 'store', 'update', 'destroy');
     }
 
     /**

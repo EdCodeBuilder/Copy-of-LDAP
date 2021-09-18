@@ -5,9 +5,11 @@ namespace App\Modules\CitizenPortal\src\Exports;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Events\BeforeExport;
 use Maatwebsite\Excel\Events\BeforeWriting;
 use Maatwebsite\Excel\Writer;
+use PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\NamedRange;
@@ -96,16 +98,16 @@ class TemplateExport implements WithMultipleSheets, WithEvents
                     "Por favor utiliza el número 1 para SI y 0 para NO."
                 );
 
-                $this->setSelectors($writer->writer, 'B2', 'PROGRAMAS', 'B', 'programs_list');
-                $this->setSelectors($writer->writer, 'D2', 'ACTIVIDADES', 'B', 'activities_list');
-                $this->setSelectors($writer->writer, 'F2', 'ESCENARIOS', 'B', 'stages_list');
-                $this->setSelectors($writer->writer, 'H2', 'DIAS', 'B', 'days_list');
-                $this->setSelectors($writer->writer, 'J2', 'HORAS', 'B', 'hours_list');
-                $this->setLookup($writer->writer, 'A2', 'MASIVOS', 'B', 'programs_list');
-                $this->setLookup($writer->writer, 'C2', 'MASIVOS', 'D', 'activities_list');
-                $this->setLookup($writer->writer, 'E2', 'MASIVOS', 'F', 'stages_list');
-                $this->setLookup($writer->writer, 'G2', 'MASIVOS', 'H', 'days_list');
-                $this->setLookup($writer->writer, 'I2', 'MASIVOS', 'J', 'hours_list');
+                $this->setSelectors($writer->writer, 'B2', 'PROGRAMAS', 'A', 'programs_list', 'B');
+                $this->setSelectors($writer->writer, 'D2', 'ACTIVIDADES', 'A', 'activities_list', 'B');
+                $this->setSelectors($writer->writer, 'F2', 'ESCENARIOS', 'A', 'stages_list', 'B');
+                $this->setSelectors($writer->writer, 'H2', 'DIAS', 'A', 'days_list', 'B');
+                $this->setSelectors($writer->writer, 'J2', 'HORAS', 'A', 'hours_list', 'B');
+                $this->setLookup($writer->writer, 'A2', 'MASIVOS', 'B2', 'programs_list');
+                $this->setLookup($writer->writer, 'C2', 'MASIVOS', 'D2', 'activities_list');
+                $this->setLookup($writer->writer, 'E2', 'MASIVOS', 'F2', 'stages_list');
+                $this->setLookup($writer->writer, 'G2', 'MASIVOS', 'H2', 'days_list');
+                $this->setLookup($writer->writer, 'I2', 'MASIVOS', 'J2', 'hours_list');
             }
         ];
     }
@@ -118,11 +120,13 @@ class TemplateExport implements WithMultipleSheets, WithEvents
      * @param $range_name
      * @throws Exception
      */
-    public function setSelectors(Writer $writer, $target_cell, $source_sheet_name, $source_row, $range_name)
+    public function setSelectors(Writer $writer, $target_cell, $source_sheet_name, $source_row, $range_name, $ids)
     {
         $source_sheet = $writer->getDelegate()->getSheetByName($source_sheet_name);
         $max_data_row = $source_sheet->getHighestRow($source_row);
         $sheet = $writer->getDelegate()->getSheetByName('MASIVOS');
+        $sheet->getParent()->addNamedRange( new NamedRange("{$range_name}_headers", $source_sheet, "{$source_row}1:{$ids}1") );
+        $sheet->getParent()->addNamedRange( new NamedRange("{$range_name}_data", $source_sheet, "{$source_row}2:{$ids}{$max_data_row}") );
         $sheet->getParent()->addNamedRange( new NamedRange($range_name, $source_sheet, "{$source_row}2:{$source_row}{$max_data_row}") );
         $sheet->getCell($target_cell)->getDataValidation()->setType(DataValidation::TYPE_LIST);
         $sheet->getCell($target_cell)->getDataValidation()->setErrorStyle(DataValidation::STYLE_INFORMATION);
@@ -139,9 +143,17 @@ class TemplateExport implements WithMultipleSheets, WithEvents
 
     public function setLookup(Writer $writer, $target_cell, $target_sheet_name, $source_row, $range_name)
     {
-        $sheet = $writer->getDelegate()->getSheetByName($target_sheet_name);
+        /*
+        $match_names = "MATCH($target_sheet_name!$source_row,$range_name,0)";
+        $index = "INDEX({$range_name}_data,$match_names,$match_header)";
+        */
         $error = '""';
-        $sheet->getCell($target_cell)->setValue("=IFERROR(MATCH({$source_row}2,$range_name,0),$error)");
+        $identifier = '"ID"';
+        $match_header = "MATCH($identifier,{$range_name}_headers,0)";
+        $lookup = "VLOOKUP($source_row,{$range_name}_data,$match_header,0)";
+        $formula = "=IFERROR($lookup,$error)";
+        $writer->getDelegate()->getSheetByName($target_sheet_name)
+                                ->setCellValue($target_cell, $formula);
     }
 
     public function setComment(Writer $writer, $sheet_name, $target, $title, $text)

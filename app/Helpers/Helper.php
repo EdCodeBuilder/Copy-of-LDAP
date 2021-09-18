@@ -1,6 +1,8 @@
 <?php
 
 use Carbon\Carbon;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 
 if ( !function_exists('toUpper') ) {
     /**
@@ -339,5 +341,25 @@ if ( ! function_exists('str_ends_with') ) {
 if ( ! function_exists('class_dash_name') ) {
     function class_dash_name($class) {
         return strtolower(preg_replace('/([a-zA-Z])(?=[A-Z])/', '$1-', class_basename($class)));
+    }
+}
+
+if ( ! function_exists('verify_url') ) {
+    /**
+     * @param $url
+     * @return bool
+     */
+    function verify_url($url) {
+        try {
+            if ($url == null) {
+                return false;
+            }
+            $client = new Client();
+            $data = $client->head( $url );
+            $status = $data->getStatusCode();
+            return $status >= 200 && $status < 300;
+        } catch (ClientException $e) {
+            return false;
+        }
     }
 }

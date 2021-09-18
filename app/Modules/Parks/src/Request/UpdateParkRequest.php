@@ -2,6 +2,15 @@
 
 namespace App\Modules\Parks\src\Request;
 
+use App\Modules\Parks\src\Constants\Roles;
+use App\Modules\Parks\src\Models\Location;
+use App\Modules\Parks\src\Models\Neighborhood;
+use App\Modules\Parks\src\Models\Park;
+use App\Modules\Parks\src\Models\Scale;
+use App\Modules\Parks\src\Models\StageType;
+use App\Modules\Parks\src\Models\Status;
+use App\Modules\Parks\src\Models\Upz;
+use App\Modules\Parks\src\Models\Vocation;
 use App\Modules\Parks\src\Rules\ParkFinderRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -14,7 +23,8 @@ class UpdateParkRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return auth('api')->user()->can(Roles::can(Park::class, 'update'), Park::class) ||
+            auth('api')->user()->can(Roles::can(Park::class, 'manage'), Park::class);
     }
 
     /**
@@ -24,14 +34,22 @@ class UpdateParkRequest extends FormRequest
      */
     public function rules()
     {
+        $locality = new Location();
+        $upz = new Upz();
+        $neighborhood = new Neighborhood();
+        $park = new Park();
+        $scale = new Scale();
+        $stage = new StageType();
+        $status = new Status();
+        $vocation = new Vocation();
         return [
-            'code'                  =>  'required|string|min:1|max:20|unique:mysql_parks.parque,Id_IDRD,'.$this->route('park')->Id,
+            'code'                  =>  "required|string|min:1|max:20|unique:{$park->getConnectionName()}.{$park->getTable()},Id_IDRD,{$this->route('park')->Id}",
             'name'                  =>  'required|string|min:3|max:200',
             'address'               =>  'required|string|min:3|max:120',
             'stratum'               =>  'required|numeric|min:1|max:10',
-            'locality_id'           =>  'required|numeric|exists:mysql_parks.localidad,Id_Localidad',
-            'upz_code'              =>  'required|exists:mysql_parks.upz,cod_upz',
-            'neighborhood_id'       =>  'required|numeric|exists:mysql_parks.Barrios,IdBarrio',
+            'locality_id'           =>  "required|numeric|exists:{$locality->getConnectionName()}.{$locality->getTable()},{$locality->getKeyName()}",
+            'upz_code'              =>  "required|exists:{$upz->getConnectionName()}.{$upz->getTable()},cod_upz",
+            'neighborhood_id'       =>  "required|numeric|exists:{$neighborhood->getConnectionName()}.{$neighborhood->getTable()},{$neighborhood->getKeyName()}",
             'urbanization'          =>  'required|string|min:3',
             'latitude'              =>  ['nullable','regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
             'longitude'             =>  ['nullable','regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/'],
@@ -50,19 +68,19 @@ class UpdateParkRequest extends FormRequest
             'access_roads'          =>  'nullable|string|max:20',
             'access_roads_status'   =>  'nullable|string|min:3|max:30',
             'zone_type'             =>  'nullable|string|min:3|max:30',
-            'scale_id'              =>  'nullable|numeric|exists:mysql_parks.tipo,Id_Tipo',
+            'scale_id'              =>  "nullable|numeric|exists:{$scale->getConnectionName()}.{$scale->getTable()},{$scale->getKeyName()}",
             'concern'               =>  'nullable|string|min:3|max:500',
             'visited_at'            =>  'nullable|date|date_format:Y-m-d',
             'general_status'        =>  'nullable|string|min:3|max:30',
-            'stage_type_id'         =>  'nullable|numeric|exists:mysql_parks.TipoEscenario,id',
-            'status_id'             =>  'nullable|numeric|exists:mysql_parks.estado,Id_Estado',
+            'stage_type_id'         =>  "nullable|numeric|exists:{$stage->getConnectionName()}.{$stage->getTable()},{$stage->getKeyName()}",
+            'status_id'             =>  "nullable|numeric|exists:{$status->getConnectionName()}.{$status->getTable()},{$status->getKeyName()}",
             'admin'                 =>  'nullable|string|min:3|max:50',
             'phone'                 =>  'nullable|numeric',
             'email'                 =>  'nullable|email',
             'admin_name'            =>  'nullable|string|min:3|max:500',
             'vigilance'             =>  'nullable|string',
             'received'              =>  'nullable|string',
-            'vocation_id'           =>  'nullable|numeric|exists:mysql_parks.Inventario_TIPOVOCACION,id',
+            'vocation_id'           =>  "nullable|numeric|exists:{$vocation->getConnectionName()}.{$vocation->getTable()},{$vocation->getKeyName()}",
         ];
     }
 

@@ -89,7 +89,7 @@ class RouteServiceProvider extends ServiceProvider
     public function mapParksRoutes()
     {
         Route::middleware('api')
-            ->group(base_path('routes/sub_routes/parks/parks.php'));
+            ->group(base_path('app/Modules/Parks/src/routes/api.php'));
     }
 
     public function mapContractorsRoutes()

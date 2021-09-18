@@ -30,7 +30,7 @@ Route::prefix('citizen-portal')->group(function () {
         Route::put('profiles/{profile}/status', [ProfileController::class, 'status']);
         Route::get('profiles/excel', [ProfileController::class, 'excel']);
         Route::resource('schedules.profiles', ProfileScheduleController::class, [
-            'only'     =>  ['index', 'store', 'update'],
+            'only'     =>  ['index', 'store', 'update', 'show'],
             'parameters' =>  ['schedules' => 'schedule', 'profiles' => 'profile']
         ]);
         Route::resource('profiles.observations', ObservationController::class, [

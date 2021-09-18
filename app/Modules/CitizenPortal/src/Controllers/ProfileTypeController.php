@@ -6,6 +6,10 @@ namespace App\Modules\CitizenPortal\src\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\CitizenPortal\src\Constants\Roles;
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
+use App\Modules\CitizenPortal\src\Models\File;
+use App\Modules\CitizenPortal\src\Models\FileType;
+use App\Modules\CitizenPortal\src\Models\Profile;
 use App\Modules\CitizenPortal\src\Models\ProfileType;
 use App\Modules\CitizenPortal\src\Request\ProfileTypeRequest;
 use App\Modules\CitizenPortal\src\Resources\ProfileTypeResource;
@@ -21,11 +25,34 @@ class ProfileTypeController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware(Roles::actions(ProfileType::class, 'create'))
+        $this->middleware(
+            Roles::canAny([
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => ProfileType::class
+                ],
+                ['model' => CitizenSchedule::class, 'actions' => 'status'],
+                ['model' => CitizenSchedule::class, 'actions' => 'view_or_manage'],
+                [
+                    'actions'   => ['status'],
+                    'model'     => File::class
+                ],
+                [
+                    'actions'   => ['view_or_manage'],
+                    'model'     => Profile::class
+                ],
+                [
+                    'actions'   => ['status', 'validator'],
+                    'model'     => Profile::class
+                ],
+            ], true, true)
+        )
+            ->only('index');
+        $this->middleware(Roles::actions(ProfileType::class, 'create_or_manage'))
             ->only('store');
-        $this->middleware(Roles::actions(ProfileType::class, 'update'))
+        $this->middleware(Roles::actions(ProfileType::class, 'update_or_manage'))
             ->only('update');
-        $this->middleware(Roles::actions(ProfileType::class, 'destroy'))
+        $this->middleware(Roles::actions(ProfileType::class, 'destroy_or_manage'))
             ->only('destroy');
     }
 

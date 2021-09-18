@@ -3,11 +3,12 @@
 namespace App\Modules\Parks\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Enclosure extends Model implements Auditable
 {
-    use \OwenIt\Auditing\Auditable;
+    use \OwenIt\Auditing\Auditable, SoftDeletes;
 
     /**
      * The connection name for the model.
@@ -36,13 +37,6 @@ class Enclosure extends Model implements Auditable
      * @var array
      */
     protected $fillable = ['Cerramiento'];
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
 
     /*
     * ---------------------------------------------------------

@@ -6,7 +6,9 @@ namespace App\Modules\CitizenPortal\src\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\CitizenPortal\src\Constants\Roles;
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
 use App\Modules\CitizenPortal\src\Models\Hour;
+use App\Modules\CitizenPortal\src\Models\Schedule;
 use App\Modules\CitizenPortal\src\Request\HourRequest;
 use App\Modules\CitizenPortal\src\Resources\HourResource;
 use Exception;
@@ -21,11 +23,26 @@ class HourController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware(Roles::actions(Hour::class, 'create'))
+        $this->middleware(
+            Roles::canAny([
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => Hour::class
+                ],
+                ['model' => CitizenSchedule::class, 'actions' => 'status'],
+                ['model' => CitizenSchedule::class, 'actions' => 'view_or_manage'],
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => Schedule::class
+                ],
+            ], true, true)
+        )
+            ->only('index');
+        $this->middleware(Roles::actions(Hour::class, 'create_or_manage'))
             ->only('store');
-        $this->middleware(Roles::actions(Hour::class, 'update'))
+        $this->middleware(Roles::actions(Hour::class, 'update_or_manage'))
             ->only('update');
-        $this->middleware(Roles::actions(Hour::class, 'destroy'))
+        $this->middleware(Roles::actions(Hour::class, 'destroy_or_manage'))
             ->only('destroy');
     }
 

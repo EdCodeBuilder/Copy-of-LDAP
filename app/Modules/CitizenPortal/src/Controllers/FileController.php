@@ -7,7 +7,9 @@ namespace App\Modules\CitizenPortal\src\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\CitizenPortal\src\Constants\Roles;
 use App\Modules\CitizenPortal\src\Jobs\ConfirmStatusFileCitizen;
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
 use App\Modules\CitizenPortal\src\Models\File;
+use App\Modules\CitizenPortal\src\Models\Observation;
 use App\Modules\CitizenPortal\src\Models\Profile;
 use App\Modules\CitizenPortal\src\Models\ProfileView;
 use App\Modules\CitizenPortal\src\Models\Status;
@@ -28,6 +30,21 @@ class FileController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->middleware(
+            Roles::canAny(
+                [
+                    ['model' => File::class, 'actions' => 'view_or_manage'],
+                    ['model' => Profile::class, 'actions' => 'view_or_manage'],
+                    ['model' => Profile::class, 'actions' => 'status'],
+                    ['model' => File::class, 'actions' => 'status'],
+                    ['model' => File::class, 'actions' => 'destroy'],
+                    ['model' => CitizenSchedule::class, 'actions' => 'status'],
+                    ['model' => CitizenSchedule::class, 'actions' => 'view_or_manage'],
+                ],
+                true,
+                true
+            )
+        )->only('index', 'show');
         $this->middleware(Roles::actions(File::class, 'status'))
             ->only('update');
         $this->middleware(Roles::actions(File::class, 'destroy'))

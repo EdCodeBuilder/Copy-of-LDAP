@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\StoreRoleRequest;
 use App\Http\Requests\Auth\UpdateRoleRequest;
 use App\Http\Resources\Auth\RoleResource;
+use App\Models\Security\User;
+use App\Modules\Parks\src\Constants\Roles;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -29,7 +31,7 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roles = Role::query()->where('name', 'like', '%park%')->get();
+        $roles = Role::query()->where('name', 'like', 'park-%')->get();
         return $this->success_response(
             RoleResource::collection( $roles )
         );
@@ -43,9 +45,9 @@ class RoleController extends Controller
      */
     public function store(StoreRoleRequest $request)
     {
-        $name = substr( toLower($request->get('name')), 0, 5 ) === "park-"
+        $name = substr( toLower($request->get('name')), 0, 5 ) === Roles::IDENTIFIER."-"
             ? toLower($request->get('name'))
-            : toLower("park-{$request->get('name')}");
+            : toLower(Roles::IDENTIFIER."-{$request->get('name')}");
         BouncerFacade::role()->firstOrCreate([
             'name'  =>  $name,
             'title' =>  $request->get('title')
@@ -65,9 +67,9 @@ class RoleController extends Controller
      */
     public function update(UpdateRoleRequest $request, Role $role)
     {
-        $name = substr( toLower($request->get('name')), 0, 5 ) === "park-"
+        $name = substr( toLower($request->get('name')), 0, 5 ) === Roles::IDENTIFIER."-"
                 ? toLower($request->get('name'))
-                : toLower("park-{$request->get('name')}");
+                : toLower(Roles::IDENTIFIER."-{$request->get('name')}");
         $role->fill([
             'name'  =>  $name,
             'title' =>  $request->get('title')
@@ -85,6 +87,11 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
+        User::whereIs($role->name)->chunk(100, function ($users) use ($role) {
+           foreach ($users as $user) {
+               $user->retract($role->name);
+           }
+        });
         $role->delete();
         return $this->success_message(__('validation.handler.deleted'));
     }

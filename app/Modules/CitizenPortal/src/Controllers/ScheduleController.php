@@ -10,6 +10,7 @@ use App\Modules\CitizenPortal\src\Exports\Excel as ExcelRaw;
 use App\Modules\CitizenPortal\src\Exports\TemplateExport;
 use App\Modules\CitizenPortal\src\Imports\Excel;
 use App\Modules\CitizenPortal\src\Models\Activity;
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
 use App\Modules\CitizenPortal\src\Models\Day;
 use App\Modules\CitizenPortal\src\Models\Hour;
 use App\Modules\CitizenPortal\src\Models\Program;
@@ -36,15 +37,28 @@ class ScheduleController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware(Roles::actions(Schedule::class, 'create'))
-            ->only('template');
-        $this->middleware(Roles::actions(Schedule::class, 'create'))
-            ->only('store');
-        $this->middleware(Roles::actions(Schedule::class, 'create'))
-            ->only('import');
-        $this->middleware(Roles::actions(Schedule::class, 'update'))
+        $this->middleware(
+            Roles::canAny([
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => CitizenSchedule::class
+                ],
+                [
+                    'actions'   => 'status',
+                    'model'     => CitizenSchedule::class
+                ],
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => Schedule::class
+                ],
+            ], true, true)
+        )
+            ->only('index', 'show');
+        $this->middleware(Roles::actions(Schedule::class, 'create_or_manage'))
+            ->only('store', 'template', 'import');
+        $this->middleware(Roles::actions(Schedule::class, 'update_or_manage'))
             ->only('update');
-        $this->middleware(Roles::actions(Schedule::class, 'destroy'))
+        $this->middleware(Roles::actions(Schedule::class, 'destroy_or_manage'))
             ->only('destroy');
     }
 
@@ -125,13 +139,21 @@ class ScheduleController extends Controller
      */
     public function template()
     {
-        $file = ExcelRaw::raw(new TemplateExport(), \Maatwebsite\Excel\Excel::XLSX);
-        $name = random_img_name();
-        $response =  array(
-            'name' => toUpper(str_replace(' ', '-', __('citizen.validations.citizen_portal')))."-$name.xlsx",
-            'file' => "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,".base64_encode($file),
-        );
-        return $this->success_message($response);
+        try {
+            $file = ExcelRaw::raw(new TemplateExport(), \Maatwebsite\Excel\Excel::XLSX);
+            $name = random_img_name();
+            $response =  array(
+                'name' => toUpper(str_replace(' ', '-', __('citizen.validations.citizen_portal')))."-$name.xlsx",
+                'file' => "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,".base64_encode($file),
+            );
+            return $this->success_message($response);
+        } catch (Exception $exception) {
+            return $this->error_response(
+                __('validation.handler.service_unavailable'),
+              Response::HTTP_UNPROCESSABLE_ENTITY,
+              $exception->getMessage()
+            );
+        }
     }
 
     /**

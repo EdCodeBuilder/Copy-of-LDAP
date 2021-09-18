@@ -78,6 +78,9 @@ class Kernel extends HttpKernel
         'api.throttle' => \App\Http\Middleware\ApiThrottleRequest::class,
         'json.response' => \App\Http\Middleware\ForceJsonResponse::class,
         'bouncer'       => \App\Http\Middleware\ScopeBouncer::class,
+        'permission'       => \App\Http\Middleware\PermissionMiddleware::class,
+        'role'       => \App\Http\Middleware\RoleMiddleware::class,
+        'role_or_permission'       => \App\Http\Middleware\RoleOrPermissionMiddleware::class,
     ];
 
     /**

@@ -5,11 +5,12 @@ namespace App\Modules\Parks\src\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Vocation extends Model implements Auditable
 {
-    use \OwenIt\Auditing\Auditable;
+    use \OwenIt\Auditing\Auditable, SoftDeletes;
 
     /**
      * The connection name for the model.
@@ -38,13 +39,6 @@ class Vocation extends Model implements Auditable
      * @var array
      */
     protected $fillable = ['vocacion'];
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
 
     /*
   * ---------------------------------------------------------

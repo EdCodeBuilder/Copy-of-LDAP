@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\HasApiTokens;
 use OwenIt\Auditing\Contracts\Auditable;
@@ -278,6 +279,40 @@ class User extends Authenticatable implements Auditable
     public function sendPasswordResetNotification( $token )
     {
         $this->notify( new ResetPassword( $token, $this->reset_email, $this, request()->ip() ) );
+    }
+
+    /*
+    * ---------------------------------------------------------
+    * Permissions
+    * ---------------------------------------------------------
+    */
+
+    /**
+     * Receive an array or string of permissions and models
+     * Ex: create-user$App\Model\User,update-role$App\Model\Role
+     *
+     * @param $permission
+     * @return bool
+     */
+    public function hasAnyPermission($permission)
+    {
+        $permissions = is_array($permission)
+            ? $permission
+            : explode('|', $permission);
+
+        foreach ($permissions as $permission) {
+            $perm = explode('$', $permission);
+            if (count($perm) == 1) {
+                if ($this->can(Arr::first($perm))) {
+                    return true;
+                }
+            } else {
+                if ($this->can(Arr::first($perm), Arr::last($perm))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /*

@@ -3,9 +3,12 @@
 namespace App\Modules\Parks\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Certified extends Model
+class Certified extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable, SoftDeletes;
     /**
      * The connection name for the model.
      *
@@ -34,10 +37,29 @@ class Certified extends Model
      */
     protected $fillable = [ 'EstadoCertificado' ];
 
+    /*
+    * ---------------------------------------------------------
+    * Data Change Auditor
+    * ---------------------------------------------------------
+    */
+
     /**
-     * Indicates if the model should be timestamped.
+     * Attributes to include in the Audit.
      *
-     * @var bool
+     * @var array
      */
-    public $timestamps = false;
+    protected $auditInclude = [
+        'EstadoCertificado',
+    ];
+
+    /**
+     * Generating tags for each model audited.
+     *
+     * @return array
+     */
+    public function generateTags(): array
+    {
+        return ['park_certified_satus'];
+    }
+
 }

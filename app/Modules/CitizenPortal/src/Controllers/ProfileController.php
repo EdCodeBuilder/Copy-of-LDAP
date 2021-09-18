@@ -10,8 +10,12 @@ use App\Modules\CitizenPortal\src\Constants\Roles;
 use App\Modules\CitizenPortal\src\Exports\CitizenExport;
 use App\Modules\CitizenPortal\src\Exports\ProfilesExport;
 use App\Modules\CitizenPortal\src\Jobs\ConfirmStatusCitizen;
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
+use App\Modules\CitizenPortal\src\Models\File;
+use App\Modules\CitizenPortal\src\Models\Observation;
 use App\Modules\CitizenPortal\src\Models\Profile;
 use App\Modules\CitizenPortal\src\Models\ProfileView;
+use App\Modules\CitizenPortal\src\Models\Schedule;
 use App\Modules\CitizenPortal\src\Models\Status;
 use App\Modules\CitizenPortal\src\Notifications\ValidatorNotification;
 use App\Modules\CitizenPortal\src\Request\AssignorRequest;
@@ -36,6 +40,24 @@ class ProfileController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->middleware(
+            Roles::canAny(
+                [
+                    ['model' => Schedule::class, 'actions' => 'view_or_manage'],
+                    ['model' => CitizenSchedule::class, 'actions' => 'status'],
+                    ['model' => CitizenSchedule::class, 'actions' => 'view_or_manage'],
+                    ['model' => Observation::class, 'actions' => 'view_or_manage'],
+                    ['model' => File::class, 'actions' => 'view_or_manage'],
+                    ['model' => File::class, 'actions' => 'status'],
+                    ['model' => File::class, 'actions' => 'destroy'],
+                    ['model' => Profile::class, 'actions' => 'view_or_manage'],
+                    ['model' => Profile::class, 'actions' => 'status'],
+                    ['model' => Profile::class, 'actions' => 'validator'],
+                ],
+                true,
+                true
+            )
+        )->only('index', 'show', 'excel');
         $this->middleware(Roles::actions(Profile::class, 'status'))
             ->only('status');
         $this->middleware(Roles::actions(Profile::class, 'validator'))
@@ -49,7 +71,13 @@ class ProfileController extends Controller
     public function index(ProfileFilterRequest $request)
     {
         $query = $this->setQuery(ProfileView::query(), (new ProfileView)->getSortableColumn($this->column))
-            ->withCount(['observations', 'files'])
+            ->withCount([
+                'observations',
+                'files',
+                'files as pending_files_count' => function($query) {
+                    return $query->where('status_id', "!=", Profile::VERIFIED);
+                },
+            ])
             ->when($this->query, function ($query) {
                 $keys = Profile::search($this->query)->get(['id'])->pluck('id')->toArray();
                 return $query->whereKey($keys);
@@ -112,7 +140,15 @@ class ProfileController extends Controller
     public function show(ProfileView $profile)
     {
         return $this->success_response(
-            new ProfileResource($profile->loadCount(['observations', 'files'])),
+            new ProfileResource($profile->loadCount(
+                [
+                    'observations',
+                    'files',
+                    'files as pending_files_count' => function($query) {
+                        return $query->where('status_id', "!=", Profile::VERIFIED);
+                    },
+                ]
+            )),
             Response::HTTP_OK,
             [
                 'headers' =>  array_values(
@@ -166,7 +202,7 @@ class ProfileController extends Controller
         try {
             DB::beginTransaction();
             if (isset($profile->checker_id)) {
-                $profile->viewer()->disallow(Roles::can(Profile::class, 'status'), $profile);
+                $profile->viewer->disallow(Roles::can(Profile::class, 'status'), $profile);
             }
             $profile->assigned_by_id = auth('api')->user()->id;
             $profile->assigned_at = now();
@@ -175,6 +211,7 @@ class ProfileController extends Controller
             $profile->verified_at = null;
             $profile->save();
             $user = User::find($request->get('validator_id'));
+            BouncerFacade::ownedVia(Profile::class, 'checker_id');
             BouncerFacade::allow($user)->toOwn($profile)->to(Roles::can(Profile::class, 'status'));
             $name = isset( $user->full_name ) ? (string) $user->full_name : 'SIN DATOS';
             $profile->observations()->create([
@@ -203,29 +240,26 @@ class ProfileController extends Controller
      */
     public function status(StatusProfileRequest $request, Profile $profile)
     {
-        DB::transaction(function () use ($request, $profile) {
+        try {
+            DB::beginTransaction();
             if ( $request->get('status_id') == Profile::VERIFIED ) {
                 $profile->verified_at = now()->format('Y-m-d H:i:s');
                 $profile->status_id = $request->get('status_id');
-                $profile->save();
-                $profile->files()->update([
-                    'verified_at'   =>  now()->format('Y-m-d H:i:s'),
-                    'status_id' =>  $request->get('status_id'),
-                ]);
             } else {
                 $profile->verified_at = null;
                 $profile->status_id = $request->get('status_id');
-                $profile->save();
             }
-
+            if (! isset($profile->assigned_by_id)) {
+                $profile->assigned_by_id = auth('api')->user()->id;
+                $profile->assigned_at = now();
+            }
+            $profile->save();
             $status = Status::find($request->get('status_id'));
             $status = isset( $status->name ) ? (string) $status->name : null;
-
             $observation = $request->has('observation') &&
             ($request->get('observation') != null || $request->get('observation') != '')
                 ? toUpper( $status.": ".$request->get('observation') )
                 : $status;
-
             $profile->observations()->create([
                 'profile_id'    => $profile->id,
                 'observation'   => $observation,
@@ -234,9 +268,17 @@ class ProfileController extends Controller
             if ( in_array( $request->get('status_id'), [Profile::VERIFIED, Profile::RETURNED] ) ) {
                 $this->dispatch( new ConfirmStatusCitizen( ProfileView::find($profile->id), $observation ) );
             }
-        });
-        return $this->success_message(
-            __('validation.handler.success')
-        );
+            DB::commit();
+            return $this->success_message(
+                __('validation.handler.success')
+            );
+        } catch (Exception $exception) {
+            DB::rollBack();
+            return $this->error_response(
+                __('validation.handler.service_unavailable'),
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                $exception->getMessage()
+            );
+        }
     }
 }

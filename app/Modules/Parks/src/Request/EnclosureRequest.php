@@ -2,6 +2,8 @@
 
 namespace App\Modules\Parks\src\Request;
 
+use App\Modules\Parks\src\Constants\Roles;
+use App\Modules\Parks\src\Models\Enclosure;
 use Illuminate\Foundation\Http\FormRequest;
 
 class EnclosureRequest extends FormRequest
@@ -13,7 +15,10 @@ class EnclosureRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        $method = toLower($this->getMethod());
+        $action = in_array($method, ['put', 'patch']) ? 'update' : 'create';
+        return auth('api')->user()->can(Roles::can(Enclosure::class, $action), Enclosure::class) ||
+            auth('api')->user()->can(Roles::can(Enclosure::class, 'manage'), Enclosure::class);
     }
 
     /**

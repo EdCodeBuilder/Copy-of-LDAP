@@ -6,6 +6,7 @@ namespace App\Modules\CitizenPortal\src\Request;
 
 
 use App\Modules\CitizenPortal\src\Constants\Roles;
+use App\Modules\CitizenPortal\src\Models\Program;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProgramRequest extends FormRequest
@@ -17,7 +18,10 @@ class ProgramRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->user()->isAn(...Roles::onlyAdmin());
+        $permission = toLower($this->getMethod()) == 'post'
+            ? Roles::can(Program::class,'create_or_manage', true)
+            : Roles::can(Program::class,'update_or_manage', true);
+        return auth('api')->user()->hasAnyPermission($permission);
     }
 
     /**

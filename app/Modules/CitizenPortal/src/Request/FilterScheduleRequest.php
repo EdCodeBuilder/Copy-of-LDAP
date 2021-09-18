@@ -7,9 +7,11 @@ namespace App\Modules\CitizenPortal\src\Request;
 
 use App\Modules\CitizenPortal\src\Constants\Roles;
 use App\Modules\CitizenPortal\src\Models\Activity;
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
 use App\Modules\CitizenPortal\src\Models\Day;
 use App\Modules\CitizenPortal\src\Models\Hour;
 use App\Modules\CitizenPortal\src\Models\Program;
+use App\Modules\CitizenPortal\src\Models\Schedule;
 use App\Modules\CitizenPortal\src\Models\Stage;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -22,7 +24,22 @@ class FilterScheduleRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->user()->isAn(...Roles::allAndRoot());
+        return auth('api')->user()->hasAnyPermission(
+            Roles::canAny([
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => CitizenSchedule::class
+                ],
+                [
+                    'actions'   => 'status',
+                    'model'     => CitizenSchedule::class
+                ],
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => Schedule::class
+                ],
+            ], false, true)
+        );
     }
 
     /**

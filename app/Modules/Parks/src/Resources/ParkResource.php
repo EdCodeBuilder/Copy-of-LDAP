@@ -3,6 +3,8 @@
 namespace App\Modules\Parks\src\Resources;
 
 use App\Modules\Parks\src\Constants\Roles;
+use App\Modules\Parks\src\Models\Origin;
+use App\Modules\Parks\src\Models\Park;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -32,7 +34,7 @@ class ParkResource extends JsonResource
             'area_hectare' => isset( $this->Areageo_enHa ) ? (float) $this->Areageo_enHa : null,
 
             'general_status'    =>  isset( $this->EstadoGeneral ) ? toUpper($this->EstadoGeneral) : null,
-            'enclosure'    =>  isset( $this->Cerramiento ) ? $this->Cerramiento : null,
+            'enclosure'    =>  isset( $this->Cerramiento ) ? (string) $this->Cerramiento : null,
             'households'   => isset( $this->Viviendas ) ? (int) $this->Viviendas : null,
             'zone_type' => isset( $this->TipoZona ) ? toUpper($this->TipoZona) : null,
             'admin'     => isset( $this->Administracion ) ? toUpper($this->Administracion) : null,
@@ -44,28 +46,23 @@ class ParkResource extends JsonResource
             'youth_population'   => isset( $this->PoblacionJuvenil ) ? (int) $this->PoblacionJuvenil : null,
             'older_population'   => isset( $this->PoblacionMayor ) ? (int) $this->PoblacionMayor : null,
             'population_chart'   => [
-                [
-                    'name'  =>  'Total',
-                    'data'  => [
-                        isset( $this->PoblacionInfantil ) ? (int) $this->PoblacionInfantil : 0,
-                        isset( $this->PoblacionJuvenil ) ? (int) $this->PoblacionJuvenil : 0,
-                        isset( $this->PoblacionMayor ) ? (int) $this->PoblacionMayor : 0,
-                    ]
-                ]
+                isset( $this->PoblacionInfantil ) ? (int) $this->PoblacionInfantil : 0,
+                isset( $this->PoblacionJuvenil ) ? (int) $this->PoblacionJuvenil : 0,
+                isset( $this->PoblacionMayor ) ? (int) $this->PoblacionMayor : 0,
             ],
             'admin_name'     => isset( $this->NomAdministrador ) ? toUpper($this->NomAdministrador) : null,
-            'status_id'    => isset( $this->Estado ) ? (int) $this->Estado : null,
+            'status_id'    => isset( $this->Estado ) && $this->Estado != 0 ? (int) $this->Estado : null,
             'status'    => isset( $this->status->Estado ) ? toUpper($this->status->Estado) : null,
-            'latitude' =>  isset( $this->Latitud ) ? $this->Latitud : null,
-            'longitude' =>  isset( $this->Longitud ) ? $this->Longitud : null,
+            'latitude' =>  isset( $this->Latitud ) ? (float) $this->Latitud : null,
+            'longitude' =>  isset( $this->Longitud ) ? (float) $this->Longitud : null,
             'urbanization'  => isset( $this->Urbanizacion ) ? toUpper($this->Urbanizacion) : null,
-            'vigilance'  => isset( $this->Vigilancia ) ? $this->Vigilancia : null,
-            'received'  => isset( $this->RecibidoIdrd ) ? $this->RecibidoIdrd : null,
+            'vigilance'  => isset( $this->Vigilancia ) ? (string) $this->Vigilancia : null,
+            'received'  => isset( $this->RecibidoIdrd ) ? (string) $this->RecibidoIdrd : null,
             'capacity' =>  isset( $this->Aforo ) ? (float) $this->Aforo : null,
             'stage_type_id'    => isset( $this->Id_Tipo_Escenario ) ? (int) $this->Id_Tipo_Escenario : null,
             'stage_type'    => isset( $this->stage_type->tipo ) ? toUpper($this->stage_type->tipo) : null,
             'pqrs'      =>  'atencionalcliente@idrd.gov.co',
-            'email'     =>  isset( $this->Email ) ? $this->Email : null,
+            'email'     =>  isset( $this->Email ) ? toLower($this->Email) : null,
             'schedule_service'  =>  'Lunes a Viernes: 6:00 AM - 6:00 PM / Sábados y Domingos: 5:00 AM - 6:00 PM',
             'schedule_admin'    =>  'Lunes a Viernes:  8:00 AM A  4:00 PM / Sábados y Domingos:  9:00 AM -2:00 PM',
             'scale_id'  =>  isset( $this->Id_Tipo ) ? (int) $this->Id_Tipo : null,
@@ -73,19 +70,20 @@ class ParkResource extends JsonResource
             'locality_id'  =>  isset( $this->Id_Localidad ) ? (int) $this->Id_Localidad : null,
             'locality'  =>  isset( $this->location->Localidad ) ? toUpper($this->location->Localidad) : null,
             'address'   =>  isset( $this->Direccion ) ? toUpper($this->Direccion) : null,
-            'upz_code'  =>  isset( $this->Upz ) ? $this->Upz : null,
+            'upz_code'  =>  isset( $this->Upz ) ? (string) $this->Upz : null,
             'upz'       =>  isset( $this->upz_name->Upz ) ? toUpper($this->upz_name->Upz) : null,
             'concept_id'    => isset( $this->EstadoCertificado ) ? (int) $this->EstadoCertificado : null,
             'concept'   =>  isset( $this->certified->EstadoCertificado ) ? toUpper($this->certified->EstadoCertificado) : null,
             'file'      =>  isset( $this->Id_IDRD ) ? $this->certified_exist($this->Id_IDRD) : null,
-            'concern'   =>  isset($this->CompeteIDRD) ? $this->CompeteIDRD : null,
+            'concern'   =>  isset($this->CompeteIDRD) ? (string) $this->CompeteIDRD : null,
             'regulation'      => isset($this->CompeteIDRD) ? toUpper( $this->regulation($this->CompeteIDRD) ) : null,
             'regulation_file' => isset($this->CompeteIDRD) ? $this->regulation_file($this->CompeteIDRD) : null,
-            'visited_at' => isset($this->FechaVisita) ? $this->checkDate($this->FechaVisita) : null,
+            'visited_at' => isset($this->FechaVisita) ? $this->FechaVisita->format('Y-m-d') : null,
             'rupis'      => $this->whenLoaded('rupis', RupiResource::collection($this->rupis)),
             'story'      => $this->whenLoaded('story', StoryResource::collection($this->story)),
+            'origin'      => $this->whenLoaded('history', new OriginResource($this->history)),
             'vocation_id'  => isset( $this->Id_Vocacion ) ? (int) $this->Id_Vocacion : null,
-            'vocation'  => isset( $this->vocation->name ) ? $this->vocation->name : null,
+            'vocation'  => isset( $this->vocation->name ) ? (string) $this->vocation->name : null,
             'color'      =>  isset( $this->Id_Tipo ) ? $this->getColor((int) $this->Id_Tipo) : 'grey',
             'green_area'    =>  isset( $this->AreaZVerde ) ? (int) $this->AreaZVerde : 0,
             'grey_area'    =>  isset( $this->AreaZDura ) ? (int) $this->AreaZDura : 0,
@@ -100,8 +98,11 @@ class ParkResource extends JsonResource
             ],
             'map'   =>  $this->setMap(),
             'plans' =>  EmergencyPlanResource::collection($this->emergency_plans),
+            'created_at'    => isset($this->created_at) ? $this->created_at->format('Y-m-d H:i:s') : null,
+            'updated_at'    => isset($this->updated_at) ? $this->updated_at->format('Y-m-d H:i:s') : null,
+            'deleted_at'    => isset($this->deleted_at) ? $this->deleted_at->format('Y-m-d H:i:s') : null,
             'audit'     =>  $this->when(
-                auth('api')->check() && auth('api')->user()->isA(Roles::ROLE_ADMIN, Roles::ROLE_ASSIGNED),
+                auth('api')->check() && auth('api')->user()->can(Roles::can(Park::class, 'history'), Park::class),
                 AuditResource::collection($this->audits()->with('user:id,name,surname')->latest()->get())
             )
         ];
@@ -125,26 +126,11 @@ class ParkResource extends JsonResource
     {
         $base = 'https://www.idrd.gov.co/SIM/Parques/Certificado/';
         if ( $code ) {
-            $path_tif = $this->urlExists( "{$base}{$code}.tif" ) ? "{$base}{$code}.tif" : null;
-            $path_pdf = $this->urlExists( "{$base}{$code}.pdf" ) ? "{$base}{$code}.pdf" : null;
+            $path_tif = verify_url( "{$base}{$code}.tif" ) ? "{$base}{$code}.tif" : null;
+            $path_pdf = verify_url( "{$base}{$code}.pdf" ) ? "{$base}{$code}.pdf" : null;
             return ($path_tif) ? $path_tif : $path_pdf;
         }
         return null;
-    }
-
-    function urlExists($url = null)
-    {
-        try {
-            if ($url == null) {
-                return false;
-            }
-            $client = new Client();
-            $data = $client->head( $url );
-            $status = $data->getStatusCode();
-            return $status >= 200 && $status < 300;
-        } catch (ClientException $e) {
-            return false;
-        }
     }
 
     public function regulation( $text = null )

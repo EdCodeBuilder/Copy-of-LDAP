@@ -10,6 +10,7 @@ use App\Modules\CitizenPortal\src\Models\Activity;
 use App\Modules\CitizenPortal\src\Models\Day;
 use App\Modules\CitizenPortal\src\Models\Hour;
 use App\Modules\CitizenPortal\src\Models\Program;
+use App\Modules\CitizenPortal\src\Models\Schedule;
 use App\Modules\CitizenPortal\src\Models\Stage;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -22,7 +23,10 @@ class ScheduleRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->user()->isAn(...Roles::onlyAdmin());
+        $permission = toLower($this->getMethod()) == 'post'
+            ? Roles::can(Schedule::class,'create_or_manage', true)
+            : Roles::can(Schedule::class,'update_or_manage', true);
+        return auth('api')->user()->hasAnyPermission($permission);
     }
 
     /**

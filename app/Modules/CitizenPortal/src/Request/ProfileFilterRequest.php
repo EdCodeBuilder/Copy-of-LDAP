@@ -7,9 +7,14 @@ namespace App\Modules\CitizenPortal\src\Request;
 
 use App\Modules\CitizenPortal\src\Constants\Roles;
 use App\Modules\CitizenPortal\src\Models\Activity;
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
 use App\Modules\CitizenPortal\src\Models\Day;
+use App\Modules\CitizenPortal\src\Models\File;
 use App\Modules\CitizenPortal\src\Models\Hour;
+use App\Modules\CitizenPortal\src\Models\Observation;
+use App\Modules\CitizenPortal\src\Models\Profile;
 use App\Modules\CitizenPortal\src\Models\Program;
+use App\Modules\CitizenPortal\src\Models\Schedule;
 use App\Modules\CitizenPortal\src\Models\Stage;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
@@ -23,7 +28,23 @@ class ProfileFilterRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->user()->isAn(...Roles::allAndRoot());
+        $permissions = Roles::canAny(
+            [
+                ['model' => Schedule::class, 'actions' => 'view_or_manage'],
+                ['model' => Observation::class, 'actions' => 'view_or_manage'],
+                ['model' => File::class, 'actions' => 'view_or_manage'],
+                ['model' => File::class, 'actions' => 'status'],
+                ['model' => File::class, 'actions' => 'destroy'],
+                ['model' => Profile::class, 'actions' => 'view_or_manage'],
+                ['model' => CitizenSchedule::class, 'actions' => 'status'],
+                ['model' => CitizenSchedule::class, 'actions' => 'view_or_manage'],
+                ['model' => Profile::class, 'actions' => 'status'],
+                ['model' => Profile::class, 'actions' => 'validator'],
+            ],
+            false,
+            true
+            );
+        return auth('api')->user()->hasAnyPermission($permissions);
     }
 
     /**

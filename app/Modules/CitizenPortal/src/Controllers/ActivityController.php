@@ -7,6 +7,8 @@ namespace App\Modules\CitizenPortal\src\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\CitizenPortal\src\Constants\Roles;
 use App\Modules\CitizenPortal\src\Models\Activity;
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
+use App\Modules\CitizenPortal\src\Models\Schedule;
 use App\Modules\CitizenPortal\src\Request\ActivityRequest;
 use App\Modules\CitizenPortal\src\Resources\ActivityResource;
 use Exception;
@@ -21,11 +23,26 @@ class ActivityController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware(Roles::actions(Activity::class, 'create'))
+        $this->middleware(
+            Roles::canAny([
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => Activity::class
+                ],
+                ['model' => CitizenSchedule::class, 'actions' => 'status'],
+                ['model' => CitizenSchedule::class, 'actions' => 'view_or_manage'],
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => Schedule::class
+                ],
+            ], true, true)
+        )
+            ->only('index');
+        $this->middleware(Roles::actions(Activity::class, 'create_or_manage'))
             ->only('store');
-        $this->middleware(Roles::actions(Activity::class, 'update'))
+        $this->middleware(Roles::actions(Activity::class, 'update_or_manage'))
             ->only('update');
-        $this->middleware(Roles::actions(Activity::class, 'destroy'))
+        $this->middleware(Roles::actions(Activity::class, 'destroy_or_manage'))
             ->only('destroy');
     }
 

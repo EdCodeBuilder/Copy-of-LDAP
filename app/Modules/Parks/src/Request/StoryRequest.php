@@ -2,6 +2,8 @@
 
 namespace App\Modules\Parks\src\Request;
 
+use App\Modules\Parks\src\Constants\Roles;
+use App\Modules\Parks\src\Models\Story;
 use App\Modules\Parks\src\Rules\ParkFinderRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -14,7 +16,10 @@ class StoryRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        $method = toLower($this->getMethod());
+        $action = in_array($method, ['put', 'patch']) ? 'update' : 'create';
+        return auth('api')->user()->can(Roles::can(Story::class, $action), Story::class) ||
+            auth('api')->user()->can(Roles::can(Story::class, 'manage'), Story::class);
     }
 
     /**

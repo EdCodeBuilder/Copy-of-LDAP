@@ -32,6 +32,20 @@ class ProfileScheduleController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->middleware(
+            Roles::canAny(
+                [
+                    ['model' => Schedule::class, 'actions' => 'view_or_manage'],
+                    ['model' => Profile::class, 'actions' => 'view_or_manage'],
+                    ['model' => CitizenSchedule::class, 'actions' => 'status'],
+                    ['model' => CitizenSchedule::class, 'actions' => 'view_or_manage'],
+                    ['model' => Profile::class, 'actions' => 'validator'],
+                ],
+                true,
+                true
+            )
+        )
+            ->only('index', 'store', 'show');
         $this->middleware(Roles::actions(CitizenSchedule::class, 'status'))
             ->only('update');
     }
@@ -89,12 +103,50 @@ class ProfileScheduleController extends Controller
             })
             ->with([
                 'profiles_view' => function ($query) {
-                    return $query->withCount(['observations', 'files']);
+                    return $query->withCount([
+                        'observations',
+                        'files',
+                        'files as pending_files_count' => function($query) {
+                            return $query->where('status_id', "!=", Profile::VERIFIED);
+                        },
+                    ]);
                 }
             ])
             ->where('schedule_id', $schedule->id);
         return $this->success_response(
             CitizenScheduleResource::collection($query->paginate( $this->per_page)),
+            Response::HTTP_OK,
+            CitizenScheduleResource::headers()
+        );
+    }
+
+    /**
+     * @param $schedule
+     * @param $profile
+     * @return JsonResponse
+     */
+    public function show($schedule, $profile)
+    {
+        $query = CitizenSchedule::query()
+            ->with(
+                [
+                    'profiles_view' => function ($query) {
+                        return $query->withCount([
+                            'observations',
+                            'files',
+                            'files as pending_files_count' => function($query) {
+                                return $query->where('status_id', "!=", Profile::VERIFIED);
+                            },
+                        ]);
+                    }
+                ]
+            )->where('schedule_id', $schedule)
+            ->where('profile_id', $profile)
+            ->firstOrFail();
+        return $this->success_response(
+            new CitizenScheduleResource(
+                $query
+            ),
             Response::HTTP_OK,
             CitizenScheduleResource::headers()
         );

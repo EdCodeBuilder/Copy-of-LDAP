@@ -2,13 +2,14 @@
 
 namespace App\Modules\Parks\src\Controllers;
 
-use App\Modules\Parks\src\Models\Scale;
+use App\Modules\Parks\src\Constants\Roles;
 use App\Modules\Parks\src\Models\Status;
-use App\Modules\Parks\src\Resources\ScaleResource;
+use App\Modules\Parks\src\Request\StatusRequest;
 use App\Modules\Parks\src\Resources\StatusResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Response;
 
 class StatusController extends Controller
 {
@@ -18,6 +19,10 @@ class StatusController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->middleware('auth:api')->except('index');
+        $this->middleware(Roles::actions(Status::class, 'create_or_manage'))->only('store');
+        $this->middleware(Roles::actions(Status::class, 'update_or_manage'))->only('update');
+        $this->middleware(Roles::actions(Status::class, 'destroy_or_manage'))->only('destroy');
     }
 
     /**
@@ -28,6 +33,48 @@ class StatusController extends Controller
     public function index()
     {
         return $this->success_response( StatusResource::collection( Status::all() ) );
+    }
+
+    /**
+     * @param StatusRequest $request
+     * @return JsonResponse
+     */
+    public function store(StatusRequest $request)
+    {
+        $form = new Status();
+        $form->Estado = $request->get('name');
+        $form->save();
+        return $this->success_message(
+            __('validation.handler.success'),
+            Response::HTTP_CREATED
+        );
+    }
+
+    /**
+     * @param StatusRequest $request
+     * @param Status $status
+     * @return JsonResponse
+     */
+    public function update(StatusRequest $request, Status $status)
+    {
+        $status->Estado = $request->get('name');
+        $status->save();
+        return $this->success_message(__('validation.handler.updated'));
+    }
+
+    /**
+     * @param Status $status
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function destroy(Status $status)
+    {
+        $status->delete();
+        return $this->success_message(
+            __('validation.handler.deleted'),
+            Response::HTTP_OK,
+            Response::HTTP_NO_CONTENT
+        );
     }
 
     /**

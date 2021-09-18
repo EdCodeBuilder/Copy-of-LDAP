@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\StorePermissionRequest;
 use App\Http\Requests\Auth\UpdatePermissionRequest;
 use App\Http\Resources\Auth\AbilityResource;
+use App\Models\Security\User;
+use App\Modules\Parks\src\Constants\Roles;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
+use OwenIt\Auditing\Models\Audit;
 use Silber\Bouncer\BouncerFacade;
 use Silber\Bouncer\Database\Ability;
 
@@ -30,8 +33,8 @@ class PermissionsController extends Controller
     public function index()
     {
         $abilities = Ability::query()
-            ->where('name', 'like', '%park%')
-            ->where('name', 'not like', '%assigned%')
+            ->where('name', 'like', '%-'.Roles::IDENTIFIER)
+            ->whereNull('entity_id')
             ->get();
         return $this->success_response(
             AbilityResource::collection( $abilities )
@@ -61,7 +64,7 @@ class PermissionsController extends Controller
                return $item['name'] != '';
             });
 
-        return $models->values();
+        return $models->merge([ ['id' => User::class, 'name' => __("parks.classes.".User::class)], ['id' => Audit::class, 'name' => __("parks.classes.".Audit::class)], ])->values();
     }
 
     /**
@@ -74,9 +77,9 @@ class PermissionsController extends Controller
     {
         $name = explode('-', toLower($request->get('name')));
         $name = end($name);
-        $name = $name == 'parks'
+        $name = $name == Roles::IDENTIFIER
             ? toLower($request->get('name'))
-            : toLower("{$request->get('name')}-parks");
+            : toLower("{$request->get('name')}-".Roles::IDENTIFIER);
 
         BouncerFacade::ability()->createForModel($request->get('entity_type'), [
             'name'  => $name,
@@ -99,9 +102,9 @@ class PermissionsController extends Controller
     {
         $name = explode('-', toLower($request->get('name')));
         $name = end($name);
-        $name = $name == 'parks'
+        $name = $name == Roles::IDENTIFIER
             ? toLower($request->get('name'))
-            : toLower("{$request->get('name')}-parks");
+            : toLower("{$request->get('name')}-".Roles::IDENTIFIER);
 
         $permission->forceFill([
             'name'  => $name,

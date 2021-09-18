@@ -5,6 +5,7 @@ namespace App\Modules\CitizenPortal\src\Request;
 
 
 
+use App\Models\Security\User;
 use App\Modules\CitizenPortal\src\Constants\Roles;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -17,7 +18,10 @@ class RoleRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->check() && auth('api')->user()->isA(...Roles::allAndRoot());
+        $permission = toLower($this->getMethod()) == 'delete'
+            ? Roles::can(User::class,'destroy_or_manage', true)
+            : Roles::can(User::class,'create_or_manage', true);
+        return auth('api')->user()->hasAnyPermission($permission);
     }
 
     /**

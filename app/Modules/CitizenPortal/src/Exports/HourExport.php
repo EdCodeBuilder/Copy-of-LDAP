@@ -40,8 +40,8 @@ class HourExport implements FromQuery, WithMapping, WithHeadings, WithColumnForm
      */
     public function headings(): array {
         return [
-            'ID',
             toUpper(__('citizen.validations.name')),
+            'ID',
         ];
     }
 
@@ -51,7 +51,7 @@ class HourExport implements FromQuery, WithMapping, WithHeadings, WithColumnForm
     public function columnFormats(): array
     {
         return [
-            'A' => NumberFormat::FORMAT_NUMBER,
+            'B' => NumberFormat::FORMAT_NUMBER,
         ];
     }
 
@@ -63,8 +63,8 @@ class HourExport implements FromQuery, WithMapping, WithHeadings, WithColumnForm
     {
         $id = isset( $row->id ) ? (int) $row->id : null;
         return [
-            'A'    =>  isset( $row->id ) ? (int) $row->id : null,
             'B'    =>  isset($row->name) ? "$id - $row->name" : null,
+            'A'    =>  isset( $row->id ) ? (int) $row->id : null,
         ];
     }
 

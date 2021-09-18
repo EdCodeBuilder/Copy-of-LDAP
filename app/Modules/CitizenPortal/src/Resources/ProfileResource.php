@@ -92,6 +92,7 @@ class ProfileResource extends JsonResource
             'status'      =>  isset($this->status) ? (string) $this->status : $this->getStatus(),
             'observations_count'      =>  isset($this->observations_count) ? (int) $this->observations_count : 0,
             'files_count'      =>  isset($this->files_count) ? (int) $this->files_count : 0,
+            'pending_files_count'      =>  isset($this->pending_files_count) ? (int) $this->pending_files_count : 0,
             'created_at'    =>  isset($this->created_at) ? $this->created_at->format('Y-m-d H:i:s') : null,
             'updated_at'    =>  isset($this->updated_at) ? $this->updated_at->format('Y-m-d H:i:s') : null,
         ];

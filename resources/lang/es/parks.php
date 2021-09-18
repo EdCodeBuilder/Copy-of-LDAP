@@ -24,11 +24,19 @@ return [
         'scales'    =>  'Gestionar Escalas',
         'stages'    =>  'Gestionar Escenarios',
         'vocation'  =>  'Gestionar Vocaciones',
+        'status'    =>  'Gestionar Estados',
+        'upz_types' =>  'Tipos de UPZ',
+        'certified' =>  'Estado Certificados',
         'map'       =>  'Mapa',
         'audit'     =>  'Auditoria',
     ],
     'handler'    => [
         'park_does_not_exist'   => 'No se encontró ningún parque relacionado al código o id :code',
+    ],
+    'excel'     => [
+        'title' =>  'PARQUES',
+        'generated_by' =>  'Generado por',
+        'created_at'    => 'Fecha de creación',
     ],
     'attributes'    =>  [
         'code'                  =>  'código del parque',
@@ -37,6 +45,7 @@ return [
         'stratum'               =>  'estrato',
         'locality_id'           =>  'localidad',
         'upz_code'              =>  'upz',
+        'upz'                   =>  'upz',
         'neighborhood_id'       =>  'barrio',
         'urbanization'          =>  'urbanización',
         'latitude'              =>  'latitud',
@@ -62,17 +71,19 @@ return [
         'general_status'        =>  'estado general',
         'stage_type_id'         =>  'tupo escenario',
         'status_id'             =>  'estado',
+        'certified_status'       =>  'estado certificado',
         'admin'                 =>  'adminitrado por',
         'phone'                 =>  'teéfono',
         'email'                 =>  'correo permisos',
         'admin_name'            =>  'nombre administrador',
         'vigilance'             =>  'vigilancia',
         'received'              =>  'recibido IDRD',
+        'compete'               =>  'compete IDRD',
         'vocation_id'           =>  'vocación',
+        'render'                =>  'diagrama'
     ],
     'classes' => [
         "App\Modules\Parks\src\Models\AssignedPark" => '',
-        "App\Modules\Parks\src\Models\Certified"    => '',
         "App\Modules\Parks\src\Models\EconomicUse"  => '',
         "App\Modules\Parks\src\Models\EconomicUsePark"  => '',
         "App\Modules\Parks\src\Models\EmergencyPlan"    => '',
@@ -84,8 +95,11 @@ return [
         "App\Modules\Parks\src\Models\ParkEndowment"    => '',
         "App\Modules\Parks\src\Models\Sector"   => '',
 
+        "App\Modules\Parks\src\Models\Origin"    => 'Historia del Parque',
+        "App\Modules\Parks\src\Models\Certified"    => 'Estado Certificado',
         "App\Modules\Parks\src\Models\Park" => 'Parques',
-        "App\Modules\Parks\src\Models\Location" => '',
+        "App\Modules\Parks\src\Models\Location" => 'Localidades',
+        "App\Modules\Parks\src\Models\UpzType"  => 'Tipos de Upz',
         "App\Modules\Parks\src\Models\Upz"  => 'Upz',
         "App\Modules\Parks\src\Models\Neighborhood" => 'Barrios',
         "App\Modules\Parks\src\Models\Rupi" => 'Rupis',
@@ -93,7 +107,9 @@ return [
         "App\Modules\Parks\src\Models\Enclosure"    => 'Cerramientos',
         "App\Modules\Parks\src\Models\StageType"    => 'Tipos de Escenarios',
         "App\Modules\Parks\src\Models\Status"   => 'Estados',
-        "App\Modules\Parks\src\Models\Story"    => 'Historias de Parque',
+        "App\Modules\Parks\src\Models\Story"    => 'Datos de interés',
         "App\Modules\Parks\src\Models\Vocation" => 'Vocaciones',
+        "App\Models\Security\User" => 'Usuarios',
+        "OwenIt\Auditing\Models\Audit" => 'Auditoría'
     ]
 ];

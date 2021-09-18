@@ -6,7 +6,11 @@ namespace App\Modules\CitizenPortal\src\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\CitizenPortal\src\Constants\Roles;
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
+use App\Modules\CitizenPortal\src\Models\File;
 use App\Modules\CitizenPortal\src\Models\FileType;
+use App\Modules\CitizenPortal\src\Models\Profile;
+use App\Modules\CitizenPortal\src\Models\Status;
 use App\Modules\CitizenPortal\src\Request\FileTypeRequest;
 use App\Modules\CitizenPortal\src\Resources\FileTypeResource;
 use Exception;
@@ -21,11 +25,36 @@ class FileTypeController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware(Roles::actions(FileType::class, 'create'))
+        $this->middleware(
+            Roles::canAny([
+                [
+                    'actions'   => 'view_or_manage',
+                    'model'     => FileType::class
+                ],
+                ['model' => CitizenSchedule::class, 'actions' => 'status'],
+                ['model' => CitizenSchedule::class, 'actions' => 'view_or_manage'],
+                [
+                    'actions'   => ['status'],
+                    'model'     => File::class
+                ],
+                [
+                    'actions'   => ['view_or_manage'],
+                    'model'     => Profile::class
+                ],
+                [
+                    'actions'   => ['status'],
+                    'model'     => Profile::class
+                ],
+            ], true, true)
+        )
+            ->only('index');
+        $this->middleware(Roles::actions(FileType::class, 'view_or_manage'))
+            ->only('index');
+        $this->middleware(Roles::actions(FileType::class, 'create_or_manage'))
             ->only('store');
-        $this->middleware(Roles::actions(FileType::class, 'update'))
+        $this->middleware(Roles::actions(FileType::class, 'update_or_manage'))
             ->only('update');
-        $this->middleware(Roles::actions(FileType::class, 'destroy'))
+        $this->middleware(Roles::actions(FileType::class, 'destroy_or_manage'))
             ->only('destroy');
     }
 

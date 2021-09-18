@@ -3,6 +3,7 @@
 namespace App\Modules\Parks\src\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Modules\Parks\src\Constants\Roles;
 use App\Modules\Parks\src\Models\Location;
 use App\Modules\Parks\src\Models\Upz;
 use App\Modules\Parks\src\Models\Vocation;
@@ -26,6 +27,10 @@ class VocationController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->middleware('auth:api')->except('index');
+        $this->middleware(Roles::actions(Vocation::class, 'create_or_manage'))->only('store');
+        $this->middleware(Roles::actions(Vocation::class, 'update_or_manage'))->only('update');
+        $this->middleware(Roles::actions(Vocation::class, 'destroy_or_manage'))->only('destroy');
     }
 
     /**
@@ -85,5 +90,20 @@ class VocationController extends Controller
                 $e->getMessage()
             );
         }
+    }
+
+    /**
+     * @param Vocation $vocation
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function destroy(Vocation $vocation)
+    {
+        $vocation->delete();
+        return $this->success_message(
+            __('validation.handler.deleted'),
+            Response::HTTP_OK,
+            Response::HTTP_NO_CONTENT
+        );
     }
 }

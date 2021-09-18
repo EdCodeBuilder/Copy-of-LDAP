@@ -17,6 +17,8 @@ class AuditController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->middleware(Roles::actions(Audit::class, 'view'))
+            ->only('index');
     }
 
     /**
@@ -26,11 +28,6 @@ class AuditController extends Controller
      */
     public function index()
     {
-        abort_unless(
-            auth('api')->check() && auth('api')->user()->isA(...Roles::onlyAdmin()),
-            Response::HTTP_FORBIDDEN,
-            __('validation.handler.unauthorized')
-        );
        $audits = Audit::query()
             ->with('user:id,name,surname')
             ->where('tags', 'like', '%citizen%')

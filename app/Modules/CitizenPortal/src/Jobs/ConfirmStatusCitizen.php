@@ -52,10 +52,11 @@ class ConfirmStatusCitizen implements ShouldQueue
         if (env('APP_ENV') != 'production') {
          $email = isset(auth('api')->user()->email)
              ? auth('api')->user()->email
-             : env('SAMPLE_EMAIL');
+             : explode(',', env('SAMPLE_CITIZEN_PORTAL_EMAIL', 'daniel.prado@idrd.gov.co'));
         }
         if ( $email  && filter_var( $email, FILTER_VALIDATE_EMAIL) ) {
-            $mailer->to($email)->send( new NotificationMail( $this->user, $this->observation ) );
+            $mailer->to($email)
+                ->send( new NotificationMail( $this->user, $this->observation ) );
         }
     }
 }

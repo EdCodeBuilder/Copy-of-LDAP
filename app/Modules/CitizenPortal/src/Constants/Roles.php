@@ -4,6 +4,9 @@
 namespace App\Modules\CitizenPortal\src\Constants;
 
 
+use Illuminate\Support\Facades\Cache;
+use Silber\Bouncer\Database\Role;
+
 class Roles
 {
     const IDENTIFIER = 'citizen-portal';
@@ -11,6 +14,7 @@ class Roles
     const ROLE_VIEWER = 'citizen-portal-viewer';
     const ROLE_ASSIGNOR = 'citizen-portal-assignor';
     const ROLE_VALIDATOR = 'citizen-portal-validator';
+    const ROLE_TEST = 'citizen-portal-test';
 
     /**
      * @param  string|object  $class
@@ -19,13 +23,21 @@ class Roles
      */
     public static function actions($class, $action)
     {
+        $model = toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER.','.$class;
+        $model_management = toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER.'$'.$class;
         $actions = [
-            'create'    => "can:create-".toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER.','.$class,
-            'update'    => "can:update-".toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER.','.$class,
-            'destroy'   => "can:destroy-".toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER.','.$class,
-            'history'   => "can:view-audit-".toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER.','.$class,
-            'status'    => "can:assign-status-".toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER.','.$class,
-            'validator'    => "can:assign-validator-".toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER.','.$class,
+            'manage'    => "can:manage-".$model,
+            'view'    => "can:view-".$model,
+            'view_or_manage' => "permission:view-$model_management|manage-$model_management|create-$model_management|update-$model_management|destroy-$model_management|assign-status-$model_management|assign-validator-$model_management",
+            'create'    => "can:create-".$model,
+            'create_or_manage' => "permission:create-$model_management|manage-$model_management",
+            'update'    => "can:update-".$model,
+            'update_or_manage' => "permission:update-$model_management|manage-$model_management",
+            'destroy'   => "can:destroy-".$model,
+            'destroy_or_manage' => "permission:destroy-$model_management|manage-$model_management",
+            'history'   => "can:view-audit-".$model,
+            'status'    => "can:assign-status-".$model,
+            'validator'    => "can:assign-validator-".$model,
         ];
         return $actions[$action];
     }
@@ -35,17 +47,73 @@ class Roles
      * @param  string  $action
      * @return string
      */
-    public static function can($class, $action)
+    public static function can($class, $action, $includeModel = false)
     {
+        $model = $includeModel
+            ? toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER.'$'.$class
+            : toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER;
         $actions = [
-            'create'    => "create-".toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER,
-            'update'    => "update-".toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER,
-            'destroy'   => "destroy-".toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER,
-            'history'   => "view-audit-".toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER,
-            'status'    => "assign-status-".toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER,
-            'validator'    => "assign-validator-".toLower(class_dash_name($class)).'-'.Roles::IDENTIFIER,
+            'manage'    => "manage-".$model,
+            'view'    => "view-".$model,
+            'view_or_manage' => "view-$model|manage-$model|create-$model|update-$model|destroy-$model",
+            'create'    => "create-".$model,
+            'create_or_manage' => "create-$model|manage-$model",
+            'update'    => "update-".$model,
+            'update_or_manage' => "update-$model|manage-$model",
+            'destroy'   => "destroy-".$model,
+            'destroy_or_manage' => "destroy-$model|manage-$model",
+            'history'   => "view-audit-".$model,
+            'status'    => "assign-status-".$model,
+            'validator'    => "assign-validator-".$model,
         ];
         return $actions[$action];
+    }
+
+    public static function canAny(array $actions, $withSuffix = true, $includeModel = false)
+    {
+        $result = $withSuffix ? "permission:" : '';
+        foreach ($actions as $key => $action) {
+            $pipe = $key > 0 ? '|' : '';
+            if (is_array($action['actions'])) {
+                foreach ($action['actions'] as $index => $value) {
+                    $pip = $key == 0 && $index > 0 ? '|' : $pipe;
+                    $result .= $pip.self::can($action['model'], $value, $includeModel);
+                }
+            } else {
+                $result .= $pipe.self::can($action['model'], $action['actions'], $includeModel);
+            }
+        }
+        return $result;
+    }
+
+    public static function authCan(array $actions, $class, $flag = 'and')
+    {
+        $status = collect();
+        foreach ($actions as $action) {
+            $status->push(
+                [
+                    'can' => auth('api')->check() && auth('api')->user()->can( self::can($class, $action), $class )
+                ]
+            );
+        }
+        if ($flag == 'and') {
+            return count($actions) == $status->where('can', true)->count();
+        }
+        if ($flag == 'or') {
+            return $status->where('can', true)->count() > 0;
+        }
+        return false;
+    }
+
+    public static function authCanMany(array $actions)
+    {
+        $result = collect();
+        foreach ($actions as $action) {
+            $result->push([
+                'can' => self::authCan($action['actions'], $action['model'], 'or')
+            ]);
+        }
+        return $result->where('can', true)->count() > 0;
     }
 
     /**
@@ -53,12 +121,13 @@ class Roles
      */
     public static function all()
     {
-        return [
-            self::ROLE_ADMIN,
-            self::ROLE_ASSIGNOR,
-            self::ROLE_VALIDATOR,
-            self::ROLE_VIEWER,
-        ];
+        $name = 'citizen-roles-user'.random_img_name();
+        return Cache::remember($name, 35, function () {
+            return Role::where('name', 'like', self::IDENTIFIER.'-%')
+                ->get()
+                ->pluck('name')
+                ->toArray();
+        });
     }
 
     /**
@@ -66,13 +135,7 @@ class Roles
      */
     public static function allAndRoot()
     {
-        return [
-            'superadmin',
-            self::ROLE_ADMIN,
-            self::ROLE_ASSIGNOR,
-            self::ROLE_VALIDATOR,
-            self::ROLE_VIEWER,
-        ];
+        return array_merge(Roles::all(), ['superadmin']);
     }
 
     /**
@@ -80,12 +143,12 @@ class Roles
      */
     public static function keyed()
     {
-        return [
-            self::ROLE_ADMIN    => self::ROLE_ADMIN,
-            self::ROLE_ASSIGNOR      => self::ROLE_ASSIGNOR,
-            self::ROLE_VALIDATOR      => self::ROLE_VALIDATOR,
-            self::ROLE_VIEWER      => self::ROLE_VIEWER,
-        ];
+        $roles = Roles::all();
+        $keys = [];
+        foreach($roles as $role) {
+            $keys[$role]=$role;
+        }
+        return $keys;
     }
 
     public static function find($role)
@@ -140,8 +203,7 @@ class Roles
             'abilities' => array_values($abilities),
             'roles' => array_values(
                 collect(auth('api')->user()->roles)->filter(function ($item) {
-                    return (false !== stristr($item->name, Roles::IDENTIFIER)) ||
-                        (false !== stristr($item->name, 'superadmin'));
+                    return (false !== stristr($item->name, Roles::IDENTIFIER)) || (false !== stristr($item->name, 'superadmin'));
                 })->toArray()
             ),
         ];

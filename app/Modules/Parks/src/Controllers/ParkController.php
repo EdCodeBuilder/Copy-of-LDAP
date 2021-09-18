@@ -4,6 +4,9 @@ namespace App\Modules\Parks\src\Controllers;
 
 
 use App\Models\Security\User;
+use App\Modules\Parks\src\Constants\Roles;
+use App\Modules\Parks\src\Exports\DashboardExport;
+use App\Modules\Parks\src\Exports\Excel as ExcelRaw;
 use App\Modules\Parks\src\Exports\ParkExport;
 use App\Modules\Parks\src\Models\AssignedPark;
 use App\Modules\Parks\src\Models\EconomicUsePark;
@@ -33,7 +36,10 @@ class ParkController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware(['auth:api'], ['only' => 'store', 'update', 'destroy', 'ownedKeys', 'owned', 'assignParks']);
+        $this->middleware('auth:api')->only(['store', 'update', 'destroy', 'ownedKeys', 'owned', 'assignParks']);
+        $this->middleware(Roles::actions(Park::class, 'create_or_manage'))->only('store');
+        $this->middleware(Roles::actions(Park::class, 'update_or_manage'))->only('update');
+        $this->middleware(Roles::actions(Park::class, 'destroy_or_manage'))->only('destroy');
     }
 
     /**
@@ -55,6 +61,18 @@ class ParkController extends Controller
                 return is_array($localities)
                     ? $query->whereIn('Id_Localidad', $localities)
                     : $query->where('Id_Localidad', $localities);
+            })
+            ->when(request()->has('upz_id'), function ($query) use ($request) {
+                $upz = $request->get('upz_id');
+                return is_array($upz)
+                    ? $query->whereIn('Upz', $upz)
+                    : $query->where('Upz', $upz);
+            })
+            ->when(request()->has('neighborhood_id'), function ($query) use ($request) {
+                $neighborhood = $request->get('neighborhood_id');
+                return is_array($neighborhood)
+                    ? $query->whereIn('Id_Barrio', $neighborhood)
+                    : $query->where('Id_Barrio', $neighborhood);
             })
             ->when(request()->has('type_id'), function ($query) use ($request) {
                 $types = $request->get('type_id');
@@ -78,11 +96,18 @@ class ParkController extends Controller
 
     /**
      * @param Request $request
-     * @return Response|BinaryFileResponse
+     * @return JsonResponse
      */
     public function excel(Request $request)
     {
-        return (new ParkExport($request))->download('REPORTE_PARQUES.xlsx', Excel::XLSX);
+        // return (new ParkExport($request))->download('REPORTE_PARQUES.xlsx', Excel::XLSX);
+        $file = ExcelRaw::raw(new DashboardExport($request), Excel::XLSX);
+        $name = random_img_name();
+        $response =  array(
+            'name' => toUpper(str_replace(' ', '-', __('parks.excel.title')))."-$name.xlsx",
+            'file' => "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,".base64_encode($file),
+        );
+        return $this->success_message($response);
     }
 
     /**
@@ -93,7 +118,7 @@ class ParkController extends Controller
      */
     public function show($park)
     {
-        $data = Park::with('rupis', 'story')
+        $data = Park::with('rupis', 'story', 'history')
                     ->when(strpos($park, '-'), function ($query) use ($park) {
                         return $query->where('Id_IDRD', $park);
                     })
@@ -119,7 +144,6 @@ class ParkController extends Controller
      */
     public function store(ParkRequest $request)
     {
-        $this->authorize('manage-parks', Park::class);
         $park = new Park();
         $filled = $park->transformRequest( $request->validated() );
         $park->fill($filled);
@@ -142,11 +166,11 @@ class ParkController extends Controller
     {
         $filled = $park->transformRequest( $request->validated() );
         $park->fill($filled);
-        if (auth('api')->user()->can('manage-parks', Park::class)) {
+        if (auth('api')->user()->can(Roles::can(Park::class, 'manage'), Park::class)) {
             $park->save();
             return $this->success_message(__('validation.handler.updated'));
         }
-        if (auth('api')->user()->can('manage-assigned-parks', $park)) {
+        if (auth('api')->user()->can(Roles::can(Park::class, 'update'), $park)) {
             $owned = AssignedPark::where('user_id', auth('api')->user()->id)
                                     ->where('park_id', $park->Id)
                                     ->count();
@@ -155,6 +179,21 @@ class ParkController extends Controller
             return $this->success_message(__('validation.handler.updated'));
         }
         return $this->error_response(__('validation.handler.unauthorized'), Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * @param Park $park
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function destroy(Park $park)
+    {
+        $park->delete();
+        return $this->success_message(
+        __('validation.handler.deleted'),
+        Response::HTTP_OK,
+        Response::HTTP_NO_CONTENT
+    );
     }
 
     public function ownedKeys()
@@ -175,9 +214,13 @@ class ParkController extends Controller
         $parks = Park::query()
                 ->whereKey($owned)
                 ->select( ['Id', 'Id_IDRD', 'Nombre', 'Direccion', 'Upz', 'Id_Localidad', 'Id_Tipo'] )
-                ->when($this->query, function ($query) {
-                    $query->search($this->query)
-                           ->orWhere('Id_IDRD', 'like', "%{$this->query}%");
+                ->when($this->query, function ($query) use($owned) {
+                    return $query->search($this->query)
+                            ->whereKey($owned)
+                           ->orWhere(function ($query) use($owned) {
+                               return $query->where('Id_IDRD', 'like', "%{$this->query}%")
+                                   ->whereKey('Id', $owned);
+                           });
                 })
                 ->when(request()->has('locality_id'), function ($query) use ($request) {
                     $localities = $request->get('locality_id');
@@ -221,7 +264,7 @@ class ParkController extends Controller
     {
         AssignedPark::where('user_id', $user->id)
                     ->where('park_id', $park->Id)->delete();
-        $user->disallow('manage-assigned-parks', $park);
+        $user->disallow(Roles::can(Park::class, 'update'), $park);
 
         return $this->success_message(__('validation.handler.deleted'));
     }
@@ -231,7 +274,7 @@ class ParkController extends Controller
         $parks = AssignedPark::where('user_id', $user->id)->get();
         foreach ($parks as $park) {
             $p = Park::find($park->park_id);
-            $user->disallow('manage-assigned-parks', $p);
+            $user->disallow(Roles::can(Park::class, 'update'), $p);
         }
         AssignedPark::where('user_id', $user->id)->delete();
         return $this->success_message(__('validation.handler.deleted'));
@@ -248,7 +291,7 @@ class ParkController extends Controller
                             ->where('Id_Localidad', $request->get('locality_id'))
                             ->get();
                 foreach ($parks as $park) {
-                    $user->allow('manage-assigned-parks', $park);
+                    $user->allow(Roles::can(Park::class, 'update'), $park);
                     $form->updateOrCreate([
                         'user_id'   => $request->get('user_id'),
                         'park_id'   =>  $park->Id,
@@ -261,7 +304,7 @@ class ParkController extends Controller
                     ->where('Upz', $request->get('upz_code'))
                     ->get();
                 foreach ($parks as $park) {
-                    $user->allow('manage-assigned-parks', $park);
+                    $user->allow(Roles::can(Park::class, 'update'), $park);
                     $form->updateOrCreate([
                         'user_id'   => $request->get('user_id'),
                         'park_id'   =>  $park->Id,
@@ -274,7 +317,7 @@ class ParkController extends Controller
                     ->where('Id_Barrio', $request->get('neighborhood_id'))
                     ->get();
                 foreach ($parks as $park) {
-                    $user->allow('manage-assigned-parks', $park);
+                    $user->allow(Roles::can(Park::class, 'update'), $park);
                     $form->updateOrCreate([
                         'user_id'   => $request->get('user_id'),
                         'park_id'   =>  $park->Id,
@@ -284,7 +327,7 @@ class ParkController extends Controller
             case 'manual':
                 foreach ($request->get('park_id') as $id) {
                     $park = Park::find($id);
-                    $user->allow('manage-assigned-parks', $park);
+                    $user->allow(Roles::can(Park::class, 'update'), $park);
                     $form->updateOrCreate([
                         'user_id'   => $request->get('user_id'),
                         'park_id'   =>  $id,

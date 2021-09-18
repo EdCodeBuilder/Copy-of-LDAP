@@ -47,38 +47,12 @@ class DashboardController extends Controller
                 'color' => $colors[$model->id],
                 'name'  =>  $model->name,
                 'value' =>  Profile::query()
-                    ->when(
-                        (
-                            auth('api')->user()->isA(Roles::ROLE_VALIDATOR)
-                            && auth('api')->user()->isNotA(...Roles::adminAnd(Roles::ROLE_ASSIGNOR)
-                            )
-                        ),
-                        function ($query) use ($model) {
-                            return $query->where(function ($query) use ($model) {
-                                return $query->where('checker_id', auth('api')->user()->id)
-                                    ->where(function ($query) use ($model) {
-                                        return $query->where('status_id', $model->id)
-                                            ->when($model->id == Profile::PENDING, function ($q) {
-                                                return $q->orWhere([
-                                                    ['status_id', null],
-                                                    ['checker_id', auth('api')->user()->id],
-                                                ]);
-                                            });
-                                    });
-                            });
-                        }
-                    )
-                    ->when(
-                        auth('api')->user()->isA(...Roles::adminAnd(Roles::ROLE_ASSIGNOR)),
-                        function ($query) use ($model) {
-                            return $query->where(function ($query) use ($model) {
-                                return $query->where('status_id', $model->id)
+                    ->where(function ($query) use ($model) {
+                        return $query->where('status_id', $model->id)
                                     ->when($model->id == Profile::PENDING, function ($q) {
                                         return $q->orWhereNull('status_id');
                                     });
-                            });
-                        }
-                    )
+                     })
                     ->count()
             ];
         });

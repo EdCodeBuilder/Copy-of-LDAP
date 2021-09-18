@@ -5,19 +5,27 @@ namespace App\Modules\Parks\src\Controllers;
 use App\Http\Resources\Auth\RoleResource;
 use App\Http\Resources\Auth\UserResource;
 use App\Models\Security\User;
+use App\Modules\CitizenPortal\src\Models\Stage;
 use App\Modules\Parks\src\Constants\Roles;
 use App\Modules\Parks\src\Models\AssignedPark;
+use App\Modules\Parks\src\Models\Certified;
 use App\Modules\Parks\src\Models\Enclosure;
 use App\Modules\Parks\src\Models\Location;
+use App\Modules\Parks\src\Models\Neighborhood;
 use App\Modules\Parks\src\Models\Park;
 use App\Modules\Parks\src\Models\Scale;
 use App\Modules\Parks\src\Models\StageType;
+use App\Modules\Parks\src\Models\Status;
+use App\Modules\Parks\src\Models\Upz;
+use App\Modules\Parks\src\Models\UpzType;
 use App\Modules\Parks\src\Models\Vocation;
+use App\Modules\Parks\src\Request\FindUserRequest;
 use App\Modules\Parks\src\Request\RoleRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
+use OwenIt\Auditing\Models\Audit;
 use Silber\Bouncer\BouncerFacade;
 use Silber\Bouncer\Database\Role;
 
@@ -26,6 +34,9 @@ class UserController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->middleware(Roles::actions(User::class, 'view_or_manage'))->only('index', 'findUsers', 'roles');
+        $this->middleware(Roles::actions(User::class, 'create_or_manage'))->only('store');
+        $this->middleware(Roles::actions(User::class, 'destroy_or_manage'))->only('destroy');
     }
 
     /**
@@ -35,20 +46,25 @@ class UserController extends Controller
      */
     public function menu()
     {
+        $manageActions = ['manage', 'view', 'create', 'update', 'destroy'];
+        $superAdmin = auth('api')->user()->isA('superadmin');
+        $user = auth('api')->user();
         $menu = collect([
             [
                 'icon'  =>  'mdi-security',
                 'title' =>  __('parks.menu.roles'),
                 'to'    =>  [ 'name' => 'parks-roles-and-permissions' ],
                 'exact' =>  true,
-                'can'   =>  auth('api')->check() && auth('api')->user()->isA('superadmin'),
+                'can'   =>  $superAdmin,
             ],
             [
                 'icon'  =>  'mdi-account-multiple-plus',
                 'title' =>  __('parks.menu.users'),
                 'to'    =>  [ 'name' => 'parks-users' ],
                 'exact' =>  true,
-                'can'   =>  auth('api')->check() && auth('api')->user()->can('manage-users-parks', Park::class),
+                'can'   => $user->hasAnyPermission(
+                        Roles::can( User::class, 'view_or_manage', true)
+                    ) || $superAdmin,
             ],
             [
                 'icon'  =>  'mdi-view-dashboard',
@@ -61,58 +77,104 @@ class UserController extends Controller
                 'icon'  =>  'mdi-magnify-scan',
                 'title' =>  __('parks.menu.finder'),
                 'to'    =>  [ 'name' => 'parks-finder' ],
-                'exact' =>  true,
+                'exact' =>  false,
                 'can'   =>  true,
             ],
             [
                 'icon'  =>  'mdi-clipboard-list-outline',
                 'title' =>  __('parks.menu.manage'),
                 'exact' =>  false,
-                'can'   => auth('api')->check() && (auth('api')->user()->can('manage-parks', Park::class) || auth('api')->user()->isA('park-assigned-parks')),
+                'can'   => $user->hasAnyPermission(
+                    Roles::canAny(
+                        [
+                            ['actions'   => 'create_or_manage', 'model'   => Park::class],
+                            ['actions'   => 'view_or_manage', 'model'     => Location::class],
+                            ['actions'   => 'view_or_manage', 'model'     => Upz::class],
+                            ['actions'   => 'view_or_manage', 'model'     => Neighborhood::class],
+                            ['actions'   => 'view_or_manage', 'model'     => Enclosure::class],
+                            ['actions'   => 'view_or_manage', 'model'     => Scale::class],
+                            ['actions'   => 'view_or_manage', 'model'     => StageType::class],
+                            ['actions'   => 'view_or_manage', 'model'     => Vocation::class],
+                            ['actions'   => 'view_or_manage', 'model'     => Status::class],
+                            ['actions'   => 'view_or_manage', 'model'     => UpzType::class],
+                            ['actions'   => 'view_or_manage', 'model'     => Certified::class],
+                        ], false, true)
+                    ) || $user->isA(Roles::ROLE_ASSIGNED) || $superAdmin,
                 'children' => array_values( collect([
                     [
                         'title' =>  __('parks.menu.owned'),
                         'to'    =>  [ 'name' => 'parks-owned' ],
                         'exact' =>  true,
-                        'can' =>  auth('api')->check() && auth('api')->user()->isA('park-assigned-parks'),
+                        'can' =>  $user->isA(Roles::ROLE_ASSIGNED),
                     ],
                     [
                         'title' =>  __('parks.menu.parks'),
                         'to'    =>  [ 'name' => 'parks-create' ],
                         'exact' =>  true,
-                        'can' =>  auth('api')->check() && auth('api')->user()->can('manage-parks', Park::class),
+                        'can' =>  $user->hasAnyPermission(Roles::can(Park::class, 'create_or_manage', true)) || $superAdmin,
                     ],
                     [
                         'title' =>  __('parks.menu.locality'),
                         'to'    =>  [ 'name' => 'parks-manage-locations' ],
                         'exact' =>  true,
-                        'can' =>  auth('api')->check() && auth('api')->user()->can('manage-localities-parks', Location::class),
+                        'can' =>  $user->hasAnyPermission(Roles::canAny(
+                            [
+                                [
+                                    'actions'   => $manageActions,
+                                    'model'     => Location::class
+                                ],
+                                [
+                                    'actions'   => $manageActions,
+                                    'model'     => Upz::class
+                                ],
+                                [
+                                    'actions'   => $manageActions,
+                                    'model'     => Neighborhood::class
+                                ]
+                            ], false, true
+                            )) || $superAdmin,
                     ],
-
-
                     [
                         'title' =>  __('parks.menu.enclosure'),
                         'to'    =>  [ 'name' => 'parks-manage-enclosure' ],
                         'exact' =>  true,
-                        'can' =>  auth('api')->check() && auth('api')->user()->can('manage-enclosures-parks', Enclosure::class),
+                        'can' =>  $user->hasAnyPermission(Roles::can(Enclosure::class, 'view_or_manage', true)) || $superAdmin,
                     ],
                     [
                         'title' =>  __('parks.menu.scales'),
                         'to'    =>  [ 'name' => 'parks-manage-scales' ],
                         'exact' =>  true,
-                        'can' =>  auth('api')->check() && auth('api')->user()->can('manage-scales-parks', Scale::class),
+                        'can' =>  $user->hasAnyPermission(Roles::can(Scale::class, 'view_or_manage', true)) || $superAdmin,
                     ],
                     [
                         'title' =>  __('parks.menu.stages'),
                         'to'    =>  [ 'name' => 'parks-manage-stages' ],
                         'exact' =>  true,
-                        'can' =>  auth('api')->check() && auth('api')->user()->can('manage-stages-parks', StageType::class),
+                        'can' =>  $user->hasAnyPermission(Roles::can(StageType::class, 'view_or_manage', true)) || $superAdmin,
                     ],
                     [
                         'title' =>  __('parks.menu.vocation'),
                         'to'    =>  [ 'name' => 'parks-manage-vocations' ],
                         'exact' =>  true,
-                        'can' =>  auth('api')->check() && auth('api')->user()->can('manage-vocations-parks', Vocation::class),
+                        'can' =>  $user->hasAnyPermission(Roles::can(Vocation::class, 'view_or_manage', true)) || $superAdmin,
+                    ],
+                    [
+                        'title' =>  __('parks.menu.status'),
+                        'to'    =>  [ 'name' => 'parks-manage-status' ],
+                        'exact' =>  true,
+                        'can' =>  $user->hasAnyPermission(Roles::can(Status::class, 'view_or_manage', true)) || $superAdmin,
+                    ],
+                    [
+                        'title' =>  __('parks.menu.upz_types'),
+                        'to'    =>  [ 'name' => 'parks-manage-upz-types' ],
+                        'exact' =>  true,
+                        'can' =>  $user->hasAnyPermission(Roles::can(UpzType::class, 'view_or_manage', true)) || $superAdmin,
+                    ],
+                    [
+                        'title' =>  __('parks.menu.certified'),
+                        'to'    =>  [ 'name' => 'parks-manage-certificate-status' ],
+                        'exact' =>  true,
+                        'can' =>  $user->hasAnyPermission(Roles::can(Certified::class, 'view_or_manage', true)) || $superAdmin,
                     ],
                 ])->where('can', true)->toArray())
             ],
@@ -128,13 +190,16 @@ class UserController extends Controller
                 'title' =>  __('parks.menu.audit'),
                 'to'    =>  [ 'name' => 'parks-audit' ],
                 'exact' =>  true,
-                'can'   =>  auth('api')->check() && auth()->user()->isA(...['park-administrator', 'superadmin']),
+                'can'   =>  $user->hasAnyPermission(Roles::can(Audit::class, 'view', true)) || $superAdmin,
             ],
         ]);
 
         return $this->success_message( array_values( $menu->where('can', true)->toArray() ) );
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function permissions()
     {
         return $this->success_message(
@@ -161,6 +226,9 @@ class UserController extends Controller
         );
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function roles()
     {
         return $this->success_response(
@@ -168,7 +236,11 @@ class UserController extends Controller
         );
     }
 
-    public function findUsers(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function findUsers(FindUserRequest $request)
     {
         $users = User::search($request->get('username'))->take(50)->get();
         return $this->success_response(
@@ -176,6 +248,11 @@ class UserController extends Controller
         );
     }
 
+    /**
+     * @param RoleRequest $request
+     * @param User $user
+     * @return JsonResponse
+     */
     public function store(RoleRequest $request, User $user)
     {
         $user->assign( $request->get('roles') );
@@ -185,6 +262,11 @@ class UserController extends Controller
         );
     }
 
+    /**
+     * @param RoleRequest $request
+     * @param User $user
+     * @return JsonResponse
+     */
     public function destroy(RoleRequest $request, User $user)
     {
         $user->retract( $request->get('roles') );

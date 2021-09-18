@@ -65,6 +65,17 @@ class FileType extends Model implements Auditable
         return ['citizen_portal_file_type'];
     }
 
+    /*
+  * ---------------------------------------------------------
+  * Accessors and Mutator
+  * ---------------------------------------------------------
+  */
+
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = toUpper($value);
+    }
+
     /**
      * @param $column
      * @return string
