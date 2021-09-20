@@ -34,6 +34,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Passport\Http\Controllers\AccessTokenController;
 use OwenIt\Auditing\Models\Audit;
+use Silber\Bouncer\BouncerFacade;
 use Silber\Bouncer\Database\Role;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 
@@ -436,6 +437,7 @@ class UserController extends LoginController
      */
     public function store(RoleRequest $request, User $user)
     {
+        BouncerFacade::refresh();
         $user->assign( $request->get('roles') );
         return $this->success_message(
             __('validation.handler.success'),
@@ -450,6 +452,7 @@ class UserController extends LoginController
      */
     public function destroy(RoleRequest $request, User $user)
     {
+        BouncerFacade::refresh();
         $user->retract( $request->get('roles') );
         return $this->success_message(
             __('validation.handler.deleted')

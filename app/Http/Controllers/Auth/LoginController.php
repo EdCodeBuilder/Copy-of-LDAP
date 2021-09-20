@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Validation\ValidationException;
 use Laravel\Passport\Http\Controllers\AccessTokenController;
+use Silber\Bouncer\BouncerFacade;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 
 class LoginController extends Controller
@@ -117,6 +118,7 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
+        BouncerFacade::refresh();
         $token = auth('api')->user()->token();
         $token->revoke();
         return $this->success_message(__('validation.handler.logout'), Response::HTTP_OK);
