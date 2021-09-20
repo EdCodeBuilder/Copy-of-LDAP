@@ -23,7 +23,7 @@ class UpdateParkRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth('api')->user()->can(Roles::can(Park::class, 'update'), Park::class) ||
+        return auth('api')->user()->can(Roles::can(Park::class, 'update'), $this->route('park')) ||
             auth('api')->user()->can(Roles::can(Park::class, 'manage'), Park::class);
     }
 
