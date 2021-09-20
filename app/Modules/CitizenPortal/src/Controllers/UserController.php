@@ -434,10 +434,12 @@ class UserController extends LoginController
      * @param RoleRequest $request
      * @param User $user
      * @return JsonResponse
+     * @throws \Exception
      */
     public function store(RoleRequest $request, User $user)
     {
         BouncerFacade::refresh();
+        cache()->flush();
         $user->assign( $request->get('roles') );
         return $this->success_message(
             __('validation.handler.success'),
@@ -449,10 +451,12 @@ class UserController extends LoginController
      * @param RoleRequest $request
      * @param User $user
      * @return JsonResponse
+     * @throws \Exception
      */
     public function destroy(RoleRequest $request, User $user)
     {
         BouncerFacade::refresh();
+        cache()->flush();
         $user->retract( $request->get('roles') );
         return $this->success_message(
             __('validation.handler.deleted')

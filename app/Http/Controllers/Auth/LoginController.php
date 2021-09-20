@@ -115,10 +115,12 @@ class LoginController extends Controller
      *
      * @param Request $request
      * @return JsonResponse
+     * @throws \Exception
      */
     public function logout(Request $request)
     {
         BouncerFacade::refresh();
+        cache()->flush();
         $token = auth('api')->user()->token();
         $token->revoke();
         return $this->success_message(__('validation.handler.logout'), Response::HTTP_OK);
