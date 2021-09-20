@@ -38,7 +38,7 @@ class ParkController extends Controller
         parent::__construct();
         $this->middleware('auth:api')->only(['store', 'update', 'destroy', 'ownedKeys', 'owned', 'assignParks']);
         $this->middleware(Roles::actions(Park::class, 'create_or_manage'))->only('store');
-        $this->middleware(Roles::actions(Park::class, 'update_or_manage'))->only('update');
+        // $this->middleware(Roles::actions(Park::class, 'update_or_manage'))->only('update');
         $this->middleware(Roles::actions(Park::class, 'destroy_or_manage'))->only('destroy');
     }
 
@@ -174,7 +174,7 @@ class ParkController extends Controller
             $owned = AssignedPark::where('user_id', auth('api')->user()->id)
                                     ->where('park_id', $park->Id)
                                     ->count();
-            abort_unless($owned > 1, Response::HTTP_FORBIDDEN, __('validation.handler.unauthorized'));
+            abort_unless($owned > 0, Response::HTTP_FORBIDDEN, __('validation.handler.unauthorized'));
             $park->save();
             return $this->success_message(__('validation.handler.updated'));
         }
