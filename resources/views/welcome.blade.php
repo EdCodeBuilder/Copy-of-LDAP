@@ -85,7 +85,12 @@
                     <div class="ml-12">
                         <div class="mt-2 text-gray-600 dark:text-gray-400 text-sm">
                             Sistema de Información Misional del Instituto Distrital de Recreación y Deporte
-                            <div class="text-lg leading-7 font-semibold"><a href="https://sim.idrd.gov.co" class="underline text-gray-900 dark:text-white">Ir al S.I.M.</a></div>
+                            <div class="text-lg leading-7 font-semibold">
+                                <a href="https://sim.idrd.gov.co" class="underline text-gray-900 dark:text-white">Ir al S.I.M.</a>
+                            </div>
+                            <div class="text-lg leading-7 font-semibold">
+                                <a href="{{ asset('/docs/index.html')  }}" class="underline text-gray-900 dark:text-white">Ver la documentación de la API</a>
+                            </div>
                         </div>
                     </div>
                 </div>
