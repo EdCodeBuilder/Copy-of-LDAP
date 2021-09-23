@@ -11,6 +11,12 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 
+/**
+ * @group Parques - Escalas
+ *
+ * API para la gestión y consulta de datos de las Escalas de Parques.
+ *
+ */
 class ScaleController extends Controller
 {
     /**
@@ -26,7 +32,11 @@ class ScaleController extends Controller
     }
 
     /**
-     * Get a listing of the resource
+     * @group Parques - Escalas
+     *
+     * Escalas
+     *
+     * Muestra un listado del recurso.
      *
      * @return JsonResponse
      */
@@ -36,7 +46,19 @@ class ScaleController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @group Parques - Escalas
+     *
+     * Crear Escalas
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     *
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param ScaleRequest $request
      * @return JsonResponse
@@ -54,7 +76,20 @@ class ScaleController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @group Parques - Escalas
+     *
+     * Actualizar Escalas
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam scale int required Id de la escala: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param ScaleRequest $request
      * @param Scale $scale
@@ -69,7 +104,20 @@ class ScaleController extends Controller
     }
 
     /**
-     * Delete the specified resource from storage.
+     * @group Parques - Escalas
+     *
+     * Eliminar Escalas
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @urlParam scale int required Id de la escala: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param Scale $scale
      * @return JsonResponse

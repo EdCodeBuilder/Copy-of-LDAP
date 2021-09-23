@@ -15,6 +15,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Password;
 
+/**
+ * @group Password
+ *
+ * Gestión de Contraseñas
+ */
 class ForgotPasswordController extends Controller
 {
     use SendsPasswordResetEmails;
@@ -27,7 +32,19 @@ class ForgotPasswordController extends Controller
     private $reset_email = null;
 
     /**
+     * @group Password
+     *
+     * Forgot Password
+     *
      * Send a reset link to the given user.
+     *
+     * @bodyParam document string required Número de documento del usuario. Example: 1234567
+     * @response {
+     *      "data": "¡Te hemos enviado por correo el enlace para restablecer tu contraseña, verifica los correos no deseados!",
+     *      "details": { "email": "Hemos enviado un correo a c****@g***.com para restablecer la contraseña de tu cuenta" },
+     *      "code": 200,
+     *      "requested_at": "2021-09-12T16:45:39-05:00"
+     * }
      *
      * @param Request $request
      * @return RedirectResponse|JsonResponse

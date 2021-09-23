@@ -104,7 +104,29 @@ class ParkResource extends JsonResource
             'audit'     =>  $this->when(
                 auth('api')->check() && auth('api')->user()->can(Roles::can(Park::class, 'history'), Park::class),
                 AuditResource::collection($this->audits()->with('user:id,name,surname')->latest()->get())
-            )
+            ),
+            '_links'    => [
+                [
+                    'rel'     => 'self',
+                    'type'    =>  'GET',
+                    'href'    => route('parks.show', ['park' => $this])
+                ],
+                [
+                    'rel'     => 'create',
+                    'type'    =>  'POST',
+                    'href'    => route('parks.store')
+                ],
+                [
+                    'rel'     => 'update',
+                    'type'    =>  'PUT/PATCH',
+                    'href'    => route('parks.update', ['park' => $this])
+                ],
+                [
+                    'rel'     => 'delete',
+                    'type'    =>  'DELETE',
+                    'href'    => route('parks.destroy', ['park' => $this])
+                ],
+            ],
         ];
     }
 

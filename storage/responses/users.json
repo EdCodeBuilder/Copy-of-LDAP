@@ -1,0 +1,46 @@
+{
+    "data": [
+        {
+            "id": 1,
+            "guid": "fbad8322-b960-...",
+            "full_name": "JHON DOE",
+            "name": "JHON",
+            "surname": "DOE",
+            "document": "12335678",
+            "email": "jhon.doe@idrd.gov.co",
+            "username": "jhon.doe",
+            "description": "CONTRATISTA",
+            "dependency": "AREA DEL IDRD",
+            "company": "SEDE PRINCIPAL",
+            "phone": "6605400",
+            "ext": "363",
+            "sim_id": 123,
+            "password_expired": false,
+            "is_locked": false,
+            "vacation_start_date": null,
+            "vacation_final_date": null,
+            "roles": [
+                {
+                    "id": 8,
+                    "name": "role",
+                    "title": "Role",
+                    "created_at": "2021-02-19 14:04:17",
+                    "updated_at": "2021-02-19 14:04:17"
+                }
+            ],
+            "expires_at": "2022-02-01 00:00:00",
+            "created_at": "2020-06-23 21:15:42",
+            "updated_at": "2021-07-09 22:34:29",
+            "ldap": [],
+            "deleted_at": null
+        },
+        {
+            "id": 143,
+            "guid": "5f3ad64e-3b46-...",
+            "...": "..."
+        }
+    ],
+    "code": 200,
+    "details": null,
+    "requested_at": "2021-09-21T16:27:03-05:00"
+}

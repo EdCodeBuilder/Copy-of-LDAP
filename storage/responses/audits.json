@@ -1,0 +1,115 @@
+{
+    "data": [
+        {
+            "id": 97005,
+            "user": "JHON DOE",
+            "event": "Actualizado",
+            "color": "warning",
+            "type": "App\\Modules\\Parks\\src\\Models\\Park",
+            "type_trans": "Parques",
+            "type_id": 26381,
+            "old_values": {
+                "AreaZDura": null,
+                "AreaZVerde": null,
+                "PoblacionInfantil": null,
+                "PoblacionJuvenil": null,
+                "PoblacionMayor": null,
+                "Aforo": null
+            },
+            "new_values": {
+                "AreaZDura": "56",
+                "AreaZVerde": "36",
+                "PoblacionInfantil": "29",
+                "PoblacionJuvenil": "38",
+                "PoblacionMayor": "39",
+                "Aforo": "2183"
+            },
+            "url": "https:\/\/sim.idrd.gov.co\/base-ldap\/public\/api\/parks\/26381",
+            "ip": "181-23.126.44",
+            "user_agent": "Mozilla\/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/93.0.4577.82 Safari\/537.36",
+            "tags": "park",
+            "created_at": "2021-09-20 11:22:51",
+            "updated_at": "2021-09-20 11:22:51"
+        }
+    ],
+    "links": {
+        "first": "https:\/\/sim.idrd.gov.co\/base-ldap\/public\/api\/parks\/audits?page=1",
+        "last": "https:\/\/sim.idrd.gov.co\/base-ldap\/public\/api\/parks\/audits?page=34",
+        "prev": null,
+        "next": "https:\/\/sim.idrd.gov.co\/base-ldap\/public\/api\/parks\/audits?page=2"
+    },
+    "meta": {
+        "current_page": 1,
+        "from": 1,
+        "last_page": 34,
+        "path": "https:\/\/sim.idrd.gov.co\/base-ldap\/public\/api\/parks\/audits",
+        "per_page": "1",
+        "to": 1,
+        "total": 34
+    },
+    "code": 200,
+    "details": {
+        "headers": [
+            {
+                "text": "#",
+                "value": "id"
+            },
+            {
+                "align": "right",
+                "text": "Evento",
+                "value": "event"
+            },
+            {
+                "text": "Tipo",
+                "value": "type_trans"
+            },
+            {
+                "text": "Usuario",
+                "value": "user"
+            },
+            {
+                "text": "IP",
+                "value": "ip"
+            },
+            {
+                "text": "Tags",
+                "value": "tags"
+            },
+            {
+                "text": "Fecha de Registro",
+                "value": "created_at"
+            }
+        ],
+        "expanded": [
+            {
+                "align": "right",
+                "label": "URL",
+                "field": "url"
+            },
+            {
+                "align": "right",
+                "label": "Navegador",
+                "field": "user_agent"
+            },
+            {
+                "align": "right",
+                "label": "Nuevos Valores",
+                "field": "new_values"
+            },
+            {
+                "align": "right",
+                "label": "Valores Anteriores",
+                "field": "old_values"
+            },
+            {
+                "label": "Fecha de Registro",
+                "field": "created_at"
+            },
+            {
+                "label": "Fecha de Actualizaci\u00f3n",
+                "field": "updated_at"
+            }
+        ]
+    },
+    "requested_at": "2021-09-21T15:51:41-05:00"
+}

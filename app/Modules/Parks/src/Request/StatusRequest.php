@@ -7,6 +7,9 @@ use App\Modules\Parks\src\Models\Enclosure;
 use App\Modules\Parks\src\Models\Status;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @bodyParam name string required Nombre del estado, máximo 30 caracteres. Example: BUENO
+ */
 class StatusRequest extends FormRequest {
 
     /**

@@ -19,6 +19,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
+/**
+ * @group Parques - Vocaciones
+ *
+ * @groupDescription API para la gestión y consulta de datos de Tipos de Vocaciones.
+ *
+ */
 class VocationController extends Controller
 {
     /**
@@ -34,7 +40,12 @@ class VocationController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Parques - Vocaciones
+     *
+     * Vocaciones
+     *
+     * Muestra un listado del recurso.
+     *
      *
      * @return JsonResponse
      */
@@ -44,6 +55,20 @@ class VocationController extends Controller
     }
 
     /**
+     * @group Parques - Vocaciones
+     *
+     * Crear Vocaciones
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     *
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
      * @param VocationRequest $request
      * @return JsonResponse
      */
@@ -69,6 +94,21 @@ class VocationController extends Controller
     }
 
     /**
+     * @group Parques - Vocaciones
+     *
+     * Actualizar Vocaciones
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam vocation int required Id del tipo de vocación: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
      * @param VocationRequest $request
      * @param Vocation $vocation
      * @return JsonResponse
@@ -93,6 +133,21 @@ class VocationController extends Controller
     }
 
     /**
+     * @group Parques - Vocaciones
+     *
+     * Eliminar Vocaciones
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @urlParam vocation int required Id del tipo de vocación: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
      * @param Vocation $vocation
      * @return JsonResponse
      * @throws \Exception

@@ -1,0 +1,22 @@
+{
+    "data": [
+        {
+            "id": "65fe6152",
+            "name": "gestionar-datos-sistema",
+            "title": "Gestionar Datos",
+            "entity_id": null,
+            "entity_type": "App\\Models\\Model",
+            "only_owned": false,
+            "options": [],
+            "scope": null,
+            "created_at": "2021-09-13 09:29:23",
+            "updated_at": "2021-09-13 09:29:23"
+        },
+        {
+            "...": "..."
+        }
+    ],
+    "code": 200,
+    "details": null,
+    "requested_at": "2021-09-21T16:04:44-05:00"
+}

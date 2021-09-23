@@ -7,6 +7,9 @@ use App\Modules\Parks\src\Models\Location;
 use App\Modules\Parks\src\Rules\ParkFinderRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @bodyParam name string required Nombre de la localidad máximo 50 caracteres. Example: USAQUÉN
+ */
 class LocationRequest extends FormRequest
 {
     /**

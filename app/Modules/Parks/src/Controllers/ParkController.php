@@ -13,6 +13,7 @@ use App\Modules\Parks\src\Models\EconomicUsePark;
 use App\Modules\Parks\src\Models\Park;
 use App\Modules\Parks\src\Models\ParkEndowment;
 use App\Modules\Parks\src\Request\AssignParkRequest;
+use App\Modules\Parks\src\Request\ParkExcelRequest;
 use App\Modules\Parks\src\Request\ParkFinderRequest;
 use App\Modules\Parks\src\Request\ParkRequest;
 use App\Modules\Parks\src\Request\UpdateParkRequest;
@@ -28,6 +29,11 @@ use Illuminate\Http\Response;
 use Maatwebsite\Excel\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+/**
+ * @group Parques
+ *
+ * API para la gestión y consulta de datos de Parques.
+ */
 class ParkController extends Controller
 {
     /**
@@ -43,7 +49,11 @@ class ParkController extends Controller
     }
 
     /**
-     * Display a listing of the resource with few data.
+     * @group Parques
+     *
+     * Buscador de parques
+     *
+     * Despliega una lista de coincidencias de parques según los criterios de búsqueda
      *
      * @param ParkFinderRequest $request
      * @return JsonResponse
@@ -95,10 +105,23 @@ class ParkController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @group Parques
+     *
+     * Reporte en excel de parques
+     *
+     * Genera un reporte en Excel (.xlsx) codificado en Base64 según filtros especificados.
+     *
+     * @response {
+     *      "data": { "name": "PARQUES-FA453A-A625A6.xlsx", "file": "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,TyayT8y76hh7A6GAJA887..." },
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
+     * @param ParkExcelRequest $request
      * @return JsonResponse
      */
-    public function excel(Request $request)
+    public function excel(ParkExcelRequest $request)
     {
         // return (new ParkExport($request))->download('REPORTE_PARQUES.xlsx', Excel::XLSX);
         $file = ExcelRaw::raw(new DashboardExport($request), Excel::XLSX);
@@ -111,7 +134,14 @@ class ParkController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @group Parques
+     *
+     * Ver parque
+     *
+     * Muesta información detallada de un parque en específico.
+     *
+     * @urlParam park string required Código o ID del parque. Example: 9
+     * @responseFile responses/parks/park.show.json
      *
      * @param $park
      * @return JsonResponse
@@ -136,11 +166,22 @@ class ParkController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @group Parques
+     *
+     * Crear Parque
+     *
+     * Crea un parque con información específica.
+     *
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param ParkRequest $request
      * @return JsonResponse
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function store(ParkRequest $request)
     {
@@ -155,12 +196,22 @@ class ParkController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @group Parques
      *
+     * Actualizar parque.
+     *
+     * Actualiza información de un parque en específico
+     *
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      * @param UpdateParkRequest $request
      * @param Park $park
      * @return JsonResponse
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function update(UpdateParkRequest $request, Park $park)
     {
@@ -182,6 +233,17 @@ class ParkController extends Controller
     }
 
     /**
+     * @group Parques
+     *
+     * Eliminar parque.
+     *
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      * @param Park $park
      * @return JsonResponse
      * @throws \Exception
@@ -196,6 +258,18 @@ class ParkController extends Controller
     );
     }
 
+    /**
+     * @group Parques - Parques Asignados
+     *
+     * Ids de parques asignados.
+     *
+     * Muestra un listado de ids de los parques asignados al usuario autenticado.
+     *
+     * @authenticated
+     * @responseFile responses/parks/ownedKey.get.json
+     *
+     * @return JsonResponse
+     */
     public function ownedKeys()
     {
         $owned = AssignedPark::where('user_id', auth()->user()->id)
@@ -207,6 +281,19 @@ class ParkController extends Controller
         return $this->success_message($owned);
     }
 
+    /**
+     * @group Parques - Parques Asignados
+     *
+     * Buscador de Parques Asignados
+     *
+     * Muestra el listado de los parques asignados al usuario autenticado
+     *
+     * @authenticated
+     * @responseFile responses/parks/assigned.get.json
+     *
+     * @param ParkFinderRequest $request
+     * @return JsonResponse
+     */
     public function owned(ParkFinderRequest $request)
     {
         $owned = AssignedPark::where('user_id', auth()->user()->id)
@@ -248,6 +335,20 @@ class ParkController extends Controller
         return $this->success_response( ParkFinderResource::collection( $parks ) );
     }
 
+    /**
+     * @group Parques - Parques Asignados
+     *
+     * Parques Asignados a Usuario
+     *
+     * Muestra un listado de los parques asignados a un usuario en específico.
+     *
+     * @urlParam user int required Id del usuario con parques asignados. Example: 1
+     * @authenticated
+     * @responseFile responses/parks/assigned.get.json
+     *
+     * @param User $user
+     * @return JsonResponse
+     */
     public function showOwned(User $user)
     {
         $owned = AssignedPark::where('user_id', $user->id)
@@ -260,6 +361,28 @@ class ParkController extends Controller
         return $this->success_response( ParkFinderResource::collection( $parks ) );
     }
 
+    /**
+     * @group Parques - Parques Asignados
+     *
+     * Deasociar un parque asignado a un usuario
+     *
+     * Eliminar permisos a parques asignados y desasigna el parque de un usuario en específico.
+     *
+     * @urlParam user int required ID de usuarios con parques asignados. Example: 3
+     * @urlParam park int required ID del parque. Example: 9
+     *
+     * @authenticated
+     * @response {
+     *  "data": "Datos eliminados satisfactoriamente",
+     *  "details": null,
+     *  "code": 204,
+     *  "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
+     * @param User $user
+     * @param Park $park
+     * @return JsonResponse
+     */
     public function destroyOwned(User $user, Park $park)
     {
         AssignedPark::where('user_id', $user->id)
@@ -269,6 +392,24 @@ class ParkController extends Controller
         return $this->success_message(__('validation.handler.deleted'));
     }
 
+    /**
+     * @group Parques - Parques Asignados
+     *
+     * Deasociar todos los parques asignados a un usuario
+     *
+     * Elimina la asignación de todos los parques a un usuario en específico.
+     *
+     * @authenticated
+     * @response {
+     *  "data": "Datos eliminados satisfactoriamente",
+     *  "details": null,
+     *  "code": 204,
+     *  "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
+     * @param User $user
+     * @return JsonResponse
+     */
     public function destroyAllOwned(User $user)
     {
         $parks = AssignedPark::where('user_id', $user->id)->get();
@@ -280,6 +421,20 @@ class ParkController extends Controller
         return $this->success_message(__('validation.handler.deleted'));
     }
 
+    /**
+     * @group Parques - Parques Asignados
+     *
+     * Asignar Parque a Usuario
+     *
+     * Asigna la administración de un parque a un usuario en específico.
+     * Puede asignar los parques de toda una localidad, upz, barrio o parque específico.
+     *
+     * @authenticated
+     * @response {}
+     *
+     * @param AssignParkRequest $request
+     * @return JsonResponse
+     */
     public function assignParks(AssignParkRequest $request)
     {
         $form = AssignedPark::query();
@@ -341,6 +496,15 @@ class ParkController extends Controller
         );
     }
 
+    /**
+     * @group Parques - Canchas Sintéticas
+     *
+     * Canchas Sintéticas
+     *
+     * En desarollo. Muestra un listado de las canchas sintéticas
+     *
+     * @return JsonResponse
+     */
     public function synthetic()
     {
         $id = 19; // Material del piso sintético
@@ -355,6 +519,15 @@ class ParkController extends Controller
         return $this->success_response( ParkEndowmentResource::collection( $parks ) );
     }
 
+    /**
+     * @group Parques - Diagramas/Renders
+     *
+     * Diagramas/Renders
+     *
+     * En desarollo. Muestra un listado de los parques que cuentan con diagramas.
+     *
+     * @return JsonResponse
+     */
     public function diagrams()
     {
         $parks = Park::query()
@@ -364,6 +537,18 @@ class ParkController extends Controller
         return $this->success_response( ParkFinderResource::collection( $parks ) );
     }
 
+    /**
+     * @group Parques - Aprovechamiento Económico
+     *
+     * Aprovechamiento Económico
+     *
+     * En desarollo. Muestra un listado de los aprovechamientos económicos de un parque especificado.
+     *
+     * @urlParam park int required Id del parque. Example: 9
+     *
+     * @param $park
+     * @return JsonResponse
+     */
     public function economic($park)
     {
         $data = EconomicUsePark::with('economic_use')->whereHas('economic_use')->where('IdParque', $park)->get();
@@ -374,11 +559,29 @@ class ParkController extends Controller
         return $this->error_response(__('parks.handler.park_does_not_exist', ['code' => $park]));
     }
 
+    /**
+     * @group Parques - Sectores Diagramas/Renders
+     *
+     * Sectores Diagramas/Renders
+     *
+     * En desarollo. Muestra breves datos de un parque y los sectores mapeados del render para mostrar información interactivamente.
+     *
+     * @urlParam park int required Id del parque. Example: 9
+     * @responseFile responses/parks/sectors.get.json
+     *
+     * @param $park
+     * @return JsonResponse
+     */
     public function sectors($park)
     {
         $park = Park::with('sectors.endowments')
             ->select( ['Id', 'Id_IDRD', 'Nombre', 'Direccion', 'Upz', 'Id_Localidad', 'Id_Tipo', 'Estado'] )
-            ->where('Id_IDRD', $park)
+            ->when(strpos($park, '-'), function ($query) use ($park) {
+                return $query->where('Id_IDRD', $park);
+            })
+            ->when(!strpos($park, '-'), function ($query) use ($park) {
+                return $query->where('Id', $park);
+            })
             ->where('Estado', true)
             ->first();
         if ( $park ) {
@@ -391,6 +594,20 @@ class ParkController extends Controller
         return $this->error_response(__('validation.handler.resource_not_found_url'), Response::HTTP_NOT_FOUND);
     }
 
+    /**
+     * @group Parques - Dotaciones
+     *
+     * Dotaciones
+     *
+     * En desarrollo. Muestra el listado de docationes de un parque especificado y un equipamiento especificado.
+     *
+     * @urlParam park int required Id del parque. Example: 9478
+     * @urlParam equipment int required Id del equipamiento. Example: 4
+     *
+     * @param $park
+     * @param $equipment
+     * @return JsonResponse
+     */
     public function fields($park, $equipment)
     {
         $parks = ParkEndowment::whereHas('endowment', function ($query) use ($equipment) {

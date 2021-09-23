@@ -8,6 +8,7 @@ namespace App\Modules\CitizenPortal\src\Request;
 use App\Models\Security\User;
 use App\Modules\CitizenPortal\src\Constants\Roles;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RoleRequest extends FormRequest
 {
@@ -33,6 +34,10 @@ class RoleRequest extends FormRequest
     {
         return [
             'roles'  => 'required|array',
+            'roles.*' => [
+                'string',
+                Rule::in(Roles::all())
+            ]
         ];
     }
 }

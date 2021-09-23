@@ -11,6 +11,12 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 
+/**
+ * @group Parques - Tipos de Upz
+ *
+ * API para la gestión y consulta de datos de Tipos de Upz.
+ *
+ */
 class UpzTypeController extends Controller
 {
     /**
@@ -26,7 +32,11 @@ class UpzTypeController extends Controller
     }
 
     /**
-     * Get a listing of the resource
+     * @group Parques - Tipos de Upz
+     *
+     * Tipos de Upz
+     *
+     * Muestra un listado del recurso.
      *
      * @return JsonResponse
      */
@@ -38,7 +48,19 @@ class UpzTypeController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @group Parques - Tipos de Upz
+     *
+     * Crear Tipo de Upz
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     *
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param UpzTypeRequest $request
      * @return JsonResponse
@@ -55,7 +77,20 @@ class UpzTypeController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @group Parques - Tipos de Upz
+     *
+     * Actualizar Tipo de Upz
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam types int required Id del tipo de Upz: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param UpzTypeRequest $request
      * @param UpzType $types
@@ -69,7 +104,20 @@ class UpzTypeController extends Controller
     }
 
     /**
-     * Delete the specified resource from storage.
+     * @group Parques - Tipos de Upz
+     *
+     * Eliminar Tipo de Upz
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @urlParam types int required Id del tipo de Upz: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param UpzType $types
      * @return JsonResponse

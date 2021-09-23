@@ -7,6 +7,9 @@ use App\Modules\Parks\src\Models\Rupi;
 use App\Modules\Parks\src\Rules\ParkFinderRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @bodyParam name string required Código rupi. Example: 9-123
+ */
 class RupiRequest extends FormRequest
 {
     /**

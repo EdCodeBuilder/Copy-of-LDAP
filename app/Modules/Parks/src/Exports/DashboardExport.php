@@ -236,8 +236,9 @@ class DashboardExport implements FromQuery, WithMapping, WithHeadings, WithColum
                     ->setSize(14)
                     ->setBold(true);
 
+                $user = isset(auth('api')->user()->full_name) ? auth('api')->user()->full_name : 'USUARIO';
                 $event->sheet->getDelegate()->getCell("B3")
-                    ->setValue(auth('api')->user()->full_name)
+                    ->setValue($user)
                     ->getStyle()
                     ->getFont()
                     ->setSize(14)

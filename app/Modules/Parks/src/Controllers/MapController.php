@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @group Parques - Mapa
+ *
+ * Api para la configuración del mapa de parques.
+ */
 class MapController extends Controller
 {
     /**
@@ -20,6 +25,15 @@ class MapController extends Controller
     }
 
     /**
+     * @group Parques - Mapa
+     *
+     * Mapa
+     *
+     * Provee la configuración del mapa y los servicios para embeber el
+     * mapa desde una etiqueta HTML <iframe> o para utilizar las
+     * librerías de ESRI/ARCGis junto con el API de Catastro.
+     *
+     * @responseFile responses/parks/assigned.get.json
      * @return JsonResponse
      */
     public function map()

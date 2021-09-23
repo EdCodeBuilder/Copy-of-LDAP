@@ -15,6 +15,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
+/**
+ * @group Parques - Localidades
+ *
+ * API para la gestión y consulta de datos de Localidades.
+ */
 class LocationController extends Controller
 {
     /**
@@ -30,18 +35,51 @@ class LocationController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Parques - Localidades
+     *
+     * Localidades
+     *
+     * @queryParam column Nombre de la columna para realizar filtros u ordenamientos Ejemplo: ['name']. No-example
+     * @queryParam order Orden de los resultados true para ascendente o false para descendente Ejemplo: ['true']. No-example
+     * @queryParam where Indica que el valor a buscar debe ser igual al especifivado. No-example
+     * @queryParam where_not Indica que el valor a buscar debe ser diferente al especifivado. No-example
+     * @queryParam where_in Indica que el valor a buscar debe estar entre los valores especificados Ejemplo: 1,2,3. No-example
+     * @queryParam where_not_in Indica que el valor a buscar no debe estar entre los valores especificados Ejemplo: 1,2,3. No-example
+     * @queryParam where_between Indica que el valor a buscar debe estar entre los valores especificados Ejemplo: 2021-01-01,2021-05-31. No-example
+     * @queryParam where_not_between Indica que el valor a buscar no debem estar entre los valores especificados Ejemplo: 1,8. No-example
+     * @queryParam or_where Si está definido el parámetro where indicará que los valores a buscar deben ser iguales al primer valor entregado o igual al segundo valor. Ejemplo: api/ruta?column[]=id&where=1&or_where=2. No-example
+     * @queryParam or_where_in Si está definido el parámetro where_in indicará que los valores a buscar deben estar en primer valor entregado o entre los datos del segundo valor. Ejemplo: api/ruta?column[]=id&where_in=1,2&or_where_in=5,6. No-example
+     * @queryParam or_where_not_in Si está definido el parámetro where_in indicará que los valores a buscar no deben estar en primer valor entregado o entre los datos del segundo valor. Ejemplo: api/ruta?column[]=id&where_not_in=1,2&or_where_not_in=5,6. No-example
+     * @queryParam or_where_between Indica que el valor a buscar debe estar entre los valores especificados Ejemplo: api/ruta?column[]=id&where_between=2021-01-01,2021-05-31&or_where_between=2020-01-01,2020-05-31. No-example
+     * @queryParam or_where_not_between Indica que el valor a buscar no debe estar entre los valores especificados Ejemplo: api/ruta?column[]=id&where_between=2021-01-01,2021-05-31&or_where_between=2020-01-01,2020-05-31. No-example
+     *
+     * Muestra un listado del recurso.
      *
      * @param Request $request
      * @return JsonResponse
      */
     public function index(Request $request)
     {
-        $data = $this->setQuery(Location::query(), 'Id_Localidad')->get();
+        $data = $this->setQuery(Location::query(), (new Location())->getSortableColumn($this->column))->get();
         return $this->success_response( LocationResource::collection( $data ) );
     }
 
     /**
+     * @group Parques - Localidades
+     *
+     * Crear Localidad
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     *
+     * @authenticated
+     *
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
      * @param LocationRequest $request
      * @return JsonResponse
      */
@@ -66,6 +104,27 @@ class LocationController extends Controller
         }
     }
 
+    /**
+     * @group Parques - Localidades
+     *
+     * Actualizar Localidad
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam location int required Id de la localidad a modificar.
+     *
+     * @authenticated
+     * @param LocationRequest $request
+     * @param Location $location
+     * @return JsonResponse
+     *
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     */
     public function update(LocationRequest $request, Location $location)
     {
         try {
@@ -86,6 +145,19 @@ class LocationController extends Controller
     }
 
     /**
+     * @group Parques - Localidades
+     *
+     * Eliminar Localidad
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     * @authenticated
      * @param Location $location
      * @return JsonResponse
      * @throws \Exception

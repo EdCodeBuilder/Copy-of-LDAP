@@ -6,6 +6,9 @@ use App\Modules\Parks\src\Constants\Roles;
 use App\Modules\Parks\src\Models\Enclosure;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @bodyParam name string required Nombre del tipo de cerramiento, máximo 30 caracteres. Example: Total
+ */
 class EnclosureRequest extends FormRequest
 {
     /**

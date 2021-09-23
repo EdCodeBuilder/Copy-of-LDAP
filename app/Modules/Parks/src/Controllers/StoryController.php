@@ -13,6 +13,12 @@ use App\Modules\Parks\src\Resources\StoryResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Parques - Datos de interés
+ *
+ * API para la gestión y consulta de datos de interés del parque.
+ *
+ */
 class StoryController extends Controller
 {
     /**
@@ -24,7 +30,13 @@ class StoryController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Parques - Datos de interés
+     *
+     * Datos de interés
+     *
+     * Muestra un listado del recurso.
+     *
+     * @urlParam park string required Id o código IDRD del parque. Example: 03-036
      *
      * @param $park
      * @return JsonResponse
@@ -44,10 +56,23 @@ class StoryController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @group Parques - Datos de interés
+     *
+     * Crear Datos de interés
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     *
+     * @urlParam park string required Id o código IDRD del parque. Example: 03-036
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param $park
-     * @param RupiRequest $request
+     * @param StoryRequest $request
      * @return JsonResponse
      */
     public function store($park, StoryRequest $request)
@@ -68,7 +93,22 @@ class StoryController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @group Parques - Datos de interés
+     *
+     * Actualizar Datos de interés
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam park string required Id o código IDRD del parque. Example: 03-036
+     * @urlParam story int required Id del Dato de Interés. Example: 3
+     *
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param StoryRequest $request
      * @param $park
@@ -86,10 +126,24 @@ class StoryController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @group Parques - Datos de interés
+     *
+     * Eliminar Datos de interés
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @urlParam park string required Id o código IDRD del parque. Example: 03-036
+     * @urlParam story int required Id del Dato de Interés. Example: 3
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param $park
-     * @param Rupi $story
+     * @param Story $story
      * @return JsonResponse
      * @throws \Exception
      */

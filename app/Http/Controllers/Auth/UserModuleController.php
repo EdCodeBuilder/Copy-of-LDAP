@@ -10,6 +10,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
+/**
+ * @group Módulos
+ *
+ * Api para la visualización de los módulos asociados al usuario.
+ */
 class UserModuleController extends Controller
 {
     public function __construct()
@@ -18,7 +23,14 @@ class UserModuleController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Módulos
+     *
+     * Módulos del Usuario
+     *
+     * Api para la visualización de los módulos asociados al usuario.
+     *
+     * @authenticated
+     * @responseFile responses/modules.get.json
      *
      * @return JsonResponse
      */

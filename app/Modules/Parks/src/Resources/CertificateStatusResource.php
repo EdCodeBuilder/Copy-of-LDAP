@@ -17,9 +17,11 @@ class CertificateStatusResource extends JsonResource
      */
     public function toArray($request)
     {
+        $park = isset($this->Id_Parque) ? (int) $this->Id_Parque : null;
         return [
             'id'        =>  isset( $this->id_EstadoCertificado ) ? (int) $this->id_EstadoCertificado : null,
             'name'      =>  isset( $this->EstadoCertificado ) ? (string) $this->EstadoCertificado : null,
+            'park_id'      =>  $park,
             'created_at'    => isset($this->created_at) ? $this->created_at->format('Y-m-d H:i:s') : null,
             'updated_at'    => isset($this->updated_at) ? $this->updated_at->format('Y-m-d H:i:s') : null,
             'deleted_at'    => isset($this->deleted_at) ? $this->deleted_at->format('Y-m-d H:i:s') : null,

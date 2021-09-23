@@ -11,6 +11,12 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 
+/**
+ * @group Parques - Estados
+ *
+ * API para la gestión y consulta de datos de Estados.
+ *
+ */
 class StatusController extends Controller
 {
     /**
@@ -26,7 +32,11 @@ class StatusController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Parques - Estados
+     *
+     * Estados
+     *
+     * Muestra un listado del recurso.
      *
      * @return JsonResponse
      */
@@ -36,6 +46,20 @@ class StatusController extends Controller
     }
 
     /**
+     * @group Parques - Estados
+     *
+     * Crear Estados
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     *
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
      * @param StatusRequest $request
      * @return JsonResponse
      */
@@ -51,6 +75,21 @@ class StatusController extends Controller
     }
 
     /**
+     * @group Parques - Estados
+     *
+     * Actualizar Estados
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam status int required Id del estado: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
      * @param StatusRequest $request
      * @param Status $status
      * @return JsonResponse
@@ -63,6 +102,21 @@ class StatusController extends Controller
     }
 
     /**
+     * @group Parques - Estados
+     *
+     * Eliminar Estados
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @urlParam status int required Id del estado: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
      * @param Status $status
      * @return JsonResponse
      * @throws \Exception
@@ -78,7 +132,11 @@ class StatusController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Parques - Tipos de Zonas
+     *
+     * Tipos de Zonas
+     *
+     * Muestra un listado del recurso.
      *
      * @return JsonResponse
      */
@@ -153,7 +211,11 @@ class StatusController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Parques - Competencia/Regulación
+     *
+     * Competencia/Regulación
+     *
+     * Muestra un listado del recurso.
      *
      * @return JsonResponse
      */
@@ -196,7 +258,11 @@ class StatusController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Parques - Vigilancia
+     *
+     * Vigilancia
+     *
+     * Muestra un listado del recurso.
      *
      * @return JsonResponse
      */

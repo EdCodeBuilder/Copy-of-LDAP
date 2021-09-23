@@ -3,6 +3,7 @@
 namespace App\Modules\Parks\src\Request;
 
 use App\Models\Security\User;
+use App\Modules\Parks\src\Constants\Roles;
 use App\Modules\Parks\src\Models\Location;
 use App\Modules\Parks\src\Models\Neighborhood;
 use App\Modules\Parks\src\Models\Park;
@@ -10,6 +11,14 @@ use App\Modules\Parks\src\Models\Upz;
 use App\Modules\Parks\src\Rules\ParkFinderRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @bodyParam user_id int required Id del usuario al que se asignará el parque. Example: 1
+ * @bodyParam locality_id int Es requerido si el tipo de asignamiento es "locality". No-example
+ * @bodyParam upz_code int Es requerido si el tipo de asignamiento es "upz". No-example
+ * @bodyParam neighborhood_id int Es requerido si el tipo de asignamiento es "neighborhood". No-example
+ * @bodyParam type_assignment string required Tipo de asignamiento Puede ser: locality, upz, neighborhood o manual. Example: manual
+ * @bodyParam park_id.* int Es requerido si el tipo de asignamiento es "manual" y debe contener Id de parques. Example: [9, 2938, 374]
+ */
 class AssignParkRequest extends FormRequest
 {
     /**
@@ -19,7 +28,7 @@ class AssignParkRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return auth('api')->user()->can(Roles::can(Park::class, 'manage'), Park::class);
     }
 
     /**

@@ -7,6 +7,12 @@ use App\Modules\Parks\src\Models\Neighborhood;
 use App\Modules\Parks\src\Models\Upz;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @bodyParam name string required Nombre del barrio máximo 500 caracteres. Example: LAS CRUCES
+ * @bodyParam neighborhood_code string Código del barrio, debe ser un valor único. Example: 45
+ * @bodyParam upz_code string required Código de la UPZ. Example: 98
+ *
+ */
 class NeighborhoodRequest extends FormRequest
 {
     /**

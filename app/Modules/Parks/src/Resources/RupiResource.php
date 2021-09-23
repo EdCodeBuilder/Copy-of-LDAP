@@ -19,7 +19,7 @@ class RupiResource extends JsonResource
         return [
             'id'        =>  (int) isset( $this->id_Rupi ) ? (int) $this->id_Rupi : null,
             'name'      =>  isset( $this->Rupi ) ? toUpper($this->Rupi) : null,
-            'park_id'   =>  (int) isset( $this->Id_Parque ) ? (int) $this->Id_Parque : null,
+            'park_id'   =>  isset( $this->Id_Parque ) ? (int) $this->Id_Parque : null,
             'created_at'    => isset($this->created_at) ? $this->created_at->format('Y-m-d H:i:s') : null,
             'updated_at'    => isset($this->updated_at) ? $this->updated_at->format('Y-m-d H:i:s') : null,
             'deleted_at'    => isset($this->deleted_at) ? $this->deleted_at->format('Y-m-d H:i:s') : null,

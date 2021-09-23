@@ -14,6 +14,46 @@ use App\Modules\Parks\src\Models\Vocation;
 use App\Modules\Parks\src\Rules\ParkFinderRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @bodyParam code string required Código del parque. Example: 03-036
+ * @bodyParam name  string required Nombre del parque. Example: LAS CRUCES
+ * @bodyParam address string required Dirección del parque. Example: CARRERA 5A #1- 90
+ * @bodyParam stratum int required Estrato del parque. Example: 2
+ * @bodyParam locality_id int required Id de la localidad del parque.
+ * @bodyParam upz_code string required Código de la UPZ del parque.
+ * @bodyParam neighborhood_id int required Id del barrio del parque.
+ * @bodyParam urbanization string required Nombre de la urbanización del parque. Example: PREDIOS PÚBLICOS NO CESIÓN
+ * @bodyParam latitude string Latitud del parque. Example: 4.585764498926
+ * @bodyParam longitude string Longitud del parque. Example: -74.0787936235177
+ * @bodyParam area_hectare int Área en hectáreas del parque. Example: 1.21
+ * @bodyParam area int Área del parque. Example: 5.79
+ * @bodyParam grey_area int Área zona dura del parque. Example: 20
+ * @bodyParam green_area int Área zona verde del parque Example: 30
+ * @bodyParam capacity int Capacidad de personas en el parque. Example: 2367
+ * @bodyParam children_population int Población infantil. Example: 33
+ * @bodyParam youth_population int Población juvenil. Example: 34
+ * @bodyParam older_population int Población mayor. Example: 32
+ * @bodyParam enclosure string Tipo de cerramiento del parque. Example: Total
+ * @bodyParam households int Cantidad de viviendas Example: 77
+ * @bodyParam walking_trails int Cantidad de senderos. Example: 700
+ * @bodyParam walking_trails_status string Estado de los senderos. Example: BUENO
+ * @bodyParam access_roads int Cantidad de vías. Example: 53
+ * @bodyParam access_roads_status  string Estado de las vías. Example: REGULAR
+ * @bodyParam zone_type string Tipo de Zona Example: RESIDENCIAL/COMERCIAL
+ * @bodyParam scale_id int Id de la escala del parque. Example: 3
+ * @bodyParam concern string Competencia/Regulación del parque. Example: IDRD
+ * @bodyParam visited_at date Fecha de última visita al parque en formato AAAA-MM-DD. Example: 2021-09-17
+ * @bodyParam general_status string Estado general del parque. Example: BUENO
+ * @bodyParam stage_type_id int Id del tipo de escenario Example: 1
+ * @bodyParam status_id int Id de estado del parque. Example: 2
+ * @bodyParam admin string Entidad que administra el parque. Example: Junta de Acción Comunal/IDRD
+ * @bodyParam phone string Números telefónicos del parque separados por coma, Ejemplo: 2800004, 6605300. Example: 2800004
+ * @bodyParam email string Correo electrónico del parque Example: lascruces@idrd.gov.co
+ * @bodyParam admin_name string Nombre del administrador del parque. Example: Jhon Doe
+ * @bodyParam vigilance string Cuenta o no con vigilancia. Ejemplo: Con vigilancia, Sin vigilancia. Example: Con Vigilancia
+ * @bodyParam received string El parque es recibido por el IDRD, Ejemplo: Si, No. Example: Si
+ * @bodyParam vocation_id int Id de la vocación del parque. Example: 2
+ */
 class UpdateParkRequest extends FormRequest
 {
     /**

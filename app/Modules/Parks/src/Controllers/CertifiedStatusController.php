@@ -14,6 +14,12 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 
+/**
+ * @group Parques - Estado de Certificación
+ *
+ * API para la gestión y consulta de datos de Estado de Certificación.
+ *
+ */
 class CertifiedStatusController extends Controller
 {
     /**
@@ -29,7 +35,11 @@ class CertifiedStatusController extends Controller
     }
 
     /**
-     * Get a listing of the resource
+     * @group Parques - Estado de Certificación
+     *
+     * Estado de Certificación
+     *
+     * Muestra un listado del recurso.
      *
      * @return JsonResponse
      */
@@ -41,7 +51,19 @@ class CertifiedStatusController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @group Parques - Estado de Certificación
+     *
+     * Crear Estado de Certificación
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     *
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param CertiicateStatusRequest $request
      * @return JsonResponse
@@ -58,7 +80,20 @@ class CertifiedStatusController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @group Parques - Estado de Certificación
+     *
+     * Actualizar Estado de Certificación
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam certified int required Id del estado de certificación: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param CertiicateStatusRequest $request
      * @param Certified $certified
@@ -72,7 +107,20 @@ class CertifiedStatusController extends Controller
     }
 
     /**
-     * Delete the specified resource from storage.
+     * @group Parques - Estado de Certificación
+     *
+     * Eliminar Estado de Certificación
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @urlParam certified int required Id del estado de certificación: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param Certified $certified
      * @return JsonResponse

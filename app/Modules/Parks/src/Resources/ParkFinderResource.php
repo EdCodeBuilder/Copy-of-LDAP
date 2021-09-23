@@ -20,6 +20,7 @@ class ParkFinderResource extends JsonResource
             'name'      =>  isset( $this->Nombre ) ? toUpper($this->Nombre) : null,
             'scale_id'  =>  isset( $this->Id_Tipo ) ? (int) $this->Id_Tipo : null,
             'scale'     =>  isset( $this->scale->Tipo ) ? toUpper($this->scale->Tipo) : null,
+            'locality_id'  =>  isset( $this->Id_Localidad ) ? (int) $this->Id_Localidad : null,
             'locality'  =>  isset( $this->location->Localidad ) ? toUpper($this->location->Localidad) : null,
             'address'   =>  isset( $this->Direccion ) ? toUpper($this->Direccion) : null,
             'upz_code'  =>  isset( $this->Upz ) ? (string) $this->Upz : null,
@@ -29,7 +30,29 @@ class ParkFinderResource extends JsonResource
             'created_at'    => isset($this->created_at) ? $this->created_at->format('Y-m-d H:i:s') : null,
             'updated_at'    => isset($this->updated_at) ? $this->updated_at->format('Y-m-d H:i:s') : null,
             'deleted_at'    => isset($this->deleted_at) ? $this->deleted_at->format('Y-m-d H:i:s') : null,
-            'sectors'   =>  SectorResource::collection( $this->whenLoaded('sectors') )
+            'sectors'   =>  SectorResource::collection( $this->whenLoaded('sectors') ),
+            '_links'    => [
+              [
+                  'rel'     => 'self',
+                  'type'    =>  'GET',
+                  'href'    => route('parks.show', ['park' => $this])
+              ],
+              [
+                  'rel'     => 'create',
+                  'type'    =>  'POST',
+                  'href'    => route('parks.store')
+              ],
+              [
+                  'rel'     => 'update',
+                  'type'    =>  'PUT/PATCH',
+                  'href'    => route('parks.update', ['park' => $this])
+              ],
+              [
+                  'rel'     => 'delete',
+                  'type'    =>  'DELETE',
+                  'href'    => route('parks.destroy', ['park' => $this])
+              ],
+            ],
         ];
     }
 

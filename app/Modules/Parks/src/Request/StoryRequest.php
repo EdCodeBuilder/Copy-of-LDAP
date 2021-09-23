@@ -7,6 +7,10 @@ use App\Modules\Parks\src\Models\Story;
 use App\Modules\Parks\src\Rules\ParkFinderRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @bodyParam title string required Título del tado de interés con máximo 191 caracteres. Example: CONDICIONES DE USO
+ * @bodyParam text string required Texto descriptivo con máximo 2500 caracteres.
+ */
 class StoryRequest extends FormRequest
 {
     /**
@@ -31,7 +35,7 @@ class StoryRequest extends FormRequest
     {
         return [
             'title'  => 'required|string|min:3|max:191',
-            'text'   => 'required|string|min:3',
+            'text'   => 'required|string|min:3|max:2500',
         ];
     }
 }

@@ -79,6 +79,24 @@ class Location extends Model implements Auditable
         return toUpper($this->Localidad);
     }
 
+    /**
+     * @param $column
+     * @return string
+     */
+    public function getSortableColumn($column)
+    {
+        switch ($column) {
+            case 'created_at':
+            case 'updated_at':
+            case 'deleted_at':
+                return $column;
+            default:
+                return in_array($column, $this->fillable)
+                    ? $column
+                    : $this->primaryKey;
+        }
+    }
+
    /*
    * ---------------------------------------------------------
    * Eloquent Relations

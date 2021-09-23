@@ -31,6 +31,11 @@ use Laravel\Passport\Http\Controllers\AccessTokenController;
 use Silber\Bouncer\BouncerFacade;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 
+/**
+ * @group Authentication
+ *
+ * Autenticación de Usuarios
+ */
 class LoginController extends Controller
 {
     /*
@@ -77,11 +82,32 @@ class LoginController extends Controller
     }
 
     /**
+     * @group Authentication
+     *
+     * Login
+     *
      * Handle a login request to the application.
+     *
+     * @bodyParam username string required Usuario de red (LDAP). Example: 'jhon.doe'
+     * @bodyParam password string required Contraseña de red (LDAP). Example: 'C0ntr4s3%$a^'
+     * @responseFile responses/login.post.json
+     * @response 422 {
+     *      "message": "'These credentials do not match our records or you do not have permission to enter this module.",
+     *      "details": null,
+     *      "code": 422,
+     *      "requested_at": "2021-09-12T16:45:39-05:00"
+     * }
+     * @response 429 {
+     *      "message": "Too many login attempts. Please try again in 60 seconds.",
+     *      "details": null,
+     *      "code": 429,
+     *      "requested_at": "2021-09-12T16:45:39-05:00"
+     * }
      *
      * @param Request $request
      * @return JsonResponse|RedirectResponse|Response|\Symfony\Component\HttpFoundation\Response|void
      *
+     * @throws PasswordExpiredException
      * @throws ValidationException
      */
     public function login(Request $request)
@@ -111,7 +137,18 @@ class LoginController extends Controller
     }
 
     /**
+     * @group Authentication
+     *
+     * Logout
+     *
      * Log the user out of the application.
+     *
+     * @response {
+     *   "data": "Se ha cerrado la sesión correctamente.",
+     *   "details": null,
+     *   "code": 200,
+     *   "requested_at": "2021-09-12T16:45:43-05:00"
+     * }
      *
      * @param Request $request
      * @return JsonResponse
@@ -127,7 +164,18 @@ class LoginController extends Controller
     }
 
     /**
-     * Log the user out of the application and revoke all tokens associated.
+     * @group Authentication
+     *
+     * Logout All Devices
+     *
+     * Log the user out of the application.
+     *
+     * @response {
+     *   "data": "Se ha cerrado la sesión correctamente.",
+     *   "details": null,
+     *   "code": 200,
+     *   "requested_at": "2021-09-12T16:45:43-05:00"
+     * }
      *
      * @param Request $request
      * @return JsonResponse
@@ -230,7 +278,13 @@ class LoginController extends Controller
     }
 
     /**
+     * @group Authentication
+     *
+     * User
+     *
      * Return authenticated user.
+     * @authenticated
+     * @responseFile responses/authUser.get.json
      *
      * @return JsonResponse
      *
@@ -246,6 +300,23 @@ class LoginController extends Controller
     }
 
     /**
+     * @group Authentication
+     *
+     * Change Password
+     *
+     * Update logged-in user password.
+     *
+     * @bodyParam old_password string required Contraseña anterior. Example: abc2737
+     * @bodyParam password string required Nueva contraseña. Example: MyStrongerPassword(&%·**
+     * @bodyParam password_confirmed string required Confirmación de la nueva contraseña. Example: MyStrongerPassword(&%·**
+     * @authenticated
+     * @response {
+     *      "data": "Your password has been changed successfully",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-12T16:45:43-05:00"
+     * }
+     *
      * @param Request $request
      * @return JsonResponse
      * @throws ValidationException

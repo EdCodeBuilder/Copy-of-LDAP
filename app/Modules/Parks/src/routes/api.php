@@ -81,7 +81,7 @@ Route::prefix('api')->group( function () {
 
     Route::prefix('parks')->group( function () {
         Route::prefix('stats')->group( function () {
-            Route::get('/', [StatsController::class, 'stats']);
+            Route::get('/', [StatsController::class, 'scales']);
             Route::get('/count', [StatsController::class, 'count']);
             Route::get('/enclosure', [StatsController::class, 'enclosure']);
             Route::get('/certified', [StatsController::class, 'certified']);

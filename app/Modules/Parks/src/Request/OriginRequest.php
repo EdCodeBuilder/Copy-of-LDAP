@@ -8,6 +8,16 @@ use App\Modules\Parks\src\Models\Origin;
 use App\Modules\Parks\src\Models\Park;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @bodyParam paragraph_1 string required Texto asociado a la historia del parque, máximo 2500 caracteres.
+ * @bodyParam paragraph_2 string Texto asociado a la historia del parque, máximo 2500 caracteres. No-example
+ * @bodyParam image_1 file Imágen asociada al parque (png, jpg). No-example
+ * @bodyParam image_2 file Imágen asociada al parque (png, jpg). No-example
+ * @bodyParam image_3 file Imágen asociada al parque (png, jpg). No-example
+ * @bodyParam image_4 file Imágen asociada al parque (png, jpg). No-example
+ * @bodyParam image_5 file Imágen asociada al parque (png, jpg). No-example
+ * @bodyParam image_6 file Imágen asociada al parque (png, jpg). No-example
+ */
 class OriginRequest extends FormRequest
 {
     /**

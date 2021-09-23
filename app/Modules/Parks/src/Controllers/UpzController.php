@@ -16,6 +16,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
+/**
+ * @group Parques - UPZ
+ *
+ * API para la gestión y consulta de datos de UPZ.
+ */
 class UpzController extends Controller
 {
     /**
@@ -31,7 +36,13 @@ class UpzController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Parques - UPZ
+     *
+     * UPZ
+     *
+     * Muestra un listado del recurso.
+     *
+     * @urlParam location int required Id de la localidad. Example: 1
      *
      * @param Location $location
      * @return JsonResponse
@@ -42,6 +53,22 @@ class UpzController extends Controller
     }
 
     /**
+     * @group Parques - UPZ
+     *
+     * Crear UPZ
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     *
+     * @urlParam location int required Id de la localidad. Example: 1
+     *
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
      * @param UpzRequest $request
      * @param Location $location
      * @return JsonResponse
@@ -69,7 +96,24 @@ class UpzController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @group Parques - UPZ
+     *
+     * Actualizar UPZ
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam location int required Id de la localidad. Example: 1
+     * @urlParam upz int required Id de la UPZ. Example: 1
+     *
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
+     * @param UpdateUpzRequest $request
      * @param $location
      * @param Upz $upz
      * @return JsonResponse
@@ -97,6 +141,24 @@ class UpzController extends Controller
     }
 
     /**
+     * @group Parques - UPZ
+     *
+     * Eliminar UPZ
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @urlParam location int required Id de la localidad. Example: 1
+     * @urlParam upz int required Id de la UPZ. Example: 1
+     *
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
+     *
      * @param $location
      * @param Upz $upz
      * @return JsonResponse

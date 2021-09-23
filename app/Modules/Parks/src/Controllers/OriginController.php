@@ -16,6 +16,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @group Parques - Historia del Parque
+ *
+ * @description API para la gestión y consulta de datos de historia del parque.
+ *
+ */
 class OriginController extends Controller
 {
     /**
@@ -31,7 +37,17 @@ class OriginController extends Controller
     }
 
     /**
-     * Get a listing of the resource
+     * @group Parques - Historia del Parque
+     *
+     * Historia del Parque
+     *
+     * Muestra un listado del recurso.
+     *
+     * Breve con fotografías del parque.
+     *
+     * @responseFile responses/parks/origin.get.json
+     * @urlParam park string required Id o código IDRD del parque. Example: 03-036
+     * @apiResourceCollection App\Modules\Parks\src\Resources\OriginResource
      *
      * @return JsonResponse
      */
@@ -57,9 +73,23 @@ class OriginController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @group Parques - Historia del Parque
+     *
+     * Crear Historia del Parque
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     *
+     * @urlParam park string required Id o código IDRD del parque. Example: 03-036
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param OriginRequest $request
+     * @param $park
      * @return JsonResponse
      */
     public function store(OriginRequest $request, $park)
@@ -95,7 +125,22 @@ class OriginController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @group Parques - Historia del Parque
+     *
+     * Actualizar Historia del Parque
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam park string required Id o código IDRD del parque. Example: 03-036
+     * @urlParam origin int required Id de la Historia del Parque. Example: 3
+     *
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param OriginRequest $request
      * @param $park
@@ -117,7 +162,22 @@ class OriginController extends Controller
     }
 
     /**
-     * Delete the specified resource from storage.
+     * @group Parques - Historia del Parque
+     *
+     * Eliminar Historia del Parque
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @urlParam park string required Id o código IDRD del parque. Example: 03-036
+     * @urlParam origin int required Id de la Historia del Parque. Example: 3
+     *
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param $park
      * @param Origin $origin

@@ -7,6 +7,7 @@ use App\Modules\Parks\src\Exports\Excel as ExcelRaw;
 use App\Modules\Parks\src\Models\Location;
 use App\Modules\Parks\src\Models\Park;
 use App\Modules\Parks\src\Models\Scale;
+use App\Modules\Parks\src\Request\ParkExcelRequest;
 use App\Modules\Parks\src\Resources\ScaleResource;
 use App\Modules\Parks\src\Resources\ScaleStatsResource;
 use App\Modules\Parks\src\Resources\StatsLocationResource;
@@ -19,6 +20,12 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+/**
+ * @group Parques - Estadísticas
+ *
+ * API para visualización de estadísticas.
+ *
+ */
 class StatsController extends Controller
 {
     /**
@@ -30,12 +37,16 @@ class StatsController extends Controller
     }
 
     /**
-     * Display a listing of the resource by scale.
+     * @group Parques - Estadísticas
      *
-     * @param Request $request
+     * Escalas
+     *
+     * Muestra la cantidad de parques por escalas.
+     *
+     * @param ParkExcelRequest $request
      * @return JsonResponse
      */
-    public function stats(Request $request)
+    public function scales(ParkExcelRequest $request)
     {
         $stats = Scale::withCount([
                             'parks' => function ($q) use ($request) {
@@ -47,12 +58,16 @@ class StatsController extends Controller
     }
 
     /**
-     * Display a listing of the resource by administration.
+     * @group Parques - Estadísticas
      *
-     * @param Request $request
+     * Administración
+     *
+     * Muestra la cantidad de parques totales, administrados por el IDRD y no administrados por el IDRD.
+     *
+     * @param ParkExcelRequest $request
      * @return JsonResponse
      */
-    public function count(Request $request)
+    public function count(ParkExcelRequest $request)
     {
         $total = Park::query();
         $total = $this->makeFilters($total, $request);
@@ -75,12 +90,16 @@ class StatsController extends Controller
     }
 
     /**
-     * Display a listing of the resource by enclosure.
+     * @group Parques - Estadísticas
      *
-     * @param Request $request
+     * Cerramientos
+     *
+     * Muestra la cantidad de parques por tipo de cerramiento.
+     *
+     * @param ParkExcelRequest $request
      * @return JsonResponse
      */
-    public function enclosure(Request $request)
+    public function enclosure(ParkExcelRequest $request)
     {
         $data = Park::selectRaw(DB::raw('Cerramiento AS enclosure, COUNT(*) as parks_count'));
         $data = $this->makeFilters($data, $request);
@@ -97,12 +116,16 @@ class StatsController extends Controller
     }
 
     /**
-     * Display a listing of the resource by certification.
+     * @group Parques - Estadísticas
      *
-     * @param Request $request
+     * Certificados
+     *
+     * Muestra el porcentaje de parques certificados.
+     *
+     * @param ParkExcelRequest $request
      * @return JsonResponse
      */
-    public function certified(Request $request)
+    public function certified(ParkExcelRequest $request)
     {
         $data = Park::where('EstadoCertificado', 1);
         $data = $this->makeFilters($data, $request);
@@ -118,12 +141,16 @@ class StatsController extends Controller
     }
 
     /**
-     * Display a listing of the resource by locality.
+     * @group Parques - Estadísticas
      *
-     * @param Request $request
+     * Localidades
+     *
+     * Muestra la cantidad de parques por localidades.
+     *
+     * @param ParkExcelRequest $request
      * @return JsonResponse
      */
-    public function localities(Request $request)
+    public function localities(ParkExcelRequest $request)
     {
         $stats = Location::withCount([
             'parks' => function ($q) use ($request) {
@@ -135,12 +162,16 @@ class StatsController extends Controller
     }
 
     /**
-     * Display a listing of the resource by upz.
+     * @group Parques - Estadísticas
      *
-     * @param Request $request
+     * UPZ
+     *
+     * Muestra la cantidad de parques por UPZ.
+     *
+     * @param ParkExcelRequest $request
      * @return JsonResponse
      */
-    public function upz(Request $request)
+    public function upz(ParkExcelRequest $request)
     {
         $stats = Park::query();
         $stats = $this->makeFilters($stats, $request);
@@ -160,10 +191,23 @@ class StatsController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @group Parques - Estadísticas
+     *
+     * Excel
+     *
+     * Devuelve un archivo en Excel (.xlsx) condificado en Base64 con información de los parques según los filtros realizados.
+     *
+     * @response {
+     *      "data": { "name": "PARQUES-FA453A-A625A6.xlsx", "file": "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,TyayT8y76hh7A6GAJA887..." },
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
+     * @param ParkExcelRequest $request
      * @return JsonResponse
      */
-    public function excel(Request $request)
+    public function excel(ParkExcelRequest $request)
     {
         $file = ExcelRaw::raw(new DashboardExport($request), Excel::XLSX);
         $name = random_img_name();
@@ -179,7 +223,7 @@ class StatsController extends Controller
      * @param Request $request
      * @return mixed
      */
-    public function makeFilters($query, Request $request)
+    private function makeFilters($query, Request $request)
     {
         $park = new Park();
         return $query

@@ -7,6 +7,9 @@ use App\Modules\Parks\src\Models\Certified;
 use App\Modules\Parks\src\Models\Enclosure;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @bodyParam name string required Nombre del estado de certificación, máximo 30 caracteres. Example: Investigado
+ */
 class CertiicateStatusRequest extends FormRequest
 {
     /**

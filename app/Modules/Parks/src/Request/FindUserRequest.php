@@ -9,6 +9,9 @@ use App\Models\Security\User;
 use App\Modules\Parks\src\Constants\Roles;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @queryParam username Nombre de usuario, documento o nombre completo del usuario para consultar en LDAP. Example: daniel.prado
+ */
 class FindUserRequest extends FormRequest
 {
     /**

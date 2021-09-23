@@ -21,6 +21,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
+/**
+ * @group Password
+ *
+ * Gestión de Contraseñas
+ */
 class ResetPasswordController extends Controller
 {
     use ResetsPasswords;
@@ -36,7 +41,23 @@ class ResetPasswordController extends Controller
     }
 
     /**
+     * @group Password
+     *
+     * Reset Password
+     *
      * Reset the given user's password.
+     *
+     * @bodyParam token string required Token enviado al correo electrónico del usuario. Example: eyUysRtsnHAHy6J8a....
+     * @bodyParam email string required Correo de restauración de contraseña. Example: jhon.doe@idrd.gov.co
+     * @bodyParam password string required Nueva contraseña del usuario. Example: MyStrongerPassword(&%·**
+     * @bodyParam password_confirmed string required Confirmación de la nueva contraseña del usuario. Example: MyStrongerPassword(&%·**
+     * @response {
+     *      "data": "¡Tu contraseña ha sido restablecida, por favor espera unos minutos mientras se raliza la sincronización de datos en todas tus cuentas!",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-12T16:45:39-05:00"
+     * }
+     *
      *
      * @param Request $request
      * @return RedirectResponse|JsonResponse

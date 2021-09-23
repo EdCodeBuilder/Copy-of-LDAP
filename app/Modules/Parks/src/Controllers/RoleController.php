@@ -14,6 +14,11 @@ use Illuminate\Http\Response;
 use Silber\Bouncer\BouncerFacade;
 use Silber\Bouncer\Database\Role;
 
+/**
+ * @group Parques - Roles
+ *
+ * Api para la gestión de roles en el módulo de parques.
+ */
 class RoleController extends Controller
 {
     /**
@@ -25,7 +30,13 @@ class RoleController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Parques - Roles
+     *
+     * Roles
+     *
+     * Muestra un listado de roles asociados al módulo.
+     * @authenticated
+     * @responseFile responses/roles.json
      *
      * @return JsonResponse
      */
@@ -38,7 +49,18 @@ class RoleController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @group Parques - Roles
+     *
+     * Crear Roles
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param StoreRoleRequest $request
      * @return JsonResponse
@@ -59,7 +81,21 @@ class RoleController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @group Parques - Roles
+     *
+     * Actualizar Roles
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam role int Id del permiso a actualizar. Example: 3
+     *
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param UpdateRoleRequest $request
      * @param Role $role
@@ -79,7 +115,20 @@ class RoleController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @group Parques - Roles
+     *
+     * Eliminar Roles
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @urlParam role int required Id del tipo de escenario: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param Role $role
      * @return JsonResponse

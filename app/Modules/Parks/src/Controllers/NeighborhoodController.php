@@ -17,6 +17,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
+/**
+ * @group Parques - Barrios
+ *
+ * API para la gestión y consulta de datos de Barrios.
+ */
 class NeighborhoodController extends Controller
 {
     /**
@@ -32,7 +37,14 @@ class NeighborhoodController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Parques - Barrios
+     *
+     * Barrios
+     *
+     * Muestra un listado del recurso.
+     *
+     * @urlParam location int required Id de la localidad. Example: 1
+     * @urlParam upz int required Id de la UPZ. Example: 1
      *
      * @param Location $location
      * @param Upz $upz
@@ -44,6 +56,23 @@ class NeighborhoodController extends Controller
     }
 
     /**
+     * @group Parques - Barrios
+     *
+     * Crear Barrio
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     *
+     * @urlParam location int required Id de la localidad. Example: 1
+     * @urlParam upz int required Id de la UPZ. Example: 1
+     *
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
      * @param NeighborhoodRequest $request
      * @param $location
      * @param Upz $upz
@@ -72,6 +101,24 @@ class NeighborhoodController extends Controller
     }
 
     /**
+     * @group Parques - Barrios
+     *
+     * Actualizar Barrio
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam location int required Id de la localidad. Example: 1
+     * @urlParam upz int required Id de la UPZ. Example: 1
+     * @urlParam neighborhood int required Id del Barrio. Example: 1
+     *
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
      * @param NeighborhoodRequest $request
      * @param $location
      * @param $upz
@@ -100,6 +147,25 @@ class NeighborhoodController extends Controller
     }
 
     /**
+     * @group Parques - Barrios
+     *
+     * Eliminar Barrios
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @urlParam location int required Id de la localidad. Example: 1
+     * @urlParam upz int required Id de la UPZ. Example: 1
+     * @urlParam neighborhood int required Id del Barrio. Example: 1
+     *
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
+     *
      * @param $location
      * @param $upz
      * @param Neighborhood $neighborhood

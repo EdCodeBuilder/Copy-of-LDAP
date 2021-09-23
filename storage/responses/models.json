@@ -1,0 +1,15 @@
+{
+    "data": [
+        {
+            "id": "App\\Models\\Model",
+            "name": "Modelo"
+        },
+        {
+            "id": "...",
+            "name": "..."
+        }
+    ],
+    "details": null,
+    "code": 200,
+    "requested_at": "2021-09-21T15:56:20-05:00"
+}

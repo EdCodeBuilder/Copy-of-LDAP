@@ -9,6 +9,11 @@ use App\Modules\Parks\src\Models\UpzType;
 use App\Modules\Parks\src\Rules\ParkFinderRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @bodyParam name string required Nombre de la UPZ máximo 50 caracteres. Example: LAS CRUCES
+ * @bodyParam upz_code string required Código de la upz máximo 50 caracteres y debe ser un valor único. Example: 78
+ * @bodyParam locality_id int required Id de la localidad. Example: 1
+ */
 class UpzRequest extends FormRequest
 {
     /**

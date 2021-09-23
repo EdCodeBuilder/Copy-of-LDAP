@@ -15,6 +15,11 @@ use OwenIt\Auditing\Models\Audit;
 use Silber\Bouncer\BouncerFacade;
 use Silber\Bouncer\Database\Ability;
 
+/**
+ * @group Parques - Permisos
+ *
+ * Api para la gestión de permisos en el módulo de parques.
+ */
 class PermissionsController extends Controller
 {
     /**
@@ -26,7 +31,13 @@ class PermissionsController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Parques - Permisos
+     *
+     * Permisos
+     *
+     * Muestra un listado de permisos asociados al módulo.
+     * @authenticated
+     * @responseFile responses/permissions.json
      *
      * @return JsonResponse
      */
@@ -41,6 +52,17 @@ class PermissionsController extends Controller
         );
     }
 
+    /**
+     * @group Parques - Modelos
+     *
+     * Modelos
+     *
+     * Muestra un listado de entidades del módulo al cual se le asociarán permisos.
+     * @authenticated
+     * @responseFile responses/models.json
+     *
+     * @return JsonResponse
+     */
     public function models()
     {
         return $this->success_message(
@@ -48,7 +70,13 @@ class PermissionsController extends Controller
         );
     }
 
-    public function getModels($path) {
+    /**
+     * Obtiene el listado de modelos del módulo.
+     *
+     * @param $path
+     * @return \Illuminate\Support\Collection|\Tightenco\Collect\Support\Collection
+     */
+    private function getModels($path) {
         $models = collect(File::allFiles($path))
             ->map(function ($item) {
                 $path = $item->getRelativePathName();
@@ -68,7 +96,18 @@ class PermissionsController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @group Parques - Permisos
+     *
+     * Crear Permisos
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param StorePermissionRequest $request
      * @return JsonResponse
@@ -92,7 +131,21 @@ class PermissionsController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @group Parques - Permisos
+     *
+     * Actualizar Permisos
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam permission int Id del permiso a actualizar. Example: 3
+     *
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param UpdatePermissionRequest $request
      * @param Ability $permission
@@ -116,7 +169,20 @@ class PermissionsController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @group Parques - Permisos
+     *
+     * Eliminar Permisos
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @urlParam permission int required Id del tipo de escenario: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param Ability $permission
      * @return JsonResponse

@@ -4,6 +4,11 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @bodyParam name string required Nombre del permiso a crear separado por guiones y debe ser único. Example: 'crear-equipamiento-parque'
+ * @bodyParam title string required Título o descripción del permiso máximo 191 caracteres. Example: Crear equipamientos de parques
+ * @bodyParam entity_type string required Modelo o entidad a la que está asociado el permiso. Example: App\Models\Equipamiento
+ */
 class StorePermissionRequest extends FormRequest
 {
     /**

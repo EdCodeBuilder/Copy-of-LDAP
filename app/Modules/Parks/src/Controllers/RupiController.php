@@ -11,6 +11,12 @@ use App\Modules\Parks\src\Resources\RupiResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group Parques - Vocaciones
+ *
+ * API para la gestión y consulta de datos de Tipos de Vocaciones.
+ *
+ */
 class RupiController extends Controller
 {
     /**
@@ -26,7 +32,15 @@ class RupiController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Parques - Rupis
+     *
+     * Rupis
+     *
+     * Muestra un listado del recurso.
+     *
+     * RUPI: Es el código de identificación de los predios en el sistema de información de la Defensoría del Espacio Público.
+     *
+     * @urlParam park string required Id o código IDRD del parque. Example: 03-036
      *
      * @param $park
      * @return JsonResponse
@@ -46,7 +60,20 @@ class RupiController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @group Parques - Rupis
+     *
+     * Crear Rupis
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     *
+     * @urlParam park string required Id o código IDRD del parque. Example: 03-036
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param $park
      * @param RupiRequest $request
@@ -68,7 +95,22 @@ class RupiController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @group Parques - Rupis
+     *
+     * Actualizar Rupis
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam park string required Id o código IDRD del parque. Example: 03-036
+     * @urlParam rupi int required Id del Ruoi. Example: 3
+     *
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param RupiRequest $request
      * @param $park
@@ -85,7 +127,21 @@ class RupiController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @group Parques - Rupis
+     *
+     * Eliminar Rupis
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @urlParam park string required Id o código IDRD del parque. Example: 03-036
+     * @urlParam rupi int required Id del Ruoi. Example: 3
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param $park
      * @param Rupi $rupi

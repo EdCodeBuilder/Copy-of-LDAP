@@ -6,6 +6,9 @@ use App\Modules\Parks\src\Constants\Roles;
 use App\Modules\Parks\src\Models\StageType;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @bodyParam name string required Nombre del tipo de escenario, máximo 191 caracteres. Example: CEFE
+ */
 class StageTypeRequest extends FormRequest
 {
     /**

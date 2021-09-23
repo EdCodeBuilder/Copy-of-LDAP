@@ -11,6 +11,12 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 
+/**
+ * @group Parques - Cerramientos
+ *
+ * API para la gestión y consulta de datos de Tipos de Cerramientos.
+ *
+ */
 class EnclosureController extends Controller
 {
     /**
@@ -26,7 +32,11 @@ class EnclosureController extends Controller
     }
 
     /**
-     * Get a listing of the resource
+     * @group Parques - Cerramientos
+     *
+     * Cerramientos
+     *
+     * Muestra un listado del recurso.
      *
      * @return JsonResponse
      */
@@ -38,7 +48,19 @@ class EnclosureController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @group Parques - Cerramientos
+     *
+     * Crear Cerramientos
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     *
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param EnclosureRequest $request
      * @return JsonResponse
@@ -55,7 +77,20 @@ class EnclosureController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @group Parques - Cerramientos
+     *
+     * Actualizar Cerramientos
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam enclosure int required Id del tipo de cerramiento: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param EnclosureRequest $request
      * @param Enclosure $enclosure
@@ -69,7 +104,20 @@ class EnclosureController extends Controller
     }
 
     /**
-     * Delete the specified resource from storage.
+     * @group Parques - Cerramientos
+     *
+     * Eliminar Cerramientos
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @urlParam enclosure required Id del tipo de cerramiento: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param Enclosure $enclosure
      * @return JsonResponse

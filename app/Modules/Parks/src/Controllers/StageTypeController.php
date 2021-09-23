@@ -15,6 +15,12 @@ use App\Modules\Parks\src\Resources\UpzResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
+/**
+ * @group Parques - Tipos de Escenarios
+ *
+ * API para la gestión y consulta de datos de Tipos de Escenarios.
+ *
+ */
 class StageTypeController extends Controller
 {
     /**
@@ -30,7 +36,11 @@ class StageTypeController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Parques - Tipos de Escenarios
+     *
+     * Tipos de Escenarios
+     *
+     * Muestra un listado del recurso.
      *
      * @return JsonResponse
      */
@@ -40,7 +50,19 @@ class StageTypeController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @group Parques - Tipos de Escenarios
+     *
+     * Crear Tipo de Escenario
+     *
+     * Almacena un recurso recién creado en la base de datos.
+     *
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param StageTypeRequest $request
      * @return JsonResponse
@@ -57,7 +79,20 @@ class StageTypeController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @group Parques - Tipos de Escenarios
+     *
+     * Actualizar Tipo de Escenario
+     *
+     * Actualiza el recurso especificado en la base de datos.
+     *
+     * @urlParam stage int required Id del tipo de escenario: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos actualizados satisfactoriamente",
+     *      "details": null,
+     *      "code": 200,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
      *
      * @param StageTypeRequest $request
      * @param StageType $stage
@@ -71,6 +106,21 @@ class StageTypeController extends Controller
     }
 
     /**
+     * @group Parques - Tipos de Escenarios
+     *
+     * Eliminar Tipo de Escenario
+     *
+     * Elimina el recurso especificado en la base de datos.
+     *
+     * @urlParam stage int required Id del tipo de escenario: Example: 1
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
      * @param StageType $stage
      * @return JsonResponse
      * @throws \Exception

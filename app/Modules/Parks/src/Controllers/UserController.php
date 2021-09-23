@@ -29,6 +29,11 @@ use OwenIt\Auditing\Models\Audit;
 use Silber\Bouncer\BouncerFacade;
 use Silber\Bouncer\Database\Role;
 
+/**
+ * @group Parques - Gestión de Usuarios
+ *
+ * Api para la gestión de usuarios en el módulo de parques.
+ */
 class UserController extends Controller
 {
     public function __construct()
@@ -40,7 +45,19 @@ class UserController extends Controller
     }
 
     /**
-     * Display a menu of the menu for current user.
+     * @group Parques - Gestión de Usuarios
+     *
+     * Menú
+     *
+     * Despliega el menú dinámico dependendo de los permisos asignados al usuario.
+     *
+     * @authenticated
+     * @response {
+     *  "data": [{ "icon": "mdi-view-dashboard", "title": "Dashboard", "to": { "name": "dashboard" }, "exact": true, "can": true}],
+     *  "details": null,
+     *  "code": 200,
+     *  "requested_at": "2021-09-12T16:45:59"
+     * }
      *
      * @return JsonResponse
      */
@@ -198,6 +215,20 @@ class UserController extends Controller
     }
 
     /**
+     * @group Parques - Gestión de Usuarios
+     *
+     * Permisos
+     *
+     * Despliega el listado de permisos asociados al usuario y módulo autenticado.
+     *
+     * @authenticated
+     * @response {
+     *  "data": {"id": 1, "abilities": [], "roles": [] },
+     *  "details": null,
+     *  "code": 200,
+     *  "requested_at": "2021-09-12T16:45:59"
+     * }
+     *
      * @return JsonResponse
      */
     public function permissions()
@@ -208,7 +239,14 @@ class UserController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @group Parques - Gestión de Usuarios
+     *
+     * Usuarios
+     *
+     * Muestra el listado de usuarios asociados al módulo de parques.
+     *
+     * @authenticated
+     * @responseFile responses/users.json
      *
      * @return JsonResponse
      */
@@ -227,6 +265,14 @@ class UserController extends Controller
     }
 
     /**
+     * @group Parques - Gestión de Usuarios
+     *
+     * Roles
+     *
+     * Muestra el listado de roles asociados al módulo.
+     * @authenticated
+     * @responseFile responses/roles.json
+     *
      * @return JsonResponse
      */
     public function roles()
@@ -237,7 +283,16 @@ class UserController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @group Parques - Gestión de Usuarios
+     *
+     * Buscador de usuarios
+     *
+     * Muestra un listado de coincidencias según los parámetros establecidos.
+     *
+     * @authenticated
+     * @responseFile responses/users.json
+     *
+     * @param FindUserRequest $request
      * @return JsonResponse
      */
     public function findUsers(FindUserRequest $request)
@@ -249,6 +304,22 @@ class UserController extends Controller
     }
 
     /**
+     * @group Parques - Gestión de Usuarios
+     *
+     * Asignación de Roles
+     *
+     * Asigna un rol o varios roles especificados a un usuario.
+     *
+     * @urlParam user int required Id del usuario a asignar roles.
+     *
+     * @authenticated
+     * @response 201 {
+     *      "data": "Datos almacenados satisfactoriamente",
+     *      "details": null,
+     *      "code": 201,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
      * @param RoleRequest $request
      * @param User $user
      * @return JsonResponse
@@ -263,6 +334,22 @@ class UserController extends Controller
     }
 
     /**
+     * @group Parques - Gestión de Usuarios
+     *
+     * Eliminación de Roles
+     *
+     * Elimina un rol o roles asociados a un usuario especificado..
+     *
+     * @urlParam user int required Id del usuario a asignar roles.
+     *
+     * @authenticated
+     * @response {
+     *      "data": "Datos eliminados satisfactoriamente",
+     *      "details": null,
+     *      "code": 204,
+     *      "requested_at": "2021-09-20T17:52:01-05:00"
+     * }
+     *
      * @param RoleRequest $request
      * @param User $user
      * @return JsonResponse

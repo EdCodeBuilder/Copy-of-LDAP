@@ -1,0 +1,107 @@
+{
+    "data": {
+        "park": {
+            "id": 9,
+            "code": "03-036",
+            "name": "LAS CRUCES",
+            "scale_id": 3,
+            "scale": "ZONAL",
+            "locality_id": 3,
+            "locality": "SANTA FE",
+            "address": "CARRERA 5A #1- 90",
+            "upz_code": "95",
+            "upz": "LAS CRUCES",
+            "color": "success",
+            "status_id": 1,
+            "created_at": "2021-09-21 13:24:32",
+            "updated_at": "2021-09-21 13:24:32",
+            "deleted_at": null,
+            "sectors": [
+                {
+                    "id": 14,
+                    "park_id": 9,
+                    "sector": "Sector I",
+                    "coordinate": null,
+                    "type": 1,
+                    "endowments": [
+                        {
+                            "id": 14827,
+                            "park_id": 9,
+                            "endowment_id": 1,
+                            "endowment_num": null,
+                            "endowment": "F\u00daTBOL",
+                            "status_id": 2,
+                            "status": "REGULAR",
+                            "material": null,
+                            "illumination": "SI",
+                            "economic_use": "SI",
+                            "area": 1111,
+                            "floor_material_id": 19,
+                            "floor_material": "GRAMA SINTETICA",
+                            "equipment_id": 1,
+                            "equipment": "CANCHAS DEPORTIVAS",
+                            "enclosure_id": 1,
+                            "enclosure": "TOTAL",
+                            "dressing_room": "NO",
+                            "light": null,
+                            "water": null,
+                            "gas": "",
+                            "capacity": 0,
+                            "lane": 0,
+                            "bath": 0,
+                            "sanitary_battery": 0,
+                            "description": "CANCHA DE Futbol 5 EN GRAMA SINTETICA, SECTOR CENTRAL.",
+                            "maintenance_diagnosis": "",
+                            "construction_diagnosis": "",
+                            "positioning": "",
+                            "destination": "",
+                            "image": "https:\/\/www.idrd.gov.co\/SIM\/Parques\/Foto\/34e82ff8e70006afe0512071cb652f3a.jpg",
+                            "date": "2017-04-03",
+                            "enclosure_type": "SOLO METALICO (CONTARIMPACTO, MALLA ESLABONADA)",
+                            "enclosure_height": "5 MTRS",
+                            "long": 1144,
+                            "width": 1,
+                            "covered": "",
+                            "dunt": 0,
+                            "male_bath": 0,
+                            "female_bath": 0,
+                            "disabled_bath": 0,
+                            "car_parking": 0,
+                            "bike_parking": 0,
+                            "public": 0,
+                            "sector_id": 14,
+                            "map": "1855,870,2013,925"
+                        },
+                        {"...":  "..."}
+                    ]
+                }
+            ],
+            "_links": [
+                {
+                    "rel": "self",
+                    "type": "GET",
+                    "href": "http:\/\/dashboard.test\/api\/parks\/9"
+                },
+                {
+                    "rel": "create",
+                    "type": "POST",
+                    "href": "http:\/\/dashboard.test\/api\/parks"
+                },
+                {
+                    "rel": "update",
+                    "type": "PUT\/PATCH",
+                    "href": "http:\/\/dashboard.test\/api\/parks\/9"
+                },
+                {
+                    "rel": "delete",
+                    "type": "DELETE",
+                    "href": "http:\/\/dashboard.test\/api\/parks\/9"
+                }
+            ]
+        },
+        "type": 1
+    },
+    "details": null,
+    "code": 200,
+    "requested_at": "2021-09-21T16:16:08-05:00"
+}

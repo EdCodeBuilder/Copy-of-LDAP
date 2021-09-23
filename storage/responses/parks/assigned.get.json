@@ -1,0 +1,61 @@
+{
+    "data": [
+        {
+            "id": 9,
+            "code": "03-036",
+            "name": "LAS CRUCES",
+            "scale_id": 3,
+            "scale": "ZONAL",
+            "locality_id": 3,
+            "locality": "SANTA FE",
+            "address": "CARRERA 5A #1- 90",
+            "upz_code": "95",
+            "upz": "LAS CRUCES",
+            "color": "success",
+            "status_id": null,
+            "created_at": "2021-09-21 13:24:32",
+            "updated_at": "2021-09-21 13:24:32",
+            "deleted_at": null,
+            "_links": [
+                {
+                    "rel": "self",
+                    "type": "GET",
+                    "href": "https://sim.idrd.gov.co/base-ldap/public/api/parks/9"
+                },
+                {
+                    "rel": "create",
+                    "type": "POST",
+                    "href": "https://sim.idrd.gov.co/base-ldap/public/api/parks/parks"
+                },
+                {
+                    "rel": "update",
+                    "type": "PUT\/PATCH",
+                    "href": "https://sim.idrd.gov.co/base-ldap/public/api/parks/9"
+                },
+                {
+                    "rel": "delete",
+                    "type": "DELETE",
+                    "href": "https://sim.idrd.gov.co/base-ldap/public/api/parks/9"
+                }
+            ]
+        }
+    ],
+    "links": {
+        "first": "https://sim.idrd.gov.co/base-ldap/public/api/owned?page=1",
+        "last": "https://sim.idrd.gov.co/base-ldap/public/api/owned?page=1",
+        "prev": null,
+        "next": null
+    },
+    "meta": {
+        "current_page": 1,
+        "from": 1,
+        "last_page": 1,
+        "path": "https://sim.idrd.gov.co/base-ldap/public/api/owned",
+        "per_page": 10,
+        "to": 1,
+        "total": 1
+    },
+    "code": 200,
+    "details": null,
+    "requested_at": "2021-09-21T08:30:54-05:00"
+}

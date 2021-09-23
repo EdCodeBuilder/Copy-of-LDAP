@@ -13,6 +13,11 @@ use Silber\Bouncer\BouncerFacade;
 use Silber\Bouncer\Database\Ability;
 use Silber\Bouncer\Database\Role;
 
+/**
+ * @group Parques - Roles y Permisos
+ *
+ * Api para la asociación de roles y permisos.
+ */
 class RolePermissionsController extends Controller
 {
     /**
@@ -24,6 +29,17 @@ class RolePermissionsController extends Controller
     }
 
     /**
+     * @group Parques - Roles y Permisos
+     *
+     * Roles y Permisos
+     *
+     * Muestra el listado de permisos asociados a un rol.
+     *
+     * @urlParam role int required Id del rol. Example 1
+     *
+     * @authenticated
+     * @responseFile responses/roles_and_permissions.json
+     *
      * @param Role $role
      * @return JsonResponse
      */
@@ -35,7 +51,16 @@ class RolePermissionsController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @group Parques - Roles y Permisos
+     *
+     * Asociar Rol a Permisos
+     *
+     * Asocia un rol a un permiso específico
+     *
+     * @urlParam role int required Id del rol. Example 1
+     * @urlParam permission int required Id del permiso. Example 2
+     *
+     * @authenticated
      *
      * @param Role $role
      * @param Ability $permission
@@ -51,7 +76,15 @@ class RolePermissionsController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @group Parques - Roles y Permisos
+     *
+     * Desasociar Rol a Permisos
+     *
+     * Elimina un permiso de un rol especificado
+     *
+     * @urlParam role int required Id del rol. Example 1
+     * @urlParam permission int required Id del permiso. Example 2
+     * @authenticated
      *
      * @param Role $role
      * @param Ability $permission

@@ -1,0 +1,113 @@
+{
+    "data": {
+        "id": 9,
+        "code": "03-036",
+        "name": "LAS CRUCES",
+        "phone": 2800004,
+        "stratum": 2,
+        "image": "",
+        "block": "LAS CRUCES",
+        "neighborhood_id": 144,
+        "area": 5.793,
+        "area_hectare": 1.209,
+        "general_status": "BUENO",
+        "enclosure": "Total",
+        "households": 70,
+        "zone_type": "",
+        "admin": "IDRD",
+        "walking_trails": 600,
+        "walking_trails_status": "BUENO",
+        "access_roads": "SI",
+        "access_roads_status": "REGULAR",
+        "children_population": 33,
+        "youth_population": 34,
+        "older_population": 33,
+        "population_chart": [
+            33,
+            34,
+            33
+        ],
+        "admin_name": "EMILSE ARIAS",
+        "status_id": 1,
+        "status": "BUENO",
+        "latitude": 4.5857644989260002,
+        "longitude": -74.0787936235176,
+        "urbanization": "PREDIOS P\u00daBLICOS NO CESI\u00d3N",
+        "vigilance": "Con vigilancia",
+        "received": "Si",
+        "capacity": 2743.17,
+        "stage_type_id": null,
+        "stage_type": null,
+        "pqrs": "atencionalcliente@idrd.gov.co",
+        "email": "lascruces@idrd.gov.co",
+        "schedule_service": "Lunes a Viernes: 6:00 AM - 6:00 PM \/ S\u00e1bados y Domingos: 5:00 AM - 6:00 PM",
+        "schedule_admin": "Lunes a Viernes:  8:00 AM A  4:00 PM \/ S\u00e1bados y Domingos:  9:00 AM -2:00 PM",
+        "scale_id": 3,
+        "scale": "ZONAL",
+        "locality_id": 3,
+        "locality": "SANTA FE",
+        "address": "CARRERA 5A #1- 90",
+        "upz_code": "95",
+        "upz": "LAS CRUCES",
+        "concept_id": 1,
+        "concept": "CERTIFICADO",
+        "file": "https:\/\/www.idrd.gov.co\/SIM\/Parques\/Certificado\/03-036.tif",
+        "concern": "IDRD",
+        "regulation": "IDRD",
+        "regulation_file": null,
+        "visited_at": "2021-06-26",
+        "rupis": [
+            {
+                "id": 14,
+                "name": "1-372",
+                "park_id": 9,
+                "created_at": "2021-09-21 13:24:32",
+                "updated_at": "2021-09-21 13:24:32",
+                "deleted_at": null
+            }
+        ],
+        "story": [],
+        "origin": {
+            "id": 9,
+            "park_id": 9,
+            "paragraph_1": "El parque zonal que cuenta con una extensi\u00f3n de 12 mil metros cuadrados, fue construido en la localidad de San Crist\u00f3bal frente a la reconocida iglesia Nuestra Se\u00f1ora de las Cruces, ubicado en un sector de habitantes bogotanos de escasos recursos.  ",
+            "paragraph_2": "Debido a la demanda de espacios para vivir, la arquitectura del barrio sufri\u00f3 cambios durante los siglos XIX y XX, evidenciados hoy en un sector rodeado por la gran presencia de inquilinatos y peque\u00c3\u00b1os negocios. En la actualidad es posible evidenciar los peque\u00f1os talleres que fueron adecuados alrededor del parque para suplir las necesidades b\u00e1sicas de los habitantes del sector, entre los que se encuentra: sastres, zapateros, carpinteros, Latoneros, tapiceros, ebanistas y peluqueros, quienes se han encargado de frecuentar el recinto l\u00fadico, el cual, ha demostrado ser un escenario recreativo y social, sin distinci\u00f3n de clases sociales o condiciones econ\u00f3micas. \t\t\t",
+            "image_1": "984c695db7ed427e4200cd890d310815.jpg",
+            "image_2": "c171a0bd9cb26982e9b610ca894efa4d.jpg",
+            "image_3": "d73e54a039a62c11f78eaa8f7d00af5f.jpg",
+            "image_4": "",
+            "image_5": "",
+            "image_6": "",
+            "images": [
+                "https:\/\/sim.idrd.gov.co\/base-ldap\/public\/\/storage\/parks\/images\/984c695db7ed427e4200cd890d310815.jpg",
+                "https:\/\/sim.idrd.gov.co\/base-ldap\/public\/\/storage\/parks\/images\/c171a0bd9cb26982e9b610ca894efa4d.jpg",
+                "https:\/\/sim.idrd.gov.co\/base-ldap\/public\/\/storage\/parks\/images\/d73e54a039a62c11f78eaa8f7d00af5f.jpg"
+            ],
+            "created_at": "2021-09-21 13:24:32",
+            "updated_at": "2021-09-21 13:24:32",
+            "deleted_at": null
+        },
+        "vocation_id": null,
+        "vocation": null,
+        "color": "success",
+        "green_area": 20,
+        "grey_area": 30,
+        "area_chart": [
+            {
+                "name": "Total",
+                "data": [
+                    20,
+                    30
+                ]
+            }
+        ],
+        "map": "https:\/\/mapas.bogota.gov.co\/?l=436&b=262&show_menu=false&e=-74.57201001759988,4.2906625340901,-73.61070630666201,4.928542831147915,4686&layerFilter=436;ID_PARQUE='03-036'",
+        "plans": [],
+        "created_at": "2021-09-21 13:24:32",
+        "updated_at": "2021-09-21 13:24:32",
+        "deleted_at": null
+    },
+    "code": 200,
+    "details": null,
+    "requested_at": "2021-09-21T13:24:32-05:00"
+}
