@@ -27,7 +27,7 @@ Route::prefix('contractors-portal')->group(function () {
     Route::post('/oracle', [UserController::class, 'oracle']);
     Route::post('/oracle-count', [UserController::class, 'countOracle']);
     Route::post('/oracle-excel', [UserController::class, 'excelOracle']);
-    Route::post('/login', [UserController::class, 'login']);
+    Route::post('/login', [UserController::class, 'login'])->name('contractors.login');
     Route::get('/users', [AdminController::class, 'index'])->middleware('auth:api');
     Route::get('/excel', [ContractorController::class, 'excel'])->middleware('auth:api');
     Route::get('/roles', [AdminController::class, 'roles'])->middleware('auth:api');

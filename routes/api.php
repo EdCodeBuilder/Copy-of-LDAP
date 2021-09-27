@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Auth\ExportController;
+use App\Http\Controllers\Auth\JobStatusController;
 use App\Http\Controllers\Auth\NotificationController;
 use App\Http\Controllers\Auth\UserModuleController;
 use App\Http\Controllers\GlobalData\AnimationsController;
@@ -55,6 +57,9 @@ Route::prefix('api')->group(function () {
 Route::middleware('auth:api')->prefix('api')->group( function () {
     Route::post('animations', [AnimationsController::class, 'store']);
     Route::get('user', [LoginController::class, 'user'])->name('passport.user');
+    Route::get('job-status', [JobStatusController::class, 'index'])->name('jobs.status.index');
+    Route::get('job-status/{job}', [JobStatusController::class, 'show'])->name('jobs.status.show');
+    Route::get('exports/{file}', [ExportController::class, 'index'])->name('exports.queued');
     Route::get('notifications', [NotificationController::class, 'index']);
     Route::post('notifications', [NotificationController::class, 'markAllAsRead']);
     Route::get('notifications/{id}', [NotificationController::class, 'markAsRead']);

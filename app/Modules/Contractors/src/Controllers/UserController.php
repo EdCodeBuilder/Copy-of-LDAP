@@ -120,6 +120,13 @@ class UserController extends LoginController
                 'exact' =>  true,
                 'can'   =>  auth('api')->user()->isAn(...Roles::all())
             ],
+            [
+                'icon'  =>  'mdi-file',
+                'title' =>  'Reportes',
+                'to'    =>  [ 'name' => 'reports' ],
+                'exact' =>  true,
+                'can'   =>  auth('api')->user()->isAn(...Roles::all())
+            ],
         ]);
         return $this->success_message( array_values( $menu->where('can', true)->toArray() ) );
     }

@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 if ( !function_exists('toUpper') ) {
     /**
@@ -360,6 +361,19 @@ if ( ! function_exists('verify_url') ) {
             return $status >= 200 && $status < 300;
         } catch (ClientException $e) {
             return false;
+        }
+    }
+}
+
+if (! function_exists('date_time_to_excel')) {
+    /**
+     * @param null $date
+     */
+    function date_time_to_excel($date = null, $fallbackFormat = 'Y-m-d H:i:s') {
+        try {
+            return Date::dateTimeToExcel($date);
+        } catch (\Exception $exception) {
+            return $date->format($fallbackFormat);
         }
     }
 }

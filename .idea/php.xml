@@ -149,9 +149,28 @@
       <path value="$PROJECT_DIR$/vendor/jean85/pretty-package-versions" />
       <path value="$PROJECT_DIR$/vendor/sentry/sentry-laravel" />
       <path value="$PROJECT_DIR$/vendor/sentry/sentry" />
+      <path value="$PROJECT_DIR$/vendor/imtigger/laravel-job-status" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.1" />
+  <component name="PhpStepFilterConfiguration">
+    <skipped_functions>
+      <skipped_function name="Illuminate\Foundation\Bootstrap\HandleExceptions-&gt;handleShutdown" />
+      <skipped_function name="App\Modules\Parks\src\Controllers\ParkController-&gt;index" />
+      <skipped_function name="Illuminate\Routing\Router-&gt;prepareResponse" />
+      <skipped_function name="Illuminate\Routing\Pipeline-&gt;Illuminate\Pipeline\{closure:/Users/danielprado/Sites/dashboard/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php:140-169}" />
+      <skipped_function name="App\Http\Middleware\Signature-&gt;handle" />
+      <skipped_function name="App\Http\Middleware\ApiThrottleRequest-&gt;handle" />
+      <skipped_function name="Fruitcake\Cors\HandleCors-&gt;handle" />
+      <skipped_function name="App\Http\Kernel-&gt;handle" />
+      <skipped_function name="require" />
+      <skipped_function name="Sentry\Transport\HttpTransport-&gt;cleanupPendingRequests" />
+      <skipped_function name="GuzzleHttp\Promise\TaskQueue-&gt;GuzzleHttp\Promise\{closure:/Users/danielprado/Sites/dashboard/vendor/guzzlehttp/promises/src/TaskQueue.php:22-30}" />
+      <skipped_function name="Sentry\Transport\HttpTransport-&gt;__destruct" />
+      <skipped_function name="Symfony\Component\HttpClient\HttplugClient-&gt;__destruct" />
+      <skipped_function name="Symfony\Component\HttpClient\CurlHttpClient-&gt;__destruct" />
+    </skipped_functions>
+  </component>
   <component name="PhpUnit">
     <phpunit_settings>
       <PhpUnitSettings configuration_file_path="$PROJECT_DIR$/phpunit.xml" custom_loader_path="$PROJECT_DIR$/vendor/autoload.php" use_configuration_file="true" />

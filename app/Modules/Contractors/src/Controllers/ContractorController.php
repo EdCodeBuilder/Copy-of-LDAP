@@ -5,9 +5,11 @@ namespace App\Modules\Contractors\src\Controllers;
 
 
 use App\Http\Controllers\Controller;
+use App\Jobs\NotifyUserOfCompletedExport;
 use App\Models\Security\User;
 use App\Modules\Contractors\src\Constants\Roles;
 use App\Modules\Contractors\src\Exports\ContractorsExport;
+use App\Modules\Contractors\src\Exports\DataExport;
 use App\Modules\Contractors\src\Jobs\ConfirmContractor;
 use App\Modules\Contractors\src\Jobs\ConfirmUpdateContractor;
 use App\Modules\Contractors\src\Models\Contract;
@@ -28,10 +30,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use Imtigger\LaravelJobStatus\JobStatus;
 use Maatwebsite\Excel\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Throwable;
@@ -65,6 +69,20 @@ class ContractorController extends Controller
                             });
                         })->count(),
             'users' =>  Contractor::whereNotNull('modifiable')->count(),
+            'active' => Contract::query()
+                    ->whereHas('files', function ($q) {
+                        return $q->where('file_type_id', 1);
+                    })
+                    ->where('contract_type_id', '!=', 3)
+                    ->whereDate('final_date', '>', now()->format('Y-m-d'))
+                    ->count(),
+            'inactive' => Contract::query()
+                    ->whereHas('files', function ($q) {
+                        return $q->where('file_type_id', 1);
+                    })
+                    ->where('contract_type_id', '!=', 3)
+                    ->whereDate('final_date', '<=', now()->format('Y-m-d'))
+                    ->count(),
         ]);
     }
 
@@ -180,11 +198,26 @@ class ContractorController extends Controller
 
     /**
      * @param Request $request
-     * @return Response|BinaryFileResponse
+     * @return JsonResponse
      */
     public function excel(Request $request)
     {
-        return (new ContractorsExport($request))->download('PORTAL_CONTRATISTA.xlsx', Excel::XLSX);
+        $name = "PORTAL-CONTRATISTA-".random_img_name().".xlsx";
+        $path = env('APP_ENV') == 'local'
+            ? env('APP_PATH_DEV')
+            : env('APP_PATH_PROD');
+        $url = "https://sim.idrd.gov.co/{$path}/es/login";
+        (new DataExport($request->all(), ['key' => $name, 'queue' => 'excel-contractor-portal', 'started_at' => now(), 'user_id' => auth('api')->user()->id]))
+            ->queue("exports/$name", 'local', Excel::XLSX)
+            ->chain([
+                new NotifyUserOfCompletedExport($request->user('api'), $name, $url)
+            ]);
+        return $this->success_message(
+            'Estamos generando el reporte solcitado, te notificaremos una vez esté listo.',
+            Response::HTTP_OK,
+            Response::HTTP_OK,
+            $name
+        );
     }
 
     /**

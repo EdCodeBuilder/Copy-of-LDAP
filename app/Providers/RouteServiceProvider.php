@@ -96,7 +96,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::middleware('api')
             ->prefix('api')
-            ->group(base_path('routes/sub_routes/contractors/api.php'));
+            ->group(base_path('app/Modules/Contractors/src/routes/api.php'));
     }
 
     public function mapPayrollRoutes()
