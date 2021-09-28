@@ -6,6 +6,7 @@ namespace App\Modules\Contractors\src\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\NotifyUserOfCompletedExport;
+use App\Jobs\RestartStatusJob;
 use App\Models\Security\User;
 use App\Modules\Contractors\src\Constants\Roles;
 use App\Modules\Contractors\src\Exports\ContractorsExport;
@@ -209,6 +210,7 @@ class ContractorController extends Controller
             $request->user('api'),
             ['queue' => 'excel-contractor-portal', 'user_id' => auth('api')->user()->id]
         );
+        $job->chain([new RestartStatusJob($job->getJobStatusId())]);
         $this->dispatch($job);
         return $this->success_message(
             'Estamos generando el reporte solcitado, te notificaremos una vez esté listo.',
