@@ -205,7 +205,7 @@ return [
     |
     */
     'value_binder' => [
-        'default' => Maatwebsite\Excel\DefaultValueBinder::class,
+        'default' => \PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder::class,
     ],
 
     'cache' => [
@@ -225,7 +225,7 @@ return [
         | Drivers: memory|illuminate|batch
         |
         */
-        'driver'     => 'memory',
+        'driver'     => 'batch',
 
         /*
         |--------------------------------------------------------------------------
