@@ -210,7 +210,6 @@ class ContractorController extends Controller
             $request->user('api'),
             ['queue' => 'excel-contractor-portal', 'user_id' => auth('api')->user()->id]
         );
-        $job->chain([new RestartStatusJob($job->getJobStatusId())]);
         $this->dispatch($job);
         return $this->success_message(
             'Estamos generando el reporte solcitado, te notificaremos una vez esté listo.',
