@@ -2,13 +2,16 @@
 
 namespace App\Modules\Contractors\src\Exports;
 
+use App\Modules\Contractors\src\Jobs\ProcessExport;
 use App\Modules\Contractors\src\Models\ContractorCareerView;
 use App\Modules\Contractors\src\Models\ContractorView;
 use App\Modules\Contractors\src\Models\ContractView;
 use App\Modules\Contractors\src\Models\FileView;
 use App\Traits\AppendHeaderToExcel;
 use Carbon\Carbon;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
+use Imtigger\LaravelJobStatus\JobStatus;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
@@ -19,7 +22,7 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class FileExport implements FromQuery, WithHeadings, WithEvents, WithTitle, WithMapping, WithColumnFormatting
+class FileExport implements FromQuery, WithHeadings, WithEvents, WithTitle, WithMapping, WithColumnFormatting, ShouldQueue
 {
     use Exportable, AppendHeaderToExcel;
 
@@ -33,9 +36,10 @@ class FileExport implements FromQuery, WithHeadings, WithEvents, WithTitle, With
      */
     private $rowNumb = 2;
 
-    public function __construct(array $request)
+    public function __construct(array $request, $job)
     {
         $this->request = $request;
+        update_status_job($job, JobStatus::STATUS_EXECUTING, 'excel-contractor-portal');
     }
 
     /**

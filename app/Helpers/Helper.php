@@ -377,3 +377,19 @@ if (! function_exists('date_time_to_excel')) {
         }
     }
 }
+
+if (! function_exists('update_status_job')) {
+    function update_status_job($id, $status, $queue) {
+        try {
+            $job = \Imtigger\LaravelJobStatus\JobStatus::query()->whereKey($id)->first();
+            if (isset($job->id)) {
+                $job->status = $status;
+                $job->queue = $queue;
+                $job->finished_at = null;
+                $job->save();
+            }
+        } catch (Exception $exception) {
+
+        }
+    }
+}

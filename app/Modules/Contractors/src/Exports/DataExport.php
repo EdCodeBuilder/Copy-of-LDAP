@@ -2,7 +2,9 @@
 
 namespace App\Modules\Contractors\src\Exports;
 
+use App\Modules\Contractors\src\Jobs\ProcessExport;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Imtigger\LaravelJobStatus\JobStatus;
 use Imtigger\LaravelJobStatus\Trackable;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithEvents;
@@ -11,7 +13,7 @@ use Maatwebsite\Excel\Events\BeforeWriting;
 
 class DataExport implements WithMultipleSheets, WithEvents, ShouldQueue
 {
-    use Exportable, Trackable;
+    use Exportable;
 
     /**
      * @var array
@@ -19,24 +21,32 @@ class DataExport implements WithMultipleSheets, WithEvents, ShouldQueue
     private $request;
 
     /**
-     * Excel constructor.
-     * @param array $request
+     * @var JobStatus
      */
-    public function __construct(array $request, array $params = [])
+    private $job;
+
+    /**
+     * Excel constructor.
+     *
+     * @param array $request
+     * @param int $job
+     */
+    public function __construct(array $request, int $job)
     {
         $this->request = $request;
-        $this->prepareStatus($params);
+        $this->job = $job;
+        update_status_job($job, JobStatus::STATUS_EXECUTING, 'excel-contractor-portal');
     }
 
     public function sheets(): array
     {
         $sheets = [];
 
-        $sheets[0] = new ContractorsExport($this->request);
-        $sheets[1] = new ContractsExport($this->request);
-        $sheets[2] = new CareerExport($this->request);
-        $sheets[3] = new FileExport($this->request);
-        $sheets[4] = new SearcherExport();
+        $sheets[0] = new ContractorsExport($this->request, $this->job);
+        $sheets[1] = new ContractsExport($this->request, $this->job);
+        $sheets[2] = new CareerExport($this->request, $this->job);
+        $sheets[3] = new FileExport($this->request, $this->job);
+        $sheets[4] = new SearcherExport($this->job);
 
         return  $sheets;
     }

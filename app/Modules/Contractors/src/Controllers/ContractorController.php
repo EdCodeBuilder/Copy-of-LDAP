@@ -12,12 +12,14 @@ use App\Modules\Contractors\src\Exports\ContractorsExport;
 use App\Modules\Contractors\src\Exports\DataExport;
 use App\Modules\Contractors\src\Jobs\ConfirmContractor;
 use App\Modules\Contractors\src\Jobs\ConfirmUpdateContractor;
+use App\Modules\Contractors\src\Jobs\ProcessExport;
 use App\Modules\Contractors\src\Models\Contract;
 use App\Modules\Contractors\src\Models\Contractor;
 use App\Modules\Contractors\src\Models\ContractorCareer;
 use App\Modules\Contractors\src\Models\ContractType;
 use App\Modules\Contractors\src\Models\File;
 use App\Modules\Contractors\src\Notifications\ArlNotification;
+use App\Modules\Contractors\src\Request\ExcelRequest;
 use App\Modules\Contractors\src\Request\FinderRequest;
 use App\Modules\Contractors\src\Request\StoreLawyerRequest;
 use App\Modules\Contractors\src\Request\UpdateContractorLawyerRequest;
@@ -197,26 +199,22 @@ class ContractorController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param ExcelRequest $request
      * @return JsonResponse
      */
-    public function excel(Request $request)
+    public function excel(ExcelRequest $request)
     {
-        $name = "PORTAL-CONTRATISTA-".random_img_name().".xlsx";
-        $path = env('APP_ENV') == 'local'
-            ? env('APP_PATH_DEV')
-            : env('APP_PATH_PROD');
-        $url = "https://sim.idrd.gov.co/{$path}/es/login";
-        (new DataExport($request->all(), ['key' => $name, 'queue' => 'excel-contractor-portal', 'started_at' => now(), 'user_id' => auth('api')->user()->id]))
-            ->queue("exports/$name", 'local', Excel::XLSX)
-            ->chain([
-                new NotifyUserOfCompletedExport($request->user('api'), $name, $url)
-            ]);
+        $job = new ProcessExport(
+            $request->all(),
+            $request->user('api'),
+            ['queue' => 'excel-contractor-portal', 'user_id' => auth('api')->user()->id]
+        );
+        $this->dispatch($job);
         return $this->success_message(
             'Estamos generando el reporte solcitado, te notificaremos una vez esté listo.',
             Response::HTTP_OK,
             Response::HTTP_OK,
-            $name
+            $job
         );
     }
 

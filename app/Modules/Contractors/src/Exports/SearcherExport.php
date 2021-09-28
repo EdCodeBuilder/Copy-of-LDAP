@@ -2,7 +2,10 @@
 
 namespace App\Modules\Contractors\src\Exports;
 
+use App\Modules\Contractors\src\Jobs\ProcessExport;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Collection;
+use Imtigger\LaravelJobStatus\JobStatus;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -17,9 +20,14 @@ use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\NamedRange;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class SearcherExport implements WithEvents, WithTitle, FromCollection, ShouldAutoSize, WithColumnFormatting
+class SearcherExport implements WithEvents, WithTitle, FromCollection, ShouldAutoSize, WithColumnFormatting, ShouldQueue
 {
     use Exportable;
+
+    public function __construct($job)
+    {
+        update_status_job($job, JobStatus::STATUS_EXECUTING, 'excel-contractor-portal');
+    }
 
     /**
      * @return \Closure[]
