@@ -57,7 +57,7 @@ class ExportReady extends Notification
 
         $job = JobStatus::query()->where('key', $this->file)->first();
         if (isset($job->key)) {
-            $job->status = JobStatus::STATUS_FINISHED;
+            $job->status = 'exported';
             $job->finished_at = now();
             $job->save();
         }
