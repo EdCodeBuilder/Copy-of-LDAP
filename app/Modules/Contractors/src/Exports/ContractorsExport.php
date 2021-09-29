@@ -8,6 +8,7 @@ use App\Traits\AppendHeaderToExcel;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Imtigger\LaravelJobStatus\JobStatus;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -40,13 +41,31 @@ class ContractorsExport implements FromQuery, WithHeadings, WithEvents, WithTitl
         update_status_job($job, JobStatus::STATUS_EXECUTING, 'excel-contractor-portal');
     }
 
-    /**
-     * @return Builder
-     */
+
     public function query()
     {
         $request = collect($this->request);
-        return ContractorView::query()
+        return DB::connection('mysql_contractors')
+                ->table('contractors_view')
+                ->leftJoin('contracts_view', 'contracts_view.contractor_id', '=', 'contractors_view.id')
+                ->when(
+                    $request->has(['start_date', 'final_date']),
+                    function ($query) use ($request) {
+                        return $query->where('contracts_view.start_date', '>=', $request->get('start_date'))
+                            ->where('contracts_view.final_date', '<=', $request->get('final_date'));
+                    }
+                )
+                ->when(
+                    $request->has('contract'),
+                    function ($query) use ($request) {
+                        return $query->where('contract', 'like', "%{$request->get('contract')}%");
+                    }
+                )
+                ->when($request->has('document'), function ($query) use ($request) {
+                    return $query->where('contractors_view.document', $request->get('document'));
+                });
+            /*
+            ContractorView::query()
             ->when(
                 $request->has(['start_date', 'final_date']) || $request->has('contract'),
                 function (Builder $query) use ($request) {
@@ -63,6 +82,7 @@ class ContractorsExport implements FromQuery, WithHeadings, WithEvents, WithTitl
             ->when($request->has('document'), function ($query) use ($request) {
                 return $query->where('document', $request->get('document'));
             });
+            */
     }
 
     /**

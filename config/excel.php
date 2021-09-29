@@ -225,7 +225,7 @@ return [
         | Drivers: memory|illuminate|batch
         |
         */
-        'driver'     => 'illuminate',
+        'driver'     => 'batch',
 
         /*
         |--------------------------------------------------------------------------

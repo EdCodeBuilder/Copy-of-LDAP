@@ -10,6 +10,7 @@ use App\Traits\AppendHeaderToExcel;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Imtigger\LaravelJobStatus\JobStatus;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -47,7 +48,8 @@ class ContractsExport implements FromQuery, WithHeadings, WithEvents, WithTitle,
     public function query()
     {
         $request = collect($this->request);
-        return ContractView::query()
+        return DB::connection('mysql_contractors')
+                ->table('contracts_view')
             ->when($request->has(['start_date', 'final_date']), function ($query) use ($request) {
                 return $query->where('start_date', '>=', $request->get('start_date'))
                     ->where('final_date', '<=', $request->get('final_date'));

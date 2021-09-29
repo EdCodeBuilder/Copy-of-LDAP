@@ -10,6 +10,7 @@ use App\Traits\AppendHeaderToExcel;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Imtigger\LaravelJobStatus\JobStatus;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -47,7 +48,25 @@ class CareerExport implements FromQuery, WithHeadings, WithEvents, WithTitle, Wi
     public function query()
     {
         $request = collect($this->request);
-        return ContractorCareerView::query()
+        return DB::connection('mysql_contractors')
+                    ->table('contractor_careers_view')
+                    ->leftJoin('contractors_view', 'contractor_careers_view.contractor_id', '=', 'contractors_view.id')
+                    ->leftJoin('contracts_view', 'contracts_view.contractor_id', '=', 'contractors_view.id')
+                    ->when($request->has('document'), function ($query) use ($request) {
+                        return $query->where('contractor_careers_view.contractor_document', $request->get('document'));
+                    })
+                    ->when($request->has(['start_date', 'final_date']), function ($query) use ($request) {
+                        return $query->where('contracts_view.start_date', '>=', $request->get('start_date'))
+                            ->where('contracts_view.final_date', '<=', $request->get('final_date'));
+                    })
+                    ->when($request->has('document'), function ($query) use ($request) {
+                        return $query->where('contracts_view.contractor_document', $request->get('document'));
+                    })
+                    ->when($request->has('contract'), function ($query) use ($request) {
+                        return $query->where('contracts_view.contract', 'like', "%{$request->get('contract')}%");
+                    });
+        /*
+            ContractorCareerView::query()
             ->when($request->has(['start_date', 'final_date']) || $request->has('contract'),
                 function (Builder $query)use ($request) {
                     return $query->whereHas('contractors', function ($query) use ($request) {
@@ -73,6 +92,7 @@ class CareerExport implements FromQuery, WithHeadings, WithEvents, WithTitle, Wi
             ->when($request->has('document'), function ($query) use ($request) {
                 return $query->where('contractor_document', $request->get('document'));
             });
+        */
 
     }
 
