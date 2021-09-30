@@ -19,6 +19,8 @@ class Localization
         $local = ($request->hasHeader("X-Localization")) ? $request->header("X-Localization") : "es";
         // set laravel localization
         app()->setLocale($local);
-        return $next($request);
+        $response = $next($request);
+        $response->headers->set( 'X-Localization', $local );
+        return $response;
     }
 }

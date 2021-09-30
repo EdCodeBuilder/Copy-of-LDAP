@@ -178,8 +178,11 @@ trait ApiResponse
 
     public function __construct()
     {
-        $this->column   =  request()->has( 'column' ) ? request()->get('column')[0] : 'id';
-        $this->order    = request()->has('order') && isset(request()->get('order')[0]) && request()->get('order')[0] == 'true';
+        $column = request()->has( 'column' ) ? request()->get('column') : 'id';
+        $order = request()->has( 'order' ) ? request()->get('order') : 'false';
+        $order = is_array($order) ? Arr::first($order) : $order;
+        $this->column   =  is_array($column) ? Arr::first($column) : $column;
+        $this->order    = $order == 'true' ? 'asc' : 'desc';
         $this->per_page =  request()->has( 'per_page' ) ? request()->get('per_page') : 10;
         $this->query    =  request()->has( 'query' ) ? request()->get('query') : null;
         $this->where    =  request()->has( 'where' ) ? request()->get('where') : null;
@@ -196,7 +199,6 @@ trait ApiResponse
         // Multiple Columns
         $this->where_columns_between    =  $this->setColumnParams('where_columns_between');
         $this->where_columns_not_between    =  $this->setColumnParams('where_columns_not_between');
-        $this->order    =  ( $this->order ) ? 'asc' : 'desc';
     }
 
     public function setColumnParams($key)

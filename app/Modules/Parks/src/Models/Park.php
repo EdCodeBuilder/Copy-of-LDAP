@@ -185,9 +185,15 @@ class Park extends Model implements Auditable
     public function getSortableColumn($column)
     {
         switch ($column) {
+            case $this->primaryKey:
+                return $this->primaryKey;
+            case 'created_at':
+            case 'updated_at':
+            case 'deleted_at':
+                return $column;
             default:
                 return in_array($this->getFillableValues($column), $this->fillable)
-                    ? $column
+                    ? $this->getFillableValues($column)
                     : $this->primaryKey;
         }
     }
