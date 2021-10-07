@@ -1,0 +1,39 @@
+{
+    "id": 9,
+    "code": "03-036",
+    "name": "LAS CRUCES",
+    "scale_id": 3,
+    "scale": "ZONAL",
+    "locality_id": 3,
+    "locality": "SANTA FE",
+    "address": "CARRERA 5A #1- 90",
+    "upz_code": "95",
+    "upz": "LAS CRUCES",
+    "color": "success",
+    "status_id": null,
+    "created_at": null,
+    "updated_at": null,
+    "deleted_at": null,
+    "_links": [
+        {
+            "rel": "self",
+            "type": "GET",
+            "href": "https://sim.idrd.gov.co/api-dev/public/api/parks/10778"
+        },
+        {
+            "rel": "create",
+            "type": "POST",
+            "href": "https://sim.idrd.gov.co/api-dev/public/api/parks"
+        },
+        {
+            "rel": "update",
+            "type": "PUT/PATCH",
+            "href": "https://sim.idrd.gov.co/api-dev/public/api/parks/10778"
+        },
+        {
+            "rel": "delete",
+            "type": "DELETE",
+            "href": "https://sim.idrd.gov.co/api-dev/public/api/parks/10778"
+        }
+    ]
+}

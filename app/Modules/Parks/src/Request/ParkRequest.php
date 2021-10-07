@@ -2,6 +2,7 @@
 
 namespace App\Modules\Parks\src\Request;
 
+use App\Modules\Parks\src\Constants\ParkStatus;
 use App\Modules\Parks\src\Constants\Roles;
 use App\Modules\Parks\src\Models\Location;
 use App\Modules\Parks\src\Models\Neighborhood;
@@ -13,6 +14,7 @@ use App\Modules\Parks\src\Models\Upz;
 use App\Modules\Parks\src\Models\Vocation;
 use App\Modules\Parks\src\Rules\ParkFinderRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 /**
  * @bodyParam code string required Código del parque. Example: 03-036
@@ -107,9 +109,17 @@ class ParkRequest extends FormRequest
             'walking_trails_status' =>  'nullable|string|min:3|max:30',
             'access_roads'          =>  'nullable|string|max:20',
             'access_roads_status'   =>  'nullable|string|min:3|max:30',
-            'zone_type'             =>  'nullable|string|min:3|max:30',
+            'zone_type'             =>  [
+                'nullable',
+                'string',
+                Rule::in((new ParkStatus())->zones())
+            ],
             'scale_id'              =>  "nullable|numeric|exists:{$scale->getConnectionName()}.{$scale->getTable()},{$scale->getKeyName()}",
-            'concern'               =>  'nullable|string|min:3|max:500',
+            'concern'               =>  [
+                'nullable',
+                'string',
+                Rule::in((new ParkStatus())->concerns())
+            ],
             'visited_at'            =>  'nullable|date|date_format:Y-m-d',
             'general_status'        =>  'nullable|string|min:3|max:30',
             'stage_type_id'         =>  "nullable|numeric|exists:{$stage->getConnectionName()}.{$stage->getTable()},{$stage->getKeyName()}",
@@ -121,22 +131,12 @@ class ParkRequest extends FormRequest
             'vigilance'             =>  [
                 'nullable',
                 'string',
-                function($attribute, $value, $fail) {
-                    $items = ['sin vigilancia', 'con vigilancia'];
-                    if (!in_array(toLower($value), $items)) {
-                        $fail("El campo $attribute debe contener alguno de los siguiente valores: Sin vigilancia, Con vigilancia");
-                    }
-                },
+                Rule::in((new ParkStatus())->vigilance())
             ],
             'received'              =>  [
                 'nullable',
                 'string',
-                function($attribute, $value, $fail) {
-                    $items = ['si', 'no'];
-                    if (!in_array(toLower($value), $items)) {
-                        $fail("El campo $attribute debe contener alguno de los siguiente valores: Si, No");
-                    }
-                },
+                Rule::in(['Si', 'No']),
             ],
             'vocation_id'           =>  "nullable|numeric|exists:{$vocation->getConnectionName()}.{$vocation->getTable()},{$vocation->getKeyName()}",
         ];

@@ -2,6 +2,7 @@
 
 namespace App\Modules\Parks\src\Controllers;
 
+use App\Modules\Parks\src\Constants\ParkStatus;
 use App\Modules\Parks\src\Constants\Roles;
 use App\Modules\Parks\src\Models\Status;
 use App\Modules\Parks\src\Request\StatusRequest;
@@ -142,72 +143,7 @@ class StatusController extends Controller
      */
     public function type_zones()
     {
-        return $this->success_message([
-            [
-                'id'    =>  'RESIDENCIAL',
-                'name'  =>  'RESIDENCIAL',
-            ],
-            [
-                'id'    =>  'COMERCIAL',
-                'name'  =>  'COMERCIAL',
-            ],
-            [
-                'id'    =>  'SENDEROS',
-                'name'  =>  'SENDEROS',
-            ],
-            [
-                'id'    =>  'MIXTO',
-                'name'  =>  'MIXTO',
-            ],
-            [
-                'id'    =>  'RESIDENCIAL/COMERCIAL',
-                'name'  =>  'RESIDENCIAL/COMERCIAL',
-            ],
-            [
-                'id'    =>  'INDUSTRIAL/COMERCIAL',
-                'name'  =>  'INDUSTRIAL/COMERCIAL',
-            ],
-            [
-                'id'    =>  'RURAL',
-                'name'  =>  'RURAL',
-            ],
-            [
-                'id'    =>  'MONTAÑOSO',
-                'name'  =>  'MONTAÑOSO',
-            ],
-            [
-                'id'    =>  'INDUSTRIAL',
-                'name'  =>  'INDUSTRIAL',
-            ],
-            [
-                'id'    =>  'INSTITUCIONAL',
-                'name'  =>  'INSTITUCIONAL',
-            ],
-            [
-                'id'    =>  'ESCOLAR',
-                'name'  =>  'ESCOLAR',
-            ],
-            [
-                'id'    =>  'OTRO',
-                'name'  =>  'OTRO',
-            ],
-            [
-                'id'    =>  'NINGUNO',
-                'name'  =>  'NINGUNO',
-            ],
-            [
-                'id'    =>  'BUENO',
-                'name'  =>  'BUENO',
-            ],
-            [
-                'id'    =>  'MALO',
-                'name'  =>  'MALO',
-            ],
-            [
-                'id'    =>  'REGULAR',
-                'name'  =>  'REGULAR',
-            ],
-        ]);
+        return $this->success_message(ParkStatus::zoneTypesAsKeyValue());
     }
 
     /**
@@ -221,40 +157,7 @@ class StatusController extends Controller
      */
     public function concerns()
     {
-        return $this->success_message([
-            [
-                'id'    =>  'IDRD',
-                'name'  =>  'IDRD'
-            ],
-            [
-                'id'    =>  'Junta Administradora Local',
-                'name'  =>  'Junta Administradora Local'
-            ],
-            [
-                'id'    =>  'Alcaldía Local',
-                'name'  =>  'Alcaldía Local'
-            ],
-            [
-                'id'    =>  'Alianza Público Privada',
-                'name'  =>  'Alianza Público Privada'
-            ],
-            [
-                'id'    =>  'Indefinido',
-                'name'  =>  'Indefinido'
-            ],
-            [
-                'id'    =>  'Otros',
-                'name'  =>  'Otros'
-            ],
-            [
-                'id'    =>  'SI',
-                'name'  =>  'SI'
-            ],
-            [
-                'id'    =>  'NO',
-                'name'  =>  'NO'
-            ],
-        ]);
+        return $this->success_message(ParkStatus::concernsAsKeyValue());
     }
 
     /**
@@ -268,16 +171,6 @@ class StatusController extends Controller
      */
     public function vigilance()
     {
-        $data = [
-            [
-                'id'    =>  'Sin vigilancia',
-                'name'  =>  'Sin vigilancia'
-            ],
-            [
-                'id'    =>  'Con vigilancia',
-                'name'  =>  'Con vigilancia'
-            ],
-        ];
-        return $this->success_message($data);
+        return $this->success_message(ParkStatus::vigilanceAsKeyValue());
     }
 }

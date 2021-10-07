@@ -56,7 +56,7 @@ class AgeGroupController extends Controller
     {
         $query = $this->setQuery(AgeGroup::query(), (new AgeGroup)->getSortableColumn($this->column))
             ->when(isset($this->query), function ($query) {
-                return $query->where('activity_name', 'like', "%$this->query%");
+                return $query->where('grupo_etario', 'like', "%$this->query%");
             })
             ->orderBy((new AgeGroup)->getSortableColumn($this->column), $this->order);
         return $this->success_response(

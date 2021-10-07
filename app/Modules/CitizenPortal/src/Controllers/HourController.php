@@ -53,7 +53,7 @@ class HourController extends Controller
     {
         $query = $this->setQuery(Hour::query(), (new Hour)->getSortableColumn($this->column))
             ->when(isset($this->query), function ($query) {
-                return $query->where('name_weekdays_schedule', 'like', "%$this->query%");
+                return $query->where('name_daily_schedule', 'like', "%$this->query%");
             })
             ->orderBy((new Hour)->getSortableColumn($this->column), $this->order);
         return $this->success_response(
