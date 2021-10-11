@@ -120,35 +120,35 @@ class UserController extends LoginController
                 'icon'  =>  'mdi-security',
                 'title' =>  __('passport.menu.admin'),
                 'exact' =>  false,
-                'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN),
+                'can'   =>  auth('api')->user()->isAn(...Roles::all()),
                 'children'  => [
                     [
                         'icon'  =>  'mdi-account-multiple-plus',
                         'title' =>  __('passport.menu.users'),
                         'to'    =>  [ 'name' => 'user-admin' ],
                         'exact' =>  true,
-                        'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+                        'can'   =>  auth('api')->user()->isAn(...Roles::all())
                     ],
                     [
                         'icon'  =>  'mdi-pine-tree',
                         'title' =>  __('passport.menu.activities'),
                         'to'    =>  [ 'name' => 'hobbies' ],
                         'exact' =>  true,
-                        'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+                        'can'   =>  auth('api')->user()->isAn(...Roles::all())
                     ],
                     [
                         'icon'  =>  'mdi-hospital-box',
                         'title' =>  __('passport.menu.eps'),
                         'to'    =>  [ 'name' => 'eps' ],
                         'exact' =>  true,
-                        'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+                        'can'   =>  auth('api')->user()->isAn(...Roles::all())
                     ],
                     [
                         'icon'  =>  'mdi-domain',
                         'title' =>  'SuperCades',
                         'to'    =>  [ 'name' => 'cades' ],
                         'exact' =>  true,
-                        'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+                        'can'   =>  auth('api')->user()->isAn(...Roles::all())
                     ],
                 ]
             ],
@@ -185,7 +185,7 @@ class UserController extends LoginController
                 'title' =>  __('passport.menu.printer'),
                 'to'    =>  [ 'name' => 'printer' ],
                 'exact' =>  true,
-                'can'   =>  auth('api')->user()->isAn('superadmin')
+                'can'   =>  auth('api')->user()->isAn(...Roles::all())
             ],
             [
                 'icon'  =>  'mdi-card-account-details-star',
@@ -213,14 +213,14 @@ class UserController extends LoginController
                 'title' =>  __('passport.menu.faq'),
                 'to'    =>  [ 'name' => 'faq' ],
                 'exact' =>  true,
-                'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+                'can'   =>  auth('api')->user()->isAn(...Roles::all())
             ],
             [
                 'icon'  =>  'mdi-magnify',
                 'title' =>  __('passport.menu.audit'),
                 'to'    =>  [ 'name' => 'audit' ],
                 'exact' =>  true,
-                'can'   =>  auth('api')->user()->isAn(Roles::ROLE_SUPER_ADMIN)
+                'can'   =>  auth('api')->user()->isAn(...Roles::all())
             ],
         ]);
         return $this->success_message( array_values( $menu->where('can', true)->toArray() ) );
