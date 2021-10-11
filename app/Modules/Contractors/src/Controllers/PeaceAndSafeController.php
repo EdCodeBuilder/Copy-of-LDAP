@@ -186,13 +186,16 @@ class PeaceAndSafeController extends Controller
             $contract_number = str_pad($request->get('contract'), 4, '0', STR_PAD_LEFT);
             $contract = "IDRD-CTO-{$contract_number}-{$request->get('year')}";
             $certification = Certification::query()->when(
-                $request->has('token') && ($request->get('token') != "" || !is_null($request->get('token'))),
+                $request->has('token') &&
+                ($request->get('token') != "" || !is_null($request->get('token')))
+                && str_starts_with($request->get('token'), 'SYS'),
                 function ($query) use ($request) {
                     return $query->where('token', $request->get('token'));
                 },
                 function ($query) use ($contract, $request) {
                     return $query->where('contract', 'like', "%{$contract}%")
-                        ->where('document', $request->get('document'));
+                        ->where('document', $request->get('document'))
+                        ->where('token', 'like', 'SYS-%');
                 }
             )->firstOrFail();
             $virtual_file = $certification->virtual_file;
@@ -209,9 +212,9 @@ class PeaceAndSafeController extends Controller
             return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output('I', 'PAZ_Y_SALVO.pdf');
         } catch (Exception $exception) {
             return $this->error_response(
-                __('validation.handler.resource_not_found'),
+                'No se encuentra un certificado válido para este número de contrato',
                 Response::HTTP_UNPROCESSABLE_ENTITY,
-                $exception->getMessage()
+                env('APP_DEBUG') == true ? $exception->getMessage() : null
             );
         }
     }
@@ -400,9 +403,11 @@ class PeaceAndSafeController extends Controller
     {
         try {
             $certification = $this->saveInDatabase($request, 'ALM');
+            /*
             if (isset($certification->token)) {
                 return $this->createWarehouseCert($certification);
             }
+            */
             $http = new Client();
             $response = $http->post("http://66.70.171.168/api/contractors-portal/oracle-count", [
                 'json' => [
@@ -414,7 +419,7 @@ class PeaceAndSafeController extends Controller
                 ],
             ]);
             $data = json_decode($response->getBody()->getContents(), true);
-            if ( isset( $data['data'] ) && count($data['data']) > 0 ) {
+            if ( isset( $data['data'] ) && ! is_numeric($data['data']) && $data['data'] > 0 ) {
                 return $this->error_response($data);
             }
             return $this->createWarehouseCert($certification);
@@ -563,7 +568,6 @@ class PeaceAndSafeController extends Controller
 
             if ($this->doesntHaveOrfeo($user)) {
                 if ($this->doesntHaveLDAP($document, 'postalcode')) {
-                    /*
                     $sub_day = Carbon::parse($expires_at)->subDay();
                     if (isset($expires_at) && now()->lessThanOrEqualTo( $sub_day )) {
                         return $this->error_response(
@@ -572,7 +576,6 @@ class PeaceAndSafeController extends Controller
                             'Usuario sin cuenta de ORFEO Y sin Cuentas Institucionales'
                         );
                     }
-                    */
                     $text = $this->createText($name, $document, $complete_text);
                     return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
                 }
