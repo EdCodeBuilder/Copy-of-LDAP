@@ -253,13 +253,15 @@ class PeaceAndSafeController extends Controller
     {
         try {
             $certification = $this->saveInDatabase($request, 'ALM');
+            /*
             if (
-                isset($certification->token) &&
+                // isset($certification->token) &&
                 isset($certification->expires_at) &&
                 $certification->expires_at->subDays(5)->gte( now() )
             ) {
                 return $this->createWarehouseCert($certification);
             }
+            */
             $http = new Client();
             $response = $http->post("http://66.70.171.168/api/contractors-portal/oracle-count", [
                 'json' => [
@@ -271,7 +273,7 @@ class PeaceAndSafeController extends Controller
                 ]
             ]);
             $data = json_decode($response->getBody()->getContents(), true);
-            if ( isset( $data['data'] ) && $data['data'] > 0 ) {
+            if ( isset( $data['data'] ) && is_numeric($data['data']) && $data['data'] > 0 ) {
                 return $this->error_response($data);
             }
             return $this->createWarehouseCert($certification);
@@ -419,7 +421,7 @@ class PeaceAndSafeController extends Controller
                 ],
             ]);
             $data = json_decode($response->getBody()->getContents(), true);
-            if ( isset( $data['data'] ) && ! is_numeric($data['data']) && $data['data'] > 0 ) {
+            if ( isset( $data['data'] ) && is_numeric($data['data']) && $data['data'] > 0 ) {
                 return $this->error_response($data);
             }
             return $this->createWarehouseCert($certification);
