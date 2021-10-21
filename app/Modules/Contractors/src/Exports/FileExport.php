@@ -48,39 +48,7 @@ class FileExport implements FromQuery, WithHeadings, WithEvents, WithTitle, With
      */
     public function query()
     {
-        $request = collect($this->request);
-        return DB::connection('mysql_contractors')
-                    ->table('files_view')
-                    ->leftJoin('contracts_view', 'contracts_view.id', '=', 'files_view.contract_id')
-                    ->when($request->has('document'), function ($query) use ($request) {
-                        return $query->where('files_view.contractor_document', $request->get('document'));
-                    })
-                    ->when($request->has('contract'), function ($query) use ($request) {
-                        return $query->where('files_view.contract', 'like', "%{$request->get('contract')}%");
-                    })
-                    ->when($request->has(['start_date', 'final_date']), function ($query) use ($request) {
-                        return $query->where('contracts_view.start_date', '>=', $request->get('start_date'))
-                            ->where('contracts_view.final_date', '<=', $request->get('final_date'));
-                    });
-                /*
-                    FileView::query()
-                    ->when($request->has(['start_date', 'final_date']) || $request->has('contract'),
-                        function (Builder $query)use ($request) {
-                            return $query->whereHas('contracts', function(Builder $query) use ($request) {
-                                return $query->when($request->has(['start_date', 'final_date']), function ($query) use ($request) {
-                                    return $query->where('start_date', '>=', $request->get('start_date'))
-                                        ->where('final_date', '<=', $request->get('final_date'));
-                                    })
-                                    ->when($request->has('contract'), function ($query) use ($request) {
-                                        return $query->where('contract', 'like', "%{$request->get('contract')}%");
-                                    });
-                            });
-                        }
-                    )
-                    ->when($request->has('document'), function ($query) use ($request) {
-                        return $query->where('contractor_document', $request->get('document'));
-                    });
-                */
+        return FileView::query()->whereIn('contract_id', $this->request['contracts']);
     }
 
     /**

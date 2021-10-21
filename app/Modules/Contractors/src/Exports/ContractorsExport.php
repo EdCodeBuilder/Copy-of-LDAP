@@ -2,7 +2,9 @@
 
 namespace App\Modules\Contractors\src\Exports;
 
+use App\Modules\Contractors\src\Constants\GlobalQuery;
 use App\Modules\Contractors\src\Jobs\ProcessExport;
+use App\Modules\Contractors\src\Models\Contractor;
 use App\Modules\Contractors\src\Models\ContractorView;
 use App\Traits\AppendHeaderToExcel;
 use Carbon\Carbon;
@@ -44,45 +46,7 @@ class ContractorsExport implements FromQuery, WithHeadings, WithEvents, WithTitl
 
     public function query()
     {
-        $request = collect($this->request);
-        return DB::connection('mysql_contractors')
-                ->table('contractors_view')
-                ->leftJoin('contracts_view', 'contracts_view.contractor_id', '=', 'contractors_view.id')
-                ->when(
-                    $request->has(['start_date', 'final_date']),
-                    function ($query) use ($request) {
-                        return $query->where('contracts_view.start_date', '>=', $request->get('start_date'))
-                            ->where('contracts_view.final_date', '<=', $request->get('final_date'));
-                    }
-                )
-                ->when(
-                    $request->has('contract'),
-                    function ($query) use ($request) {
-                        return $query->where('contract', 'like', "%{$request->get('contract')}%");
-                    }
-                )
-                ->when($request->has('document'), function ($query) use ($request) {
-                    return $query->where('contractors_view.document', $request->get('document'));
-                });
-            /*
-            ContractorView::query()
-            ->when(
-                $request->has(['start_date', 'final_date']) || $request->has('contract'),
-                function (Builder $query) use ($request) {
-                return $query->whereHas('contracts', function(Builder $query) use ($request) {
-                   return $query->when($request->has(['start_date', 'final_date']), function ($query) use ($request) {
-                               return $query->where('start_date', '>=', $request->get('start_date'))
-                                   ->where('final_date', '<=', $request->get('final_date'));
-                           })
-                           ->when($request->has('contract'), function ($query) use ($request) {
-                               return $query->where('contract', 'like', "%{$request->get('contract')}%");
-                           });
-                });
-            })
-            ->when($request->has('document'), function ($query) use ($request) {
-                return $query->where('document', $request->get('document'));
-            });
-            */
+        return ContractorView::query()->whereKey($this->request['contractors']);
     }
 
     /**
@@ -106,6 +70,7 @@ class ContractorsExport implements FromQuery, WithHeadings, WithEvents, WithTitl
             'CORREO INSTITUCIONAL',
             'TELÉFONO',
             'EPS',
+            'EPS NIT',
             'OTRA EPS',
             'AFP',
             'OTRA AFP',
@@ -132,7 +97,7 @@ class ContractorsExport implements FromQuery, WithHeadings, WithEvents, WithTitl
     {
         return [
             AfterSheet::class => function(AfterSheet $sheet) {
-                $this->setHeader($sheet->sheet, 'CONTRATISTAS - PORTAL CONTRATISTA', 'A1:AE1', 'AE');
+                $this->setHeader($sheet->sheet, 'CONTRATISTAS - PORTAL CONTRATISTA', 'A1:AF1', 'AF');
             },
         ];
     }
@@ -163,6 +128,7 @@ class ContractorsExport implements FromQuery, WithHeadings, WithEvents, WithTitl
             'institutional_email'   => $row['institutional_email'] ?? null,
             'phone'                 => $row['phone'] ?? null,
             'eps_name'              => $row['eps'] ?? null,
+            'eps_nit'              => $row['eps_nit'] ?? null,
             'eps'                   => $row['other_eps'] ?? null,
             'afp_name'              => $row['afp'] ?? null,
             'afp'                   => $row['other_afp'] ?? null,
@@ -219,8 +185,8 @@ class ContractorsExport implements FromQuery, WithHeadings, WithEvents, WithTitl
     {
         return [
             'F' => NumberFormat::FORMAT_DATE_YYYYMMDD2,
-            'AD' => NumberFormat::FORMAT_DATE_YYYYMMDD2.' h'.NumberFormat::FORMAT_DATE_TIME4,
             'AE' => NumberFormat::FORMAT_DATE_YYYYMMDD2.' h'.NumberFormat::FORMAT_DATE_TIME4,
+            'AF' => NumberFormat::FORMAT_DATE_YYYYMMDD2.' h'.NumberFormat::FORMAT_DATE_TIME4,
         ];
     }
 }

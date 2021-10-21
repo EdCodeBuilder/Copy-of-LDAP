@@ -47,53 +47,7 @@ class CareerExport implements FromQuery, WithHeadings, WithEvents, WithTitle, Wi
      */
     public function query()
     {
-        $request = collect($this->request);
-        return DB::connection('mysql_contractors')
-                    ->table('contractor_careers_view')
-                    ->leftJoin('contractors_view', 'contractor_careers_view.contractor_id', '=', 'contractors_view.id')
-                    ->leftJoin('contracts_view', 'contracts_view.contractor_id', '=', 'contractors_view.id')
-                    ->when($request->has('document'), function ($query) use ($request) {
-                        return $query->where('contractor_careers_view.contractor_document', $request->get('document'));
-                    })
-                    ->when($request->has(['start_date', 'final_date']), function ($query) use ($request) {
-                        return $query->where('contracts_view.start_date', '>=', $request->get('start_date'))
-                            ->where('contracts_view.final_date', '<=', $request->get('final_date'));
-                    })
-                    ->when($request->has('document'), function ($query) use ($request) {
-                        return $query->where('contracts_view.contractor_document', $request->get('document'));
-                    })
-                    ->when($request->has('contract'), function ($query) use ($request) {
-                        return $query->where('contracts_view.contract', 'like', "%{$request->get('contract')}%");
-                    });
-        /*
-            ContractorCareerView::query()
-            ->when($request->has(['start_date', 'final_date']) || $request->has('contract'),
-                function (Builder $query)use ($request) {
-                    return $query->whereHas('contractors', function ($query) use ($request) {
-                        return $query
-                            ->when($request->has('document'), function ($query) use ($request) {
-                                return $query->where('document', $request->get('document'));
-                            })
-                            ->whereHas('contracts', function(Builder $query) use ($request) {
-                                return $query->when($request->has(['start_date', 'final_date']), function ($query) use ($request) {
-                                    return $query->where('start_date', '>=', $request->get('start_date'))
-                                        ->where('final_date', '<=', $request->get('final_date'));
-                                })
-                                ->when($request->has('document'), function ($query) use ($request) {
-                                    return $query->where('contractor_document', $request->get('document'));
-                                })
-                                ->when($request->has('contract'), function ($query) use ($request) {
-                                    return $query->where('contract', 'like', "%{$request->get('contract')}%");
-                                });
-                        });
-                    });
-                }
-            )
-            ->when($request->has('document'), function ($query) use ($request) {
-                return $query->where('contractor_document', $request->get('document'));
-            });
-        */
-
+        return ContractorCareerView::query()->whereIn('contractor_id', $this->request['contractors']);
     }
 
     /**

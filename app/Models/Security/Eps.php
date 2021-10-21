@@ -28,7 +28,8 @@ class Eps extends Model
      */
     protected $fillable = [
         'name',
-        'active'
+        'active',
+        'nit',
     ];
 
     public function scopeActive($query)

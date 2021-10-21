@@ -47,19 +47,7 @@ class ContractsExport implements FromQuery, WithHeadings, WithEvents, WithTitle,
      */
     public function query()
     {
-        $request = collect($this->request);
-        return DB::connection('mysql_contractors')
-                ->table('contracts_view')
-            ->when($request->has(['start_date', 'final_date']), function ($query) use ($request) {
-                return $query->where('start_date', '>=', $request->get('start_date'))
-                    ->where('final_date', '<=', $request->get('final_date'));
-            })
-            ->when($request->has('contract'), function ($query) use ($request) {
-                return $query->where('contract', 'like', "%{$request->get('contract')}%");
-            })
-            ->when($request->has('document'), function ($query) use ($request) {
-                return $query->where('contractor_document', $request->get('document'));
-            });
+        return ContractView::query()->whereKey($this->request['contracts']);
     }
 
     /**

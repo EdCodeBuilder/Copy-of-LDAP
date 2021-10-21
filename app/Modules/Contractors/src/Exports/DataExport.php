@@ -3,6 +3,7 @@
 namespace App\Modules\Contractors\src\Exports;
 
 use App\Modules\Contractors\src\Jobs\ProcessExport;
+use App\Modules\Contractors\src\Models\ContractorView;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Imtigger\LaravelJobStatus\JobStatus;
 use Imtigger\LaravelJobStatus\Trackable;
@@ -42,11 +43,12 @@ class DataExport implements WithMultipleSheets, WithEvents, ShouldQueue
     {
         $sheets = [];
 
-        $sheets[0] = new ContractorsExport($this->request, $this->job);
-        $sheets[1] = new ContractsExport($this->request, $this->job);
-        $sheets[2] = new CareerExport($this->request, $this->job);
-        $sheets[3] = new FileExport($this->request, $this->job);
-        $sheets[4] = new SearcherExport($this->job);
+        $sheets[0] = new SummaryExport($this->request, $this->job);
+        $sheets[1] = new ContractorsExport($this->request, $this->job);
+        $sheets[2] = new ContractsExport($this->request, $this->job);
+        $sheets[3] = new CareerExport($this->request, $this->job);
+        $sheets[4] = new FileExport($this->request, $this->job);
+        $sheets[5] = new SearcherExport($this->job);
 
         return  $sheets;
     }

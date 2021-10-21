@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\NotifyUserOfCompletedExport;
 use App\Jobs\RestartStatusJob;
 use App\Models\Security\User;
+use App\Modules\Contractors\src\Constants\GlobalQuery;
 use App\Modules\Contractors\src\Constants\Roles;
 use App\Modules\Contractors\src\Exports\ContractorsExport;
 use App\Modules\Contractors\src\Exports\DataExport;
@@ -17,6 +18,7 @@ use App\Modules\Contractors\src\Jobs\ProcessExport;
 use App\Modules\Contractors\src\Models\Contract;
 use App\Modules\Contractors\src\Models\Contractor;
 use App\Modules\Contractors\src\Models\ContractorCareer;
+use App\Modules\Contractors\src\Models\ContractorView;
 use App\Modules\Contractors\src\Models\ContractType;
 use App\Modules\Contractors\src\Models\File;
 use App\Modules\Contractors\src\Notifications\ArlNotification;
@@ -137,7 +139,7 @@ class ContractorController extends Controller
      */
     public function index(Request $request)
     {
-       $contractors = $this->query($request, Contractor::query());
+       $contractors = GlobalQuery::query($request, Contractor::query());
        $contractors = $contractors->with('contracts')
                                   ->latest()
                                   ->paginate($this->per_page);
@@ -149,54 +151,6 @@ class ContractorController extends Controller
                 'expanded'  =>  ContractorResource::additionalData(),
             ]
         );
-    }
-
-    /**
-     * @param Request $request
-     * @param Builder $builder
-     * @return BuildsQueries|Builder|mixed
-     */
-    public function query(Request $request, Builder $builder)
-    {
-        $is_hiring_and_not_admin = !auth()->user()->isAll( Roles::ROLE_ADMIN, Roles::ROLE_HIRING );
-        $is_legal_and_not_admin = !auth()->user()->isAll( Roles::ROLE_ADMIN, Roles::ROLE_LEGAL );
-        return $builder->when($request->has('doesnt_have_arl'), function ($q) {
-                    return $q->whereNull('modifiable')->whereHas('contracts', function ($query) {
-                        return $query->where('contract_type_id', '!=', 3)
-                            ->whereDate('final_date', '>=', now()->format('Y-m-d'))
-                            ->withCount([
-                                'files as arl_files_count' => function ($q) {
-                                    return $q->where('file_type_id', 1);
-                                },
-                                'files as other_files_count' => function ($q) {
-                                    return $q->where('file_type_id', '!=', 1);
-                                },
-                            ])->having('arl_files_count', 0);
-                    });
-                })->when($request->has('doesnt_have_secop'), function ($q) {
-            return $q->whereHas('contracts', function ($query) {
-                return $query->where('contract_type_id', '!=', 3)
-                    ->whereDate('final_date', '>=', now()->format('Y-m-d'))
-                    ->withCount([
-                                'files as arl_files_count' => function ($q) {
-                                    return $q->where('file_type_id', 1);
-                                },
-                                'files as other_files_count' => function ($q) {
-                                    return $q->where('file_type_id', '!=', 1);
-                                },
-                            ])->having('other_files_count', 0);
-                        });
-                })->when($request->has('query'), function ($q) use ($request) {
-                    $data = toLower($request->get('query'));
-                    return $q->whereHas('contracts', function ($query) use ($data) {
-                        return $query->where('contract', 'like', "%{$data}%");
-                    })->orWhere('name', 'like', "%{$data}%")
-                      ->orWhere('id', 'like', "%{$data}%")
-                      ->orWhere('surname', 'like', "%{$data}%")
-                      ->orWhere('document', 'like', "%{$data}%");
-                })->when($request->has('doesnt_have_data'), function ($q) use ($request) {
-                    return $q->whereNotNull('modifiable');
-                });
     }
 
     /**
