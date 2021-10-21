@@ -106,6 +106,7 @@ return [
         'new_values'          =>  'valores nuevos',
         'old_values'          =>  'valores anteriores',
         'email'          =>  'email',
+        'phone'          =>  'teléfono',
         'observations_count'          =>  'cantidad de observaciones',
         'files_count'          =>  'cantidad de archivos',
         'pending_files_count'          =>  'cantidad de archivos pendientes por validación',

@@ -393,3 +393,18 @@ if (! function_exists('update_status_job')) {
         }
     }
 }
+
+if (! function_exists('whatsapp_link')) {
+    function whatsapp_link($phone, $message = null, $phone_code = '57') {
+        if (isset($phone) && strlen($phone) > 9) {
+            $url = "https://api.whatsapp.com/send?";
+            $params = [
+                'phone' => "{$phone_code}{$phone}",
+                'text'  => $message,
+            ];
+            $queryString =  http_build_query($params);
+            return "$url$queryString";
+        }
+        return null;
+    }
+}

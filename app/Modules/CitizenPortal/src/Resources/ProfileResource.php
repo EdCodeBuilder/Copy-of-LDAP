@@ -4,6 +4,7 @@
 namespace App\Modules\CitizenPortal\src\Resources;
 
 
+use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
 use App\Modules\CitizenPortal\src\Models\Profile;
 use App\Modules\CitizenPortal\src\Models\Status;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -19,18 +20,27 @@ class ProfileResource extends JsonResource
      */
     public function toArray($request)
     {
+        $name = isset($this->name) ? (string) $this->name : null;
+        $id = isset($this->id) ? (int) $this->id : null;
         return [
-            'id'        =>  isset($this->id) ? (int) $this->id : null,
+            'id'        =>  $id,
             'user_id'      =>  isset($this->user_id) ? (int) $this->user_id : null,
             'profile_type_id'      =>  isset($this->profile_type_id) ? (int) $this->profile_type_id : null,
             'profile_type'      =>  isset($this->profile_type) ? (string) $this->profile_type : null,
             'document_type_id'      =>  isset($this->document_type_id) ? (int) $this->document_type_id : null,
             'document_type'      =>  isset($this->document_type) ? (string) $this->document_type : null,
             'document'      =>  isset($this->document) ? (int) $this->document : null,
-            'name'      =>  isset($this->name) ? (string) $this->name : null,
+            'name'      =>  $name,
             'surname'      =>  isset($this->surname) ? (string) $this->surname : null,
             'full_name'      =>  isset($this->full_name) ? (string) $this->full_name : null,
             'email'      =>  isset($this->email) ? toLower($this->email) : null,
+            'phone'      =>  isset($this->mobile_phone) && $this->mobile_phone != 0 ? (int) $this->mobile_phone : null,
+            'whatsapp'      =>  isset($this->mobile_phone)
+                ? whatsapp_link(
+                    $this->mobile_phone,
+                    "👋 ¡Hola $name! te escribimos desde el Portal Ciudadano del IDRD"
+                )
+                : null,
             'sex_id'      =>  isset($this->sex_id) ? (int) $this->sex_id : null,
             'sex'      =>  isset($this->sex) ? (string) $this->sex : null,
             'blood_type_id'      =>  isset($this->blood_type_id) ? (int) $this->blood_type_id : null,
@@ -90,6 +100,7 @@ class ProfileResource extends JsonResource
             'status_id'      =>  isset($this->status_id) ? (int) $this->status_id : Profile::PENDING,
             'color' => $this->getColor(),
             'status'      =>  isset($this->status) ? (string) $this->status : $this->getStatus(),
+            'activities_count'      =>  $id ? CitizenSchedule::query()->where('profile_id', $id)->count() : 0,
             'observations_count'      =>  isset($this->observations_count) ? (int) $this->observations_count : 0,
             'files_count'      =>  isset($this->files_count) ? (int) $this->files_count : 0,
             'pending_files_count'      =>  isset($this->pending_files_count) ? (int) $this->pending_files_count : 0,
@@ -176,6 +187,13 @@ class ProfileResource extends JsonResource
                     'align' => "left",
                     'text' => Str::ucfirst(__('citizen.validations.email')),
                     'value'  =>  "email",
+                    'sortable' => false
+                ],
+                [
+                    'icon'  => 'mdi-whatsapp',
+                    'align' => "left",
+                    'text' => Str::ucfirst(__('citizen.validations.phone')),
+                    'value'  =>  "phone",
                     'sortable' => false
                 ],
             ],

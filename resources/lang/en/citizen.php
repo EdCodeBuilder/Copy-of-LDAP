@@ -106,6 +106,7 @@ return [
         'new_values'          =>  'new values',
         'old_values'          =>  'old values',
         'email'          =>  'email',
+        'phone'          =>  'phone',
         'observations_count'          =>  'observations count',
         'files_count'          =>  'files count',
         'pending_files_count'          =>  'pending files count to check',

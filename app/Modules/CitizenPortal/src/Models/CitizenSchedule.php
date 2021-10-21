@@ -121,4 +121,12 @@ class CitizenSchedule extends Model implements Auditable
     {
         return $this->belongsTo(Schedule::class, 'schedule_id', 'id');
     }
+
+    /**
+     * @return BelongsTo
+     */
+    public function schedule_view()
+    {
+        return $this->belongsTo(ScheduleView::class, 'schedule_id', 'id');
+    }
 }

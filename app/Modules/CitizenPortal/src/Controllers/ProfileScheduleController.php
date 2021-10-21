@@ -16,6 +16,7 @@ use App\Modules\CitizenPortal\src\Models\ScheduleView;
 use App\Modules\CitizenPortal\src\Models\Status;
 use App\Modules\CitizenPortal\src\Request\ProfileFilterRequest;
 use App\Modules\CitizenPortal\src\Request\StatusProfileScheduleRequest;
+use App\Modules\CitizenPortal\src\Resources\CitizenActivitiesResource;
 use App\Modules\CitizenPortal\src\Resources\CitizenScheduleResource;
 use App\Modules\CitizenPortal\src\Resources\ProfileResource;
 use Exception;
@@ -149,6 +150,22 @@ class ProfileScheduleController extends Controller
             ),
             Response::HTTP_OK,
             CitizenScheduleResource::headers()
+        );
+    }
+
+    /**
+     * @param $profile
+     * @return JsonResponse
+     */
+    public function activities($profile)
+    {
+        $query = CitizenSchedule::query()
+            ->with('schedule_view')
+            ->where('profile_id', $profile)
+            ->latest()
+            ->paginate($this->per_page);
+        return $this->success_response(
+            CitizenActivitiesResource::collection($query)
         );
     }
 
