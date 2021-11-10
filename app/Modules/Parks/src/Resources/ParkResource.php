@@ -146,7 +146,7 @@ class ParkResource extends JsonResource
 
     public function certified_exist( $code = null )
     {
-        $base = 'https://www.idrd.gov.co/SIM/Parques/Certificado/';
+        $base = 'https://sim1.idrd.gov.co/SIM/Parques/Certificado/';
         if ( $code ) {
             $path_tif = verify_url( "{$base}{$code}.tif" ) ? "{$base}{$code}.tif" : null;
             $path_pdf = verify_url( "{$base}{$code}.pdf" ) ? "{$base}{$code}.pdf" : null;
@@ -174,7 +174,7 @@ class ParkResource extends JsonResource
     {
         switch ($text) {
             case 'Junta Administradora Local':
-                return 'https://www.idrd.gov.co/SIM/Parques/Certificado/Resolucion2011.pdf';
+                return 'https://sim1.idrd.gov.co/SIM/Parques/Certificado/Resolucion2011.pdf';
                 break;
             default:
                 return null;

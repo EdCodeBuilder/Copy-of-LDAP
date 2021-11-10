@@ -63,8 +63,9 @@ class ParkController extends Controller
         $parks = $this->setQuery(Park::query(), (new Park)->getSortableColumn($this->column))
             ->select( ['Id', 'Id_IDRD', 'Nombre', 'Direccion', 'Upz', 'Id_Localidad', 'Id_Tipo'] )
             ->when($this->query, function ($query) {
-                $query->search($this->query)
-                    ->orWhere('Id_IDRD', 'like', "%{$this->query}%");
+                return $query
+                        ->search($this->query)
+                        ->orWhere('Id_IDRD', 'like', "%{$this->query}%");
             })
             ->when(request()->has('locality_id'), function ($query) use ($request) {
                 $localities = $request->get('locality_id');

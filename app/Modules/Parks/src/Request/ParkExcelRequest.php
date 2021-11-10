@@ -43,37 +43,45 @@ class ParkExcelRequest extends FormRequest
             'location'   => [
                 'nullable',
                 function($attribute, $value, $fail) {
-                 $values = is_array($value) ? $value : explode(',', $value);
-                    if (!count($values) > 0 && !Location::query()->whereKey($value)->count() > 0) {
-                        $fail(__('validation.exists', ['attribute' => $attribute]));
+                    if (!is_null($value)) {
+                        $values = is_array($value) ? $value : explode(',', $value);
+                        if (!count($values) > 0 && !Location::query()->whereKey($value)->count() > 0) {
+                            $fail(__('validation.exists', ['attribute' => $attribute]));
+                        }
                     }
                 },
             ],
             'upz'        => [
                 'nullable',
                 function($attribute, $value, $fail) {
-                 $values = is_array($value) ? $value : explode(',', $value);
-                    if (!count($values) > 0 && !Upz::query()->whereKey($value)->count() > 0) {
-                        $fail(__('validation.exists', ['attribute' => $attribute]));
+                    if (!is_null($value)) {
+                        $values = is_array($value) ? $value : explode(',', $value);
+                        if (!count($values) > 0 && !Upz::query()->whereKey($value)->count() > 0) {
+                            $fail(__('validation.exists', ['attribute' => $attribute]));
+                        }
                     }
                 },
             ],
             'neighborhood'  => [
                 'nullable',
                 function($attribute, $value, $fail) {
-                 $values = is_array($value) ? $value : explode(',', $value);
-                 if (!count($values) > 0 && !Neighborhood::query()->whereKey($value)->count() > 0) {
-                     $fail(__('validation.exists', ['attribute' => $attribute]));
-                 }
+                    if (!is_null($value)) {
+                        $values = is_array($value) ? $value : explode(',', $value);
+                        if (!count($values) > 0 && !Neighborhood::query()->whereKey($value)->count() > 0) {
+                            $fail(__('validation.exists', ['attribute' => $attribute]));
+                        }
+                    }
                 },
             ],
             'certified'     => [
                 'nullable',
                 'string',
                 function($attribute, $value, $fail) {
-                    $items = ['certified', 'not_certified'];
-                    if (!in_array(toLower($value), $items)) {
-                        $fail("El campo $attribute debe contener alguno de los siguiente valores: certified, not_certified");
+                    if (!is_null($value)) {
+                        $items = ['certified', 'not_certified'];
+                        if (!in_array(toLower($value), $items)) {
+                            $fail("El campo $attribute debe contener alguno de los siguiente valores: certified, not_certified");
+                        }
                     }
                 },
             ],
@@ -81,27 +89,37 @@ class ParkExcelRequest extends FormRequest
                 'nullable',
                 'string',
                 function($attribute, $value, $fail) {
-                    $items = ['admin', 'is_not_admin'];
-                    if (!in_array(toLower($value), $items)) {
-                        $fail("El campo $attribute debe contener alguno de los siguiente valores: admin, is_not_admin");
+                    if (!is_null($value)) {
+                        $items = ['admin', 'is_not_admin'];
+                        if (!in_array(toLower($value), $items)) {
+                            $fail("El campo $attribute debe contener alguno de los siguiente valores: admin, is_not_admin");
+                        }
                     }
                 },
             ],
             'enclosure'     => [
                 'nullable',
                 function($attribute, $value, $fail) {
-                    $values = is_array($value) ? $value : explode(',', $value);
-                    if (!count($values) > 0 && !Enclosure::query()->whereIn('Cerramiento', $value)->count() > 0) {
-                        $fail(__('validation.exists', ['attribute' => $attribute]));
+                    if (!is_null($value) ) {
+                        $values = is_array($value) ? $value : explode(',', $value);
+                        if (count($values) > 0) {
+                            if (!count($values) > 0 && !Enclosure::query()->whereIn('Cerramiento', $value)->count() > 0) {
+                                $fail(__('validation.exists', ['attribute' => $attribute]));
+                            }
+                        }
                     }
                 },
             ],
             'park_type'       => [
                 'nullable',
                 function($attribute, $value, $fail) {
-                    $values = is_array($value) ? $value : explode(',', $value);
-                    if (!count($values) > 0 && !Scale::query()->whereKey($value)->count() > 0) {
-                        $fail(__('validation.exists', ['attribute' => $attribute]));
+                    if (!is_null($value)) {
+                        $values = is_array($value) ? $value : explode(',', $value);
+                        if (count($values) > 0) {
+                            if (!count($values) > 0 && !Scale::query()->whereKey($value)->count() > 0) {
+                                $fail(__('validation.exists', ['attribute' => $attribute]));
+                            }
+                        }
                     }
                 },
             ]

@@ -6,6 +6,7 @@ namespace App\Modules\Passport\src\Constants;
 
 class Roles
 {
+    const IDENTIFIER = 'vital-passport';
     const ROLE_SUPER_ADMIN = 'vital-passport-super-admin';
     const ROLE_ADMIN = 'vital-passport-admin';
 
@@ -55,10 +56,17 @@ class Roles
         $abilities->each(function ($ability) {
             $ability->forbidden = auth('api')->user()->getForbiddenAbilities()->contains($ability);
         });
+        $abilities = collect($abilities)->filter(function ($item) {
+            return false !== stristr($item->name, Roles::IDENTIFIER) || $item->name == '*';
+        })->toArray();
         return [
             'id'    => auth('api')->user()->id,
-            'abilities' => $abilities,
-            'roles' => auth('api')->user()->roles,
+            'abilities' => array_values($abilities),
+            'roles' => array_values(
+                collect(auth('api')->user()->roles)->filter(function ($item) {
+                    return (false !== stristr($item->name, Roles::IDENTIFIER)) || (false !== stristr($item->name, 'superadmin'));
+                })->toArray()
+            ),
         ];
     }
 }
