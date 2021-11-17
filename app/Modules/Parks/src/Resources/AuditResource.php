@@ -39,31 +39,38 @@ class AuditResource extends JsonResource
             [
                 'text' => "#",
                 'value'  =>  "id",
+                'sortable' => false
             ],
             [
                 'align' => "right",
                 'text' => "Evento",
                 'value'  =>  "event",
+                'sortable' => false
             ],
             [
                 'text' => 'Tipo',
                 'value'  =>  'type_trans',
+                'sortable' => false
             ],
             [
                 'text' => 'Usuario',
                 'value'  =>  'user',
+                'sortable' => false
             ],
             [
                 'text' => "IP",
                 'value'  =>  "ip",
+                'sortable' => false
             ],
             [
                 'text' => "Tags",
                 'value'  =>  "tags",
+                'sortable' => false
             ],
             [
                 'text'  => 'Fecha de Registro',
                 'value'  => 'created_at',
+                'sortable' => false
             ],
         ];
     }

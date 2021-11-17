@@ -68,7 +68,7 @@ class EndowmentResource extends JsonResource
 
     public function image_exist( $image = null )
     {
-        $base = 'https://www.idrd.gov.co/SIM/Parques/Foto/';
+        $base = 'https://sim1.idrd.gov.co/SIM/Parques/Foto/';
         if ( $image ) {
             return $this->urlExists( "{$base}{$image}" ) ? "{$base}{$image}" : null;
         }

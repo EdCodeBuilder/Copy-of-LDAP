@@ -134,7 +134,7 @@ class StatsController extends Controller
         $total = $this->makeFilters($total, $request);
         $total = $total->count();
         return $this->success_message([
-            'name'  =>  'Parques Certificados',
+            'name'  =>  'Certificados en el Sistema',
             'value' =>  $data,
             'percent' => $total == 0 ? 0 : round($data * 100 / $total, 2)
         ]);
@@ -182,7 +182,7 @@ class StatsController extends Controller
                     ->get()
                     ->map(function ($model) {
                         return [
-                            'name'   => isset( $model->name ) ? toUpper($model->name) : 'SIN UPZ',
+                            'name'   => isset( $model->name ) ? toUpper($model->name) : 'UPZ EN REVISIÓN',
                             'code'   => isset( $model->code ) ? toUpper($model->code) : null,
                             'parks_count'   => isset( $model->parks_count ) ? (int) $model->parks_count : 0,
                         ];

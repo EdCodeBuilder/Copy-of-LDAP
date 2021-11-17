@@ -20,7 +20,7 @@ class EmergencyPlanResource extends JsonResource
             'version'       =>  isset( $this->version ) ? (int) $this->version : null,
             'file_id'       =>  isset( $this->idArchivo ) ? (int) $this->idArchivo : null,
             'file'          =>  isset( $this->file->nombreArchivo ) ? toUpper($this->file->nombreArchivo) : null,
-            'url'           =>  isset( $this->file->nombreArchivo ) ? "https://www.idrd.gov.co/SIM/Parques/PlanesEmergencia/{$this->file->nombreArchivo}" : null,
+            'url'           =>  isset( $this->file->nombreArchivo ) ? "https://sim1.idrd.gov.co/SIM/Parques/PlanesEmergencia/{$this->file->nombreArchivo}" : null,
             'description'   =>  isset( $this->file->descripcionArchivo ) ? toUpper($this->file->descripcionArchivo) : null,
             'category'   =>  isset( $this->file->category->categoria ) ? toUpper($this->file->category->categoria) : null,
             'order'         =>  isset( $this->file->orden ) ? (int) $this->file->orden : null,
