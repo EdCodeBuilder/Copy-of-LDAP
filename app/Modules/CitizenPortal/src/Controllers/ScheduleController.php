@@ -17,6 +17,7 @@ use App\Modules\CitizenPortal\src\Models\Program;
 use App\Modules\CitizenPortal\src\Models\Schedule;
 use App\Modules\CitizenPortal\src\Models\ScheduleView;
 use App\Modules\CitizenPortal\src\Models\Stage;
+use App\Modules\CitizenPortal\src\Request\FilterSchedulePublicRequest;
 use App\Modules\CitizenPortal\src\Request\FilterScheduleRequest;
 use App\Modules\CitizenPortal\src\Request\MassiveScheduleRequest;
 use App\Modules\CitizenPortal\src\Request\ScheduleRequest;
@@ -60,6 +61,42 @@ class ScheduleController extends Controller
             ->only('update');
         $this->middleware(Roles::actions(Schedule::class, 'destroy_or_manage'))
             ->only('destroy');
+    }
+
+    public function publicApi(FilterSchedulePublicRequest $request)
+    {
+        $query = $this->setQuery(ScheduleView::query(), (new ScheduleView)->getSortableColumn($this->column))
+            ->withCount('users_schedules')
+            ->when(isset($this->query), function ($query) {
+                return $query->search($this->query);
+            })
+            ->when($request->has('weekday_id'), function ($query) use ($request) {
+                return $query->whereIn('weekday_id', $request->get('weekday_id'));
+            })
+            ->when($request->has('daily_id'), function ($query) use ($request) {
+                return $query->whereIn('daily_id', $request->get('daily_id'));
+            })
+            ->when($request->has('activity_id'), function ($query) use ($request) {
+                return $query->whereIn('activity_id', $request->get('activity_id'));
+            })
+            ->when($request->has('stage_id'), function ($query) use ($request) {
+                return $query->whereIn('stage_id', $request->get('stage_id'));
+            })
+            ->when($request->has('is_paid'), function ($query) use ($request) {
+                return $query->where('is_paid', $request->get('is_paid'));
+            })
+            ->when($request->has('program_id'), function ($query) use ($request) {
+                return $query->whereIn('program_id', $request->get('program_id'));
+            })
+            ->whereDate('final_date', '>=', now()->startOfDay())
+            ->where('is_activated', true)
+            ->orderBy((new ScheduleView)->getSortableColumn($this->column), $this->order)
+            ->paginate($this->per_page);
+        return $this->success_response(
+            ScheduleResource::collection($query),
+            Response::HTTP_OK,
+            ScheduleResource::headers()
+        );
     }
 
     /**
