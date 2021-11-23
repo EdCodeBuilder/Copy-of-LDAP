@@ -76,6 +76,12 @@ class ScheduleController extends Controller
             ->when($request->has('daily_id'), function ($query) use ($request) {
                 return $query->whereIn('daily_id', $request->get('daily_id'));
             })
+            ->when($request->has('min_age'), function ($query) use ($request) {
+                return $query->where('min_age', '>=', $request->get('min_age'));
+            })
+            ->when($request->has('max_age'), function ($query) use ($request) {
+                return $query->where('max_age', '<=', $request->get('max_age'));
+            })
             ->when($request->has('activity_id'), function ($query) use ($request) {
                 return $query->whereIn('activity_id', $request->get('activity_id'));
             })
@@ -88,7 +94,7 @@ class ScheduleController extends Controller
             ->when($request->has('program_id'), function ($query) use ($request) {
                 return $query->whereIn('program_id', $request->get('program_id'));
             })
-            ->whereDate('final_date', '>=', now()->startOfDay())
+            //->whereDate('final_date', '>=', now()->startOfDay())
             ->where('is_activated', true)
             ->orderBy((new ScheduleView)->getSortableColumn($this->column), $this->order)
             ->paginate($this->per_page);

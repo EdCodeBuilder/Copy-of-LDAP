@@ -71,6 +71,8 @@ class FilterSchedulePublicRequest extends FormRequest
                 "exists:{$daily->getConnectionName()}.{$daily->getTable()},{$daily->getKeyName()}"
             ],
             'is_paid'        =>  'nullable|boolean',
+            'min_age'        =>  'nullable|numeric|between:0,110|lte:max_age',
+            'max_age'        =>  'nullable|numeric|between:0,110|gte:min_age',
             'final_date'      =>  'nullable|date|after_or_equal:start_date',
         ];
     }
