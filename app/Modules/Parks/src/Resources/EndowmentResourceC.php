@@ -6,6 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class EndowmentResourceC extends JsonResource
 {
+	
     /**
      * Transform the resource into an array.
      *

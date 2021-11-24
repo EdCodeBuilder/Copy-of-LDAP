@@ -12,7 +12,6 @@ use App\Modules\Parks\src\Request\ParkEndowmentUpdateRequest;
 use App\Modules\Parks\src\Resources\EndowmentResource;
 use App\Modules\Parks\src\Resources\EndowmentResourceC;
 use App\Modules\Parks\src\Resources\MaterialResource;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 
@@ -29,18 +28,7 @@ class InventoriesController extends Controller
 	}
 
 	/**
-	 * Display a listing of the resource.
-	 *
-	 * @return \Illuminate\Http\Response
-	 */
-	public function index()
-	{
-		//
-	}
-
-	/**
-	 * @group Parques - Dotaciones
-	 *create
+	 * @group Parques-inventarios
 	 * Dotaciones
 	 *
 	 * En desarrollo. Muestra el listado de docationes de un parque especificado y un equipamiento especificado.
@@ -63,7 +51,7 @@ class InventoriesController extends Controller
 	}
 
 	/**
-	 * @group Parques
+	 * @group Parques-inventarios
 	 *
 	 * Crear dotacion
 	 *
@@ -94,7 +82,7 @@ class InventoriesController extends Controller
 	}
 
 	/**
-	 * @group Parques
+	 * @group Parques-inventarios
 	 *
 	 * Actualizar dotación parque.
 	 *
@@ -125,7 +113,7 @@ class InventoriesController extends Controller
 	}
 
 	/**
-	 * @group Parques
+	 * @group Parques-inventarios
 	 *
 	 * Eliminar dotacion parque.
 	 *
@@ -155,7 +143,7 @@ class InventoriesController extends Controller
 	}
 
 	/**
-	 * @group Parques
+	 * @group Parques-inventarios
 	 *
 	 * Muestra el listado de dotaciones existentes.
 	 *
@@ -171,7 +159,7 @@ class InventoriesController extends Controller
 	}
 
 	/**
-	 * @group Parques
+	 * @group Parques-inventarios
 	 *
 	 * Muestra el listado de materiales existentes.
 	 *
