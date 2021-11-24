@@ -23,6 +23,7 @@ use App\Modules\CitizenPortal\src\Controllers\WeekDayController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('citizen-portal')->group(function () {
+    Route::get('public-schedules', [ScheduleController::class, 'publicApi']);
     Route::post('login', [UserController::class, 'login']);
     Route::middleware('auth:api')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index']);

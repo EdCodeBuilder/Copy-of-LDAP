@@ -168,7 +168,7 @@ class PassportController extends Controller
             return $this->success_message(
                 'data:application/pdf;base64,'.base64_encode($pdf),
                 Response::HTTP_OK,
-                Response::HTTP_OK.
+                Response::HTTP_OK,
                 [
                     'file'  => "PASAPORTE_VITAL_{$user->passport->id}.pdf"
                 ]
