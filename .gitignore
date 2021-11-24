@@ -3,7 +3,6 @@
 /public/storage
 /storage/*.key
 /vendor
-/laradock
 .env
 .env.backup
 .phpunit.result.cache
@@ -15,3 +14,6 @@ yarn-error.log
 
 storage/.DS_Store
 .DS_Store
+
+### Laradock ###
+/laradock*
