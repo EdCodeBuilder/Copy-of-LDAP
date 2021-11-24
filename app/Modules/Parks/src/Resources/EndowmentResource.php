@@ -48,6 +48,7 @@ class EndowmentResource extends JsonResource
             'positioning'    =>  isset( $this->Posicionamiento ) ? $this->Posicionamiento : null,
             'destination'    =>  isset( $this->Destinacion ) ? $this->Destinacion : null,
             'image'    =>  isset( $this->Imagen ) ? $this->image_exist( $this->Imagen ) : null,
+	     //'image'    =>  isset( $this->Imagen ) ? $this->Imagen: null,
             'date'    =>  isset( $this->Fecha ) ? $this->Fecha : null,
             'enclosure_type'    =>  isset( $this->TipoCerramiento ) ? toUpper($this->TipoCerramiento) : null,
             'enclosure_height'    =>  isset( $this->AlturaCerramiento ) ? toUpper($this->AlturaCerramiento) : null,
@@ -68,7 +69,7 @@ class EndowmentResource extends JsonResource
 
     public function image_exist( $image = null )
     {
-        $base = 'https://www.idrd.gov.co/SIM/Parques/Foto/';
+        $base = 'https://sim1.idrd.gov.co/SIM/Parques/Foto/';
         if ( $image ) {
             return $this->urlExists( "{$base}{$image}" ) ? "{$base}{$image}" : null;
         }

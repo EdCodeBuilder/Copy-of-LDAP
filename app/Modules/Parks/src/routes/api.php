@@ -1,5 +1,6 @@
 <?php
 
+
 use App\Modules\Parks\src\Controllers\AuditController;
 use App\Modules\Parks\src\Controllers\CertifiedStatusController;
 use App\Modules\Parks\src\Controllers\EnclosureController;
@@ -11,6 +12,7 @@ use App\Modules\Parks\src\Controllers\RoleController;
 use App\Modules\Parks\src\Controllers\RolePermissionsController;
 use App\Modules\Parks\src\Controllers\RupiController;
 use App\Modules\Parks\src\Controllers\EquipmentController;
+use App\Modules\Parks\src\Controllers\InventoriesController;
 use App\Modules\Parks\src\Controllers\LocationController;
 use App\Modules\Parks\src\Controllers\ParkController;
 use App\Modules\Parks\src\Controllers\ScaleController;
@@ -107,7 +109,17 @@ Route::prefix('api')->group( function () {
 
         Route::get('{park}/economic-use', [ParkController::class, 'economic']);
         Route::get('{park}/sectors', [ParkController::class, 'sectors']);
-        Route::get('{park}/equipment/{equipment}', [ParkController::class, 'fields']);
+
+       //Route::get('{park}/equipment/{equipment}', [ParkController::class, 'fields']);
+	Route::prefix('inventories')->group( function () {
+		Route::get('{park}/equipment/{equipment}', [InventoriesController::class, 'inventory']);
+		Route::post('parks-Endowment', [InventoriesController::class, 'create']);
+		Route::post('parks-Endowment/{id}', [InventoriesController::class, 'update']);
+		Route::delete('parks-Endowment/{id}', [InventoriesController::class, 'destroy']);
+		Route::get('endowments', [InventoriesController::class, 'endowments']);
+		Route::get('material', [InventoriesController::class, 'material']);
+	});
+
 
         Route::middleware('auth:api')->prefix('users')->group(function () {
             Route::get('', [UserController::class, 'index']);
