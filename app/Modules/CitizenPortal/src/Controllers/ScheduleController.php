@@ -28,6 +28,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ScheduleController extends Controller
@@ -94,8 +95,10 @@ class ScheduleController extends Controller
             ->when($request->has('program_id'), function ($query) use ($request) {
                 return $query->whereIn('program_id', $request->get('program_id'));
             })
-            //->whereDate('final_date', '>=', now()->startOfDay())
+            ->where('quota', '>', 0)
             ->where('is_activated', true)
+            ->where('is_initiate', true)
+            ->having('users_schedules_count', '<', DB::raw('quota'))
             ->orderBy((new ScheduleView)->getSortableColumn($this->column), $this->order)
             ->paginate($this->per_page);
         return $this->success_response(
