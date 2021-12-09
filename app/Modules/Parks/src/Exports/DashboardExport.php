@@ -29,6 +29,11 @@ class DashboardExport implements FromQuery, WithMapping, WithHeadings, WithColum
     private $request;
 
     /**
+     * @var int
+     */
+    private $row = 1;
+
+    /**
      * OrfeoExport constructor.
      * @param Request $request
      */
@@ -73,6 +78,14 @@ class DashboardExport implements FromQuery, WithMapping, WithHeadings, WithColum
 
                         return $query;
                     })
+                    ->when($this->request->has('endowment_id'), function ($query) {
+                        if (!is_null($this->request->get('endowment_id'))) {
+                            return $query->whereHas('park_endowment', function ($query)  {
+                                return $query->where('Id_Dotacion', $this->request->get('endowment_id'));
+                            });
+                        }
+                        return  $query;
+                    })
                     ->when($this->request->has('park_type'), function ($query) {
                         if (is_array($this->request->get('park_type')) && count($this->request->get('park_type')) > 0)
                             return $query->whereIn('Id_Tipo', $this->request->get('park_type'));
@@ -90,7 +103,7 @@ class DashboardExport implements FromQuery, WithMapping, WithHeadings, WithColum
     public function headings(): array
     {
         return [
-            'ID',
+            '#',
             toUpper(__('parks.attributes.code')),
             toUpper(__('parks.attributes.name')),
             toUpper(__('parks.attributes.locality_id')),
@@ -138,8 +151,11 @@ class DashboardExport implements FromQuery, WithMapping, WithHeadings, WithColum
 
     public function map($row): array
     {
+        if (auth('api')->user()->isA('superadmin')) {
+            $id = isset( $row->Id ) ? (int) $row->Id : null;
+        }
         return [
-            'id'        =>  (int) isset( $row->Id ) ? (int) $row->Id : null,
+            'id'        => $id ?? $this->row++,
             'code'      =>  isset( $row->Id_IDRD ) ? toUpper($row->Id_IDRD) : null,
             'name'      =>  isset( $row->Nombre ) ? toUpper($row->Nombre) : null,
             'locality'  =>  isset( $row->location->Localidad ) ? toUpper($row->location->Localidad) : null,

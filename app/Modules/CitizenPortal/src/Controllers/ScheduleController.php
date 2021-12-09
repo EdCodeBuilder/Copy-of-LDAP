@@ -22,6 +22,7 @@ use App\Modules\CitizenPortal\src\Request\FilterScheduleRequest;
 use App\Modules\CitizenPortal\src\Request\MassiveScheduleRequest;
 use App\Modules\CitizenPortal\src\Request\ScheduleRequest;
 use App\Modules\CitizenPortal\src\Resources\ProfileResource;
+use App\Modules\CitizenPortal\src\Resources\SchedulePublicResource;
 use App\Modules\CitizenPortal\src\Resources\ScheduleResource;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -77,11 +78,10 @@ class ScheduleController extends Controller
             ->when($request->has('daily_id'), function ($query) use ($request) {
                 return $query->whereIn('daily_id', $request->get('daily_id'));
             })
-            ->when($request->has('min_age'), function ($query) use ($request) {
-                return $query->where('min_age', '>=', $request->get('min_age'));
-            })
-            ->when($request->has('max_age'), function ($query) use ($request) {
-                return $query->where('max_age', '<=', $request->get('max_age'));
+            ->when($request->has('age'), function ($query) use ($request) {
+                return $query
+                    ->where('min_age', '<=', $request->get('age'))
+                    ->where('max_age', '>=', $request->get('age'));
             })
             ->when($request->has('activity_id'), function ($query) use ($request) {
                 return $query->whereIn('activity_id', $request->get('activity_id'));
@@ -98,13 +98,13 @@ class ScheduleController extends Controller
             ->where('quota', '>', 0)
             ->where('is_activated', true)
             ->where('is_initiate', true)
-            ->having('users_schedules_count', '<', DB::raw('quota'))
+            ->whereColumn('taken', '<', 'quota')
             ->orderBy((new ScheduleView)->getSortableColumn($this->column), $this->order)
             ->paginate($this->per_page);
         return $this->success_response(
-            ScheduleResource::collection($query),
+            SchedulePublicResource::collection($query),
             Response::HTTP_OK,
-            ScheduleResource::headers()
+            SchedulePublicResource::headers()
         );
     }
 

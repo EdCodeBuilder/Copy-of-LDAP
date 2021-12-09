@@ -4,6 +4,7 @@ namespace App\Modules\Parks\src\Controllers;
 
 use App\Modules\Parks\src\Exports\DashboardExport;
 use App\Modules\Parks\src\Exports\Excel as ExcelRaw;
+use App\Modules\Parks\src\Models\Endowment;
 use App\Modules\Parks\src\Models\Location;
 use App\Modules\Parks\src\Models\Park;
 use App\Modules\Parks\src\Models\Scale;
@@ -37,6 +38,30 @@ class StatsController extends Controller
     }
 
     /**
+     * Relación de parques que no se toman en el conteo por estar sectorizados
+     *
+     */
+    public function uniqueParks() {
+        return [
+            // 07-036	TIMIZA(SECTOR VILLA DEL RIO) Se toma en cuenta un TIMIZA únicamente ya que cuentan como un sólo parque
+            '07-036', // TIMIZA
+            // '10-291' SIMON BOLIVAR (SECTOR JARDIN BOTANICO) Se toma en cuenta un parque ya que todo los sectores nombrados como SIMÓN BOLIVAR cuentan como un parque
+            '12-090', // SIMON BOLIVAR (SECTOR CENTRO DE ALTO RENDIMIENTO )
+            '12-091', // SIMON BOLIVAR ( SECTOR PARQUE DEPORTIVO EL SALITRE )
+            '12-092', // SIMON BOLIVAR ( SECTOR PARQUE DE LOS NOVIOS )
+            '12-110', // SIMON BOLIVAR ( SECTOR PLAZA DE ARTESANOS )
+            '12-117', // SIMON BOLIVAR ( SECTOR SALITRE MAGICO )
+            '12-140', // SIMON BOLIVAR (SECTOR ESCUELA DESALVAMENTO CRUZ ROJA)
+            '12-141', // SIMON BOLIVAR (SECTOR MUSEO DE LOS NI┬ÑOS )
+            '12-144', // SIMON BOLIVAR (SECTOR FUNDACION NI┬ÑO DIFERENTE)
+            '12-145', // SIMON BOLIVAR (SECTOR I.D.R.D.)
+            '12-146', // SIMON BOLIVAR (SECTOR NOVIOS II)
+            '13-088', // SIMON BOLIVAR ( SECTOR VIRGILIO BARCO)
+            '13-089', // SIMON BOLIVAR ( SECTOR CENTRAL )
+        ];
+    }
+
+    /**
      * @group Parques - Estadísticas
      *
      * Escalas
@@ -50,7 +75,8 @@ class StatsController extends Controller
     {
         $stats = Scale::withCount([
                             'parks' => function ($q) use ($request) {
-                                return $this->makeFilters($q, $request);
+                                return $this->makeFilters($q, $request)
+                                            ->whereNotIn('Id_IDRD', $this->uniqueParks());
                             }
                         ])
                         ->get();
@@ -71,20 +97,31 @@ class StatsController extends Controller
     {
         $total = Park::query();
         $total = $this->makeFilters($total, $request);
-        $total = $total->count();
+        $total = $total->whereNotIn('Id_IDRD', $this->uniqueParks())->count();
 
         $idrd = Park::idrd();
         $idrd = $this->makeFilters($idrd, $request);
         $idrd = $idrd->count();
 
+        /*
         $not_idrd = Park::notIdrd();
         $not_idrd = $this->makeFilters($not_idrd, $request);
-        $not_idrd = $not_idrd->count();
+        $not_idrd = $not_idrd->whereNotIn('Id_IDRD', $this->uniqueParks())->count();
+        */
+
+        $stats = Scale::withCount([
+                    'parks' => function ($q) use ($request) {
+                        return $this->makeFilters($q, $request)
+                            ->whereNotIn('Id_IDRD', $this->uniqueParks());
+                    }
+                ])
+                ->orderByDesc('parks_count')
+                ->first();
 
         $data = [
             'total'     =>  $total,
             'admin'     =>  $idrd,
-            'not_admin' =>  $not_idrd,
+            'not_admin' =>  new ScaleStatsResource($stats),
         ];
         return $this->success_message($data);
     }
@@ -101,14 +138,14 @@ class StatsController extends Controller
      */
     public function enclosure(ParkExcelRequest $request)
     {
-        $data = Park::selectRaw(DB::raw('Cerramiento AS enclosure, COUNT(*) as parks_count'));
-        $data = $this->makeFilters($data, $request);
+        $data = Park::selectRaw(DB::raw('Estrato AS enclosure, COUNT(*) as parks_count'));
+        $data = $this->makeFilters($data, $request)->whereNotIn('Id_IDRD', $this->uniqueParks());
         $data = $data
-            ->groupBy(['Cerramiento'])
+            ->groupBy(['Estrato'])
             ->get()
             ->map(function ($model) {
                 return [
-                    'name'     => isset($model->enclosure) ? toUpper($model->enclosure) : '',
+                    'name'     => isset($model->enclosure) ? toUpper("Estrato $model->enclosure") : '',
                     'parks_count'   => isset($model->parks_count) ? (int) $model->parks_count : 0,
                 ];
             });
@@ -158,7 +195,13 @@ class StatsController extends Controller
             }
         ])->get();
 
-        return $this->success_response(StatsLocationResource::collection( $stats ));
+        return $this->success_response(
+            StatsLocationResource::collection( $stats ),
+            Response::HTTP_OK,
+            [
+                'total' =>  Park::query()->whereNotIn('Id_IDRD', $this->uniqueParks())->count()
+            ]
+        );
     }
 
     /**
@@ -218,6 +261,29 @@ class StatsController extends Controller
         return $this->success_message($response);
     }
 
+    public function endowmentStats($equipment, $park = null)
+    {
+        $data = Endowment::query()
+            ->where('Id_Dotacion', $equipment)
+            ->when($park, function ($query) use ($park) {
+                return $query->whereHas('parks', function ($query) use ($park) {
+                   return $query->where('Id', $park);
+                });
+            })
+            ->withCount('parks')
+            ->get()
+            ->map(function ($model) {
+                return [
+                    'id'   => isset( $model->id ) ?  (int) $model->id : null,
+                    'name'   => isset( $model->name ) ? toUpper($model->name) : null,
+                    'equipment_id'   => isset( $model->Id_Equimamento ) ? (int) $model->Id_Equimamento : null,
+                    'parks_count'   => isset( $model->parks_count ) ? (int) $model->parks_count : 0,
+                ];
+            });
+
+        return $this->success_message($data);
+    }
+
     /**
      * @param $query
      * @param Request $request
@@ -257,6 +323,13 @@ class StatsController extends Controller
                     $types = $request->get('enclosure');
                     if (is_array($types) && count($types) > 0)
                         return $query->whereIn('Cerramiento', $types);
+
+                    return $query;
+                })
+                ->when($request->has('stratum'), function ($query) use ($request) {
+                    $stratum = $request->get('stratum');
+                    if (is_array($stratum) && count($stratum) > 0)
+                        return $query->whereIn('Estrato', $stratum);
 
                     return $query;
                 })

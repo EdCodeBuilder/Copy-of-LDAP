@@ -581,7 +581,7 @@ class PeaceAndSafeController extends Controller
                     $text = $this->createText($name, $document, $complete_text);
                     return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output();
                 }
-                if ($this->accountIsActive() && $this->cantCreateDocument($expires_at)) {
+                if ($this->cantCreateDocument($expires_at)) {
                     $date = $this->getExpireDate($expires_at);
                     return $this->error_response(
                         "El Servicio de Paz y Salvo del Área de Sistemas estará disponible a partir de la fecha {$date}.",
@@ -607,7 +607,7 @@ class PeaceAndSafeController extends Controller
             $username = isset($user->usua_login) ? $user->usua_login : 0;
             if ($this->hasLDAP($username) ) {
                 if (
-                    $this->accountIsActive() &&
+                    // $this->accountIsActive() &&
                     $this->cantCreateDocument($expires_at)
                 ) {
                     $date = $this->getExpireDate($expires_at);
@@ -742,7 +742,7 @@ class PeaceAndSafeController extends Controller
         if (isset($this->user)) {
             $exp_day_account = ldapDateToCarbon( $this->user->getFirstAttribute('accountexpires'));
             $expires_at = isset($expires_at) ? $expires_at : $exp_day_account;
-            return Carbon::parse($expires_at)->startOfDay()->equalTo(now()->startOfDay());
+            return now()->startOfDay()->greaterThanOrEqualTo(Carbon::parse($expires_at)->startOfDay());
         }
         return false;
     }

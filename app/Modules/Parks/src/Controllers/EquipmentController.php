@@ -3,6 +3,7 @@
 namespace App\Modules\Parks\src\Controllers;
 
 use App\Modules\Parks\src\Models\Equipment;
+use App\Modules\Parks\src\Resources\EndowmentResourceC;
 use App\Modules\Parks\src\Resources\EquipmentResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,5 +37,12 @@ class EquipmentController extends Controller
     public function index()
     {
         return $this->success_response( EquipmentResource::collection( Equipment::all() ) );
+    }
+
+    public function endowments(Equipment $equipment)
+    {
+        return $this->success_response(
+            EndowmentResourceC::collection($equipment->endowments)
+        );
     }
 }

@@ -89,14 +89,16 @@ Route::prefix('api')->group( function () {
             Route::get('/certified', [StatsController::class, 'certified']);
             Route::get('/localities', [StatsController::class, 'localities']);
             Route::get('/upz', [StatsController::class, 'upz']);
+            Route::get('/endowments/{equipment}/{park?}', [StatsController::class, 'endowmentStats']);
             Route::get('/excel', [StatsController::class, 'excel']);
         });
         Route::get('audits', [AuditController::class, 'index'])->middleware('auth:api');
 
-        Route::post('excel', [ParkController::class, 'excel']);
+        Route::get('excel', [ParkController::class, 'excel']);
 
         Route::get('synthetic-fields', [ParkController::class, 'synthetic']);
         Route::get('equipments', [EquipmentController::class, 'index']);
+        Route::get('equipments/{equipment}/endowments', [EquipmentController::class, 'endowments']);
         Route::get('diagrams', [ParkController::class, 'diagrams']);
 
         Route::get('owned-keys', [ParkController::class, 'ownedKeys'])->middleware('auth:api');

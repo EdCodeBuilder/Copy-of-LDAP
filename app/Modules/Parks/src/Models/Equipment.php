@@ -33,4 +33,9 @@ class Equipment extends Model
      * @var array
      */
     protected $fillable = ['Equipamento'];
+
+    public function endowments()
+    {
+        return $this->hasMany(Endowment::class, 'Id_Equipamento');
+    }
 }

@@ -6,7 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class EndowmentResourceC extends JsonResource
 {
-	
+
     /**
      * Transform the resource into an array.
      *
@@ -16,9 +16,9 @@ class EndowmentResourceC extends JsonResource
     public function toArray($request)
     {
         return [
-            'Id_Dotacion'        	=>  (int) isset( $this->Id_Dotacion ) ? (int) $this->Id_Dotacion : null,
-            'Dotacion'      	=>  isset( $this->Dotacion ) ? toUpper($this->Dotacion) : null,
-	     'Id_Equipamento'      	=>  (int) isset( $this->Id_Equipamento ) ? (int) $this->Id_Equipamento : null,
+            'id'        	=>  isset( $this->Id_Dotacion ) ? (int) $this->Id_Dotacion : null,
+            'name'      	=>  isset( $this->Dotacion ) ? toUpper($this->Dotacion) : null,
+	        'equipment_id'      	=>  isset( $this->Id_Equipamento ) ? (int) $this->Id_Equipamento : null,
         ];
     }
 }

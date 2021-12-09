@@ -37,6 +37,7 @@ class SchedulePublicResource extends JsonResource
             'start_date'      =>  isset($this->start_date) ? $this->start_date->format('Y-m-d H:i:s') : null,
             'final_date'      =>  isset($this->final_date) ? $this->final_date->format('Y-m-d H:i:s') : null,
             'is_activated'      =>  isset($this->is_activated) ? (bool) $this->is_activated : null,
+            'taken'   => isset($this->users_schedules_count) ? (int) $this->users_schedules_count : 0,
             'users_schedules_count'   => isset($this->users_schedules_count) ? (int) $this->users_schedules_count : 0,
             'created_at'    =>  isset($this->created_at) ? $this->created_at->format('Y-m-d H:i:s') : null,
             'updated_at'    =>  isset($this->updated_at) ? $this->updated_at->format('Y-m-d H:i:s') : null,

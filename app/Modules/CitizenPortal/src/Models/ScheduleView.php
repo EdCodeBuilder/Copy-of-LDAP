@@ -57,6 +57,7 @@ class ScheduleView extends Model
         'min_age',
         'max_age',
         'quota',
+        'taken',
         'is_paid',
         'is_initiate',
         'start_date',

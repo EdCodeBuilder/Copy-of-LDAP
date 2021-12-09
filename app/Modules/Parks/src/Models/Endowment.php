@@ -28,11 +28,37 @@ class Endowment extends Model
     protected $primaryKey = 'Id_Dotacion';
 
     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'Dotacion',
+        'Id_Equipamento'
+    ];
+
+    /**
      * Indicates if the model should be timestamped.
      *
      * @var bool
      */
     public $timestamps = false;
+
+    /*
+     * ---------------------------------------------------------
+     * Accessors and Mutator
+     * ---------------------------------------------------------
+     */
+
+    public function getIdAttribute()
+    {
+        return (int) $this->Id_Dotacion;
+    }
+
+    public function getNameAttribute()
+    {
+        return toUpper( $this->Dotacion );
+    }
 
     public function parks()
     {

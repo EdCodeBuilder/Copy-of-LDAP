@@ -10,7 +10,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class ParkEndowment extends Model implements Auditable
 {
-	use \OwenIt\Auditing\Auditable, SoftDeletes;
+	use \OwenIt\Auditing\Auditable;
 	/**
 	 * The connection name for the model.
 	 *

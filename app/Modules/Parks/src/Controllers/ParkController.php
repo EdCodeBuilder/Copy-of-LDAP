@@ -60,12 +60,16 @@ class ParkController extends Controller
      */
     public function index(ParkFinderRequest $request)
     {
+        $parksId = [];
+        if (isset($this->query)) {
+            $parksId = Park::query()->search($this->query)
+                ->orWhere('Id_IDRD', 'like', "%{$this->query}%")
+                ->get(['Id'])->pluck('Id')->toArray();
+        }
         $parks = $this->setQuery(Park::query(), (new Park)->getSortableColumn($this->column))
             ->select( ['Id', 'Id_IDRD', 'Nombre', 'Direccion', 'Upz', 'Id_Localidad', 'Id_Tipo'] )
-            ->when($this->query, function ($query) {
-                return $query
-                        ->search($this->query)
-                        ->orWhere('Id_IDRD', 'like', "%{$this->query}%");
+            ->when($this->query, function ($query) use($parksId) {
+                return $query->whereIn('Id', $parksId);
             })
             ->when(request()->has('locality_id'), function ($query) use ($request) {
                 $localities = $request->get('locality_id');
@@ -93,6 +97,19 @@ class ParkController extends Controller
             })
             ->when(request()->has('vigilance'), function ($query) use ($request) {
                 return $query->where('Vigilancia', $request->get('vigilance'));
+            })
+            ->when($request->has('stratum'), function ($query) use ($request) {
+                $stratum = $request->get('stratum');
+                if (is_array($stratum) && count($stratum) > 0)
+                    return $query->whereIn('Estrato', $stratum);
+
+                return $query;
+            })
+            ->when($request->has('endowment_id'), function ($query) use ($request) {
+                $endowment = $request->get('endowment_id');
+                return $query->whereHas('park_endowment', function ($query) use ($endowment) {
+                   return $query->where('Id_Dotacion', $endowment);
+                });
             })
             ->when(request()->has('enclosure'), function ($query) use ($request) {
                 $types = $request->get('enclosure');
@@ -129,7 +146,7 @@ class ParkController extends Controller
         $name = random_img_name();
         $response =  array(
             'name' => toUpper(str_replace(' ', '-', __('parks.excel.title')))."-$name.xlsx",
-            'file' => "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,".base64_encode($file),
+            'file' => "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,".base64_encode($file)
         );
         return $this->success_message($response);
     }
