@@ -34,6 +34,8 @@ class Certificados_TributariosController extends Controller
             $certification->type = "TRB";
             $certification->save();
             $this->dispatch(new VerificationCodeTributario($contractor, $certification));
+            $email=mask_email($contractor->email);
+            return $this->success_message("Hemos enviado un código de verificación al correo $email.");
 
         } catch (Exception $exception) {
             if ($exception instanceof ModelNotFoundException) {
