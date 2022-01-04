@@ -38,6 +38,7 @@ class CertificateCompliance extends Model implements Auditable
     protected $fillable = [
         'supervisor',
         'component',
+        'profession',
         'funding_source',
         'entry',
         'total_pay',

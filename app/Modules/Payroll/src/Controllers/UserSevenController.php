@@ -12,6 +12,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;  
 use App\Modules\Payroll\src\Resources\UserSevenResource;
 use App\Modules\Payroll\src\Models\UserSeven;
+use App\Modules\Payroll\src\Models\Person;
 use App\Modules\Payroll\src\Models\CertificateCompliance;
 use App\Modules\Payroll\src\Request\CertificateComplianceRequest;
 use App\Modules\Payroll\src\Exports\CertificateComplianceExportTemplate;
@@ -58,6 +59,12 @@ class UserSevenController extends Controller
             UserSevenResource::collection( $data )
         );
     }
+    public function getPerson(Request $request)
+    {
+        //$data = [];
+        $data = Person::where('Cedula', $request->identification)->first();
+        return  response()->json($data);
+    }
     /**
      * @param Request $request
      * @return JsonResponse|string
@@ -66,6 +73,8 @@ class UserSevenController extends Controller
     {
         try {
             $http = new Client();
+            //crear registro DNS publico(registro A) 
+            //$response = $http->post("http://kubernet.gov.co/api/payroll/getUserSevenList", [
             $response = $http->post("http://66.70.171.168/api/payroll/getUserSevenList", [
                 'json' => [
                     'listDocuments' => $request->get('listDocuments'),
@@ -95,13 +104,14 @@ class UserSevenController extends Controller
             $certificate = new CertificateCompliance;
             $certificate->supervisor = $request->get('supervisorName');
             $certificate->component = $request->get('supervisorComponent');
+            $certificate->profession = $request->get('supervisorProfession');
             $certificate->funding_source = $request->get('fundingSource');
             $certificate->entry = $request->get('entry');
             $certificate->total_pay = $request->get('totalPay');
             $certificate->settlement_period = $request->get('settlementPeriod');
             $collections = collect($request->get('contractorsList'));
-            
-            $writer = new CertificateComplianceExportTemplate($certificate, $collections );
+            $supervisorSupportList = collect($request->get('supervisorSupportList'));
+            $writer = new CertificateComplianceExportTemplate($certificate, $collections, $supervisorSupportList );
             
             $response = response()->streamDownload(function() use ($writer) {
                 $writer->create()->save('php://output');

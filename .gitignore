@@ -17,3 +17,5 @@ storage/.DS_Store
 
 ### Laradock ###
 /laradock*
+/oradiag_www-data*
+.gitmodules

@@ -9,5 +9,6 @@ Route::prefix('payroll')->group(function () {
     Route::post('/consultUserSevenList', [UserSevenController::class, 'consultUserSevenList']);
     Route::post('/certificate-compliance-excel', [UserSevenController::class, 'excelCertificateCompliance']);
     Route::post('/loadExcelContractors', [UserSevenController::class, 'loadExcelContractors']);
+    Route::post('/getPerson', [UserSevenController::class, 'getPerson']);
     //Route::post('/find-contractor', [ContractorController::class, 'find'])->middleware('auth:api');
 });
