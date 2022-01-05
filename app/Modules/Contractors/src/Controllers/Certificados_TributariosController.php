@@ -40,7 +40,7 @@ class Certificados_TributariosController extends Controller
             $email=mask_email($contractor->email);
             return $this->success_message("Hemos enviado un código de verificación al correo $email.");
 
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             if ($exception instanceof ModelNotFoundException) {
                 return $this->error_response(
                     'No se encuentra el usuario con los parámetros establecidos.',
@@ -64,7 +64,7 @@ class Certificados_TributariosController extends Controller
             $pdf = $this->conexionSeven($request);
             return $this->success_message($pdf);
             
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             if ($exception instanceof ModelNotFoundException) {
                 return $this->error_response(
                     'El código no coincide con el enviado. Por favor verifique nuevamente',
