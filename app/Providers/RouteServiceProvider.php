@@ -50,6 +50,9 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapPassportRoutes();
 
         $this->mapCitizenRoutes();
+
+        $this->mapPaymentGatewayRoutes();
+
     }
 
     /**
@@ -118,6 +121,13 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware('api')
             ->prefix('api')
             ->group(base_path('app/Modules/CitizenPortal/src/routes/api.php'));
+    }
+
+    public function mapPaymentGatewayRoutes()
+    {
+        Route::middleware('api')
+            ->prefix('api')
+            ->group(base_path('app/Modules/PaymentGateway/src/routes/api.php'));
     }
 
 }
