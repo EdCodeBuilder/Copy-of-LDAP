@@ -9,6 +9,7 @@ use App\Modules\Contractors\src\Controllers\FileController;
 use App\Modules\Contractors\src\Controllers\FileTypeController;
 use App\Modules\Contractors\src\Controllers\PeaceAndSafeController;
 use App\Modules\Contractors\src\Controllers\UserController;
+use App\Modules\Contractors\src\Controllers\Certificados_TributariosController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('contractors-portal')->group(function () {
@@ -61,4 +62,6 @@ Route::prefix('contractors-portal')->group(function () {
         'only'     =>     ['index', 'store', 'update'],
         'parameters' =>     ['contractors' => 'contractor', 'contracts' => 'contract'],
     ])->middleware('auth:api');
+    Route::post('certificado-tributario', [Certificados_TributariosController::class, "index"]);
+    Route::post('certificado-tributario/token', [Certificados_TributariosController::class, "validarUsuario"]);
 });
