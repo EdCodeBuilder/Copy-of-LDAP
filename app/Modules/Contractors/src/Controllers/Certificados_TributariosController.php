@@ -12,6 +12,8 @@ use App\Modules\Contractors\src\Models\Contractor;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Modules\Contractors\src\Models\Certification;
 use App\Modules\Contractors\src\Jobs\VerificationCodeTributario;
+use App\Modules\Contractors\src\Request\ValidacionRequest;
+use Illuminate\Http\Request;
 
 class Certificados_TributariosController extends Controller
 {
@@ -53,7 +55,30 @@ class Certificados_TributariosController extends Controller
         }
 
     }
-    public function consultaSV(ConsultaRequest $request){
+
+    public function validarUsuario(ValidacionRequest $request){
+        try {
+            $data=Certification::query()->where("document", $request->get("document"))->where("code", $request->get("code"))->firstOrFail();
+            
+            $pdf = $this->consultaSV($request);
+            return $this->success_message($pdf);
+            
+        } catch (Exception $exception) {
+            if ($exception instanceof ModelNotFoundException) {
+                return $this->error_response(
+                    'El código no coincide con el enviado. Por favor verifique nuevamente',
+                    422
+                );
+            }
+
+            return $this->error_response(
+                'No podemos realizar la consulta en este momento, por favor intente más tarde.',
+                422,
+                $exception->getMessage()
+            );
+        }
+    }
+    public function consultaSV(Request $request){
         $data=DB::connection("oracle")->raw("SELECT F.PVD_CODI, FAC_ANOP,P.PVR_NOCO,LIQ_NOMB,(SELECT SUM(A1.DFA_VALO)  FROM PO_DFACT A1 WHERE A1.PVD_CODI=F.PVD_CODI and A1.DFA_ANOP=F.FAC_ANOP) VAL_BRUT, SUM (LIQ_VALO)*-1 VAL_RETE, SUM(LIQ_BASE) VAL_BASE FROM PO_FACTU F, PO_DVFAC D, PO_PVDOR P
         WHERE  F.PVD_CODI={$request->get('document')}
         AND F.FAC_ANOP={$request->get('year')}
