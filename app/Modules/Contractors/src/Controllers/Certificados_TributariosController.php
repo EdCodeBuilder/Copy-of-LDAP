@@ -14,6 +14,7 @@ use App\Modules\Contractors\src\Models\Certification;
 use App\Modules\Contractors\src\Jobs\VerificationCodeTributario;
 use App\Modules\Contractors\src\Request\ValidacionRequest;
 use Illuminate\Http\Request;
+use GuzzleHttp\Client;
 
 class Certificados_TributariosController extends Controller
 {
@@ -60,7 +61,7 @@ class Certificados_TributariosController extends Controller
         try {
             $data=Certification::query()->where("document", $request->get("document"))->where("code", $request->get("code"))->firstOrFail();
             
-            $pdf = $this->consultaSV($request);
+            $pdf = $this->conexionSeven($request);
             return $this->success_message($pdf);
             
         } catch (Exception $exception) {
@@ -78,7 +79,20 @@ class Certificados_TributariosController extends Controller
             );
         }
     }
-    public function consultaSV(Request $request){
+
+    public function conexionSeven(ValidacionRequest $request){
+        $http=new Client();
+        $response=$http->post("http://66.70.171.168/api/contractors-portal/certificado-tributario/oracle", [
+            "json"=>$request->all(), "headers"=>[
+                'Accept'    => 'application/json',
+                'Content-type' => 'application/json'
+            ]
+            ]);
+            $data=json_decode($response->getBody()->getContents(), true);
+            return $data;
+    }
+
+    public function consultaSV(ConsultaRequest $request){
         $data=DB::connection("oracle")->raw("SELECT F.PVD_CODI, FAC_ANOP,P.PVR_NOCO,LIQ_NOMB,(SELECT SUM(A1.DFA_VALO)  FROM PO_DFACT A1 WHERE A1.PVD_CODI=F.PVD_CODI and A1.DFA_ANOP=F.FAC_ANOP) VAL_BRUT, SUM (LIQ_VALO)*-1 VAL_RETE, SUM(LIQ_BASE) VAL_BASE FROM PO_FACTU F, PO_DVFAC D, PO_PVDOR P
         WHERE  F.PVD_CODI={$request->get('document')}
         AND F.FAC_ANOP={$request->get('year')}
@@ -89,6 +103,6 @@ class Certificados_TributariosController extends Controller
         AND P.EMP_CODI= F.EMP_CODI
         AND P.PVD_CODI = F.PVD_CODI
         GROUP BY F.PVD_CODI, FAC_ANOP,P.PVR_NOCO,LIQ_NOMB");
-        return $data;
+        return $this->success_message($data);
     }
 }
