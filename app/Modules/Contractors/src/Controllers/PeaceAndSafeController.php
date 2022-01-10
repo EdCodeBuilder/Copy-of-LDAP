@@ -5,21 +5,15 @@ namespace App\Modules\Contractors\src\Controllers;
 
 
 use Adldap\AdldapInterface;
-use Adldap\Utilities;
 use App\Helpers\FPDF;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Auth\ActiveRecordResource;
-use App\Modules\Contractors\src\Exports\WareHouseExport;
 use App\Modules\Contractors\src\Exports\WareHouseExportTemplate;
 use App\Modules\Contractors\src\Jobs\VerificationCode;
-use App\Modules\Contractors\src\Mail\WareHouseMail;
 use App\Modules\Contractors\src\Models\Certification;
 use App\Modules\Contractors\src\Models\Contract;
 use App\Modules\Contractors\src\Models\Contractor;
 use App\Modules\Contractors\src\Request\ConsultPeaceAndSafeRequest;
-use App\Modules\Contractors\src\Request\EnableLDAPRequest;
 use App\Modules\Contractors\src\Request\PeaceAndSafeRequest;
-use App\Modules\Orfeo\src\Models\Filed;
 use App\Modules\Orfeo\src\Models\Informed;
 use App\Modules\Orfeo\src\Models\User;
 use Carbon\Carbon;
@@ -29,20 +23,15 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use LaravelQRCode\Facades\QRCode;
-use Maatwebsite\Excel\Excel;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException;
 use setasign\Fpdi\PdfParser\Filter\FilterException;
 use setasign\Fpdi\PdfParser\PdfParserException;
 use setasign\Fpdi\PdfParser\Type\PdfTypeException;
 use setasign\Fpdi\PdfReader\PdfReaderException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Tightenco\Collect\Support\Collection;
 
 class PeaceAndSafeController extends Controller
 {
@@ -159,12 +148,12 @@ class PeaceAndSafeController extends Controller
 
             if ($exception instanceof ModelNotFoundException) {
                 return $this->error_response(
-                    'No se encuentra el usuario con los parámetros establecidos.',
+                    __('contractor.not_found'),
                     422
                 );
             }
             return $this->error_response(
-                'No podemos realizar la consulta en este momento, por favor intente más tarde.',
+                __('contractor.error'),
                 422,
                 $exception->getMessage()
             );
@@ -212,7 +201,7 @@ class PeaceAndSafeController extends Controller
             return $this->getPDF('PAZ_Y_SALVO.pdf', $text, $certification)->Output('I', 'PAZ_Y_SALVO.pdf');
         } catch (Exception $exception) {
             return $this->error_response(
-                'No se encuentra un certificado válido para este número de contrato',
+                __('contractor.invalid'),
                 Response::HTTP_UNPROCESSABLE_ENTITY,
                 env('APP_DEBUG') == true ? $exception->getMessage() : null
             );
@@ -234,11 +223,17 @@ class PeaceAndSafeController extends Controller
 
             return $this->success_message([
                 'id'        =>  $certification->id,
-                'message'   =>  "Este certificado fue emitido originalmente en la fecha correspondiente a {$certification->created_at->format('Y-m-d H:i:s')} a nombre de $certification->name con número de documento $certification->document bajo el contrato $certification->contract para el área de $area."
+                'message' => __('contractor.valid_token', [
+                            'date'      => $certification->created_at->format('Y-m-d H:i:s'),
+                            'name'      => $certification->name,
+                            'document'  => $certification->document,
+                            'contract'  => $certification->contract,
+                            'area'      => $area
+                        ])
             ]);
         } catch (Exception $exception) {
             return $this->error_response(
-                "No se encuentró ningún certificado válido para el token {$token}.",
+                __('contractor.invalid_token', ['token' => $token]),
                 422,
                 $exception->getMessage()
             );
@@ -281,13 +276,13 @@ class PeaceAndSafeController extends Controller
 
             if ($exception instanceof ModelNotFoundException) {
                 return $this->error_response(
-                    'No se encuentra el usuario con los parámetros establecidos.',
+                    __('contractor.not_found'),
                     422
                 );
             }
 
             return $this->error_response(
-                'No podemos realizar la consulta en este momento, por favor intente más tarde.',
+                __('contractor.error'),
                 422,
                 $exception->getMessage()
             );
@@ -324,13 +319,13 @@ class PeaceAndSafeController extends Controller
         } catch (Exception $exception) {
             if ($exception instanceof ModelNotFoundException) {
                 return $this->error_response(
-                    'No se encuentra el usuario con los parámetros establecidos.',
+                    __('contractor.not_found'),
                     422
                 );
             }
 
             return $this->error_response(
-                'No podemos realizar la consulta en este momento, por favor intente más tarde.',
+                __('contractor.error'),
                 422,
                 $exception->getMessage()
             );
@@ -351,7 +346,7 @@ class PeaceAndSafeController extends Controller
             return $this->success_message( $this->getWareHouseData($request) );
         } catch (Exception $exception) {
             return $this->error_response(
-                'El código de verificación ingresado no es válido.',
+                __('contractor.invalid_code'),
                 422
             );
         }
@@ -367,7 +362,7 @@ class PeaceAndSafeController extends Controller
             return $this->success_message( $this->getWareHouseData($request) );
         } catch (Exception $exception) {
             return $this->error_response(
-                'No se puede consltar información en este momento. Por favor intente más tarde.',
+                __('contractor.error'),
                 422
             );
         }
@@ -427,7 +422,7 @@ class PeaceAndSafeController extends Controller
             return $this->createWarehouseCert($certification);
         } catch (Exception $exception) {
             return $this->error_response(
-                'No podemos realizar la consulta en este momento, por favor intente más tarde.',
+                __('contractor.error'),
                 422,
                 $exception->getMessage()
             );
@@ -475,12 +470,12 @@ class PeaceAndSafeController extends Controller
         } catch (Exception $exception) {
             if ($exception instanceof ModelNotFoundException) {
                 return $this->error_response(
-                    'No se encuentra el usuario con los parámetros establecidos.',
+                    __('contractor.not_found'),
                     422
                 );
             }
             return $this->error_response(
-                'No podemos realizar la consulta en este momento, por favor intente más tarde.',
+                __('contractor.error'),
                 422,
                 $exception->getMessage()
             );
@@ -573,9 +568,9 @@ class PeaceAndSafeController extends Controller
                     $sub_day = Carbon::parse($expires_at)->subDay();
                     if (isset($expires_at) && now()->lessThanOrEqualTo( $sub_day )) {
                         return $this->error_response(
-                            "El Servicio de Paz y Salvo del Área de Sistemas estará disponible a partir de la fecha {$sub_day}.",
+                            __('contractor.contract_date', ['date' => $sub_day]),
                             Response::HTTP_UNPROCESSABLE_ENTITY,
-                            'Usuario sin cuenta de ORFEO Y sin Cuentas Institucionales'
+                            __('contractor.no_accounts')
                         );
                     }
                     $text = $this->createText($name, $document, $complete_text);
@@ -584,9 +579,9 @@ class PeaceAndSafeController extends Controller
                 if ($this->cantCreateDocument($expires_at)) {
                     $date = $this->getExpireDate($expires_at);
                     return $this->error_response(
-                        "El Servicio de Paz y Salvo del Área de Sistemas estará disponible a partir de la fecha {$date}.",
+                        __('contractor.contract_date', ['date' => $date]),
                         Response::HTTP_UNPROCESSABLE_ENTITY,
-                        'Usuario sin cuenta de ORFEO pero con cuenta institucional'
+                        __('contractor.only_email')
                     );
                 }
                 if ($this->hasLDAP($document, 'postalcode')) {
@@ -612,9 +607,9 @@ class PeaceAndSafeController extends Controller
                 ) {
                     $date = $this->getExpireDate($expires_at);
                     return $this->error_response(
-                        "El Servicio de Paz y Salvo del Área de Sistemas estará disponible a partir de la fecha {$date}.",
+                        __('contractor.contract_date', ['date' => $date]),
                         Response::HTTP_UNPROCESSABLE_ENTITY,
-                        'Usuario con cuenta de ORFEO y LDAP'
+                        __('contractor.with_accounts')
                     );
                 }
             }
@@ -624,7 +619,7 @@ class PeaceAndSafeController extends Controller
             if ( $total['total'] > 0 ) {
                 array_push($total, ['result' => $this->cantCreateDocument($expires_at)]);
                 return $this->error_response(
-                    "Para generar el paz y salvo de sistemas debe tener sus bandejas de Orfeo en cero, actualmente cuenta con {$total['total']} radicado(s) sin procesar.",
+                    trans_choice('contractor.orfeo_exception', $total['total'], ['count' => $total['total']]),
                     Response::HTTP_UNPROCESSABLE_ENTITY,
                     $total
                 );
@@ -915,7 +910,7 @@ class PeaceAndSafeController extends Controller
         // use the imported page and place it at point 10,10 with a width of 100 mm
         $pdf->useTemplate($tplId, 0, 0, null, null, true);
         // Creation date and time
-        $created_at = isset($certification->created_at) ? $certification->created_at->format('Y-m-d H:i:s') : null;
+        $created_at = isset($certification->updated_at) ? $certification->updated_at->format('Y-m-d H:i:s') : null;
         $pdf->SetFont('Helvetica', 'B');
         $pdf->SetFontSize(8);
         $pdf->SetTextColor(0, 0, 0);
