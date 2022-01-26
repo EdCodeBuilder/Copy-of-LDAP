@@ -5,8 +5,8 @@ namespace App\Modules\PaymentGateway\src\Controllers;
 use App\Modules\PaymentGateway\src\Models\ParkPse;
 use App\Modules\PaymentGateway\src\Resources\ParkPseResource;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Modules\PaymentGateway\src\Resources\ServicePseResource;
 
 /**
  * @group Pasarela de pagos - Parques
@@ -35,13 +35,21 @@ class ParkPseController extends Controller
      */
     public function index()
     {
-        return $this->success_response( ParkPseResource::collection( ParkPse::all() ) );
+        return $this->success_response(ParkPseResource::collection(ParkPse::all()));
     }
 
-    // public function endowments(Equipment $equipment)
-    // {
-    //     return $this->success_response(
-    //         EndowmentResourceC::collection($equipment->endowments)
-    //     );
-    // }
+    /**
+     * @group Pasarela de pagos - Servicios
+     *
+     * Servicios
+     *
+     * Muestra un listado de los servicios de un parque.
+     *
+     *
+     * @return JsonResponse
+     */
+    public function services($id)
+    {
+        return $this->success_response(ServicePseResource::collection(ParkPse::find($id)->servicesOffered));
+    }
 }
