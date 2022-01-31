@@ -4,7 +4,7 @@ namespace App\Modules\PaymentGateway\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Pago extends Model
+class Status extends Model
 {
       /**
        * The connection name for the model.
@@ -18,7 +18,7 @@ class Pago extends Model
        *
        * @var string
        */
-      protected $table = 'pago_pse';
+      protected $table = 'estado_pse';
 
       /**
        * The primary key for the model.
@@ -26,7 +26,6 @@ class Pago extends Model
        * @var string
        */
       protected $primaryKey = 'id';
-
 
       /**
        * The attributes that are mass assignable.
@@ -36,8 +35,10 @@ class Pago extends Model
       protected $fillable = [
       ];
 
-      public function state()
+
+      public function payments()
       {
-            return $this->belongsTo(Status::class, 'estado_id', 'id')->select(['id', 'estado_paymentez', 'descripcion']);
+
+            return $this->hasMany(Pago::class, 'estado_id', 'id');
       }
 }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTablePagoPse extends Migration
+class CreatePagoPse extends Migration
 {
       /**
        * Run the migrations.
@@ -25,17 +25,23 @@ class CreateTablePagoPse extends Migration
                   $table->text('nombre');
                   $table->text('apellido');
                   $table->text('telefono');
-                  $table->text('estado');
+                  $table->unsignedBigInteger('estado_id');
                   $table->text('estado_banco');
                   $table->text('concepto');
-                  $table->float('total');
-                  $table->float('iva');
+                  $table->text('moneda');
+                  $table->decimal('total', 20, 2);
+                  $table->decimal('iva', 2, 1);
                   $table->bigInteger('permiso');
                   $table->string('tipo_permiso');
                   $table->integer('id_reserva')->nullable();
+                  $table->text('fecha_pago')->nullable();
+                  $table->text('user_id_pse');
                   $table->timestamps();
                   $table->softDeletes();
+
+                  $table->foreign('estado_id')->references('id')->on('estado_pse')->onDelete('cascade')->onUpdate('cascade');
             });
+
       }
 
       /**
@@ -45,6 +51,6 @@ class CreateTablePagoPse extends Migration
        */
       public function down()
       {
-            Schema::dropIfExists('table_pago_pse');
+            Schema::dropIfExists('pago_pse');
       }
 }

@@ -5,7 +5,7 @@ namespace App\Modules\PaymentGateway\src\Controllers;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Modules\PaymentGateway\src\Models\Pago;
-use App\Modules\PaymentGateway\src\Resources\TransaccionsPseResource;
+use App\Modules\PaymentGateway\src\Resources\StatusPseResource;
 use GuzzleHttp\Client;
 use DateTime;
 use Illuminate\Http\Request;
@@ -81,7 +81,7 @@ class PseController extends Controller
                         'order' => [
                               'country' => 'COL',
                               'currency' => 'COP',
-                              'dev_reference' => 'reject',
+                              'dev_reference' => '1',
                               'amount' => (int)$request->totalPay,
                               'vat' => 0,
                               'description' => $request->concept
@@ -101,13 +101,17 @@ class PseController extends Controller
             $pago->nombre = toUpper($request->name);
             $pago->apellido = toUpper($request->lastName);
             $pago->telefono = $request->phone;
-            $pago->estado = $responsePse['transaction']['status'];
+            $pago->estado_id = $this->getStatus($responsePse['transaction']['status']);
             $pago->estado_banco = $responsePse['transaction']['status_bank'];
             $pago->concepto = toUpper($request->concept);
+            $pago->moneda = $responsePse['transaction']['currency'];
             $pago->total = $request->totalPay;
             $pago->iva = 0;
             $pago->permiso = $request->permitNumber;
             $pago->tipo_permiso = $request->permitTypeSelected;
+            $pago->id_reserva = null;
+            $pago->fecha_pago = null;
+            $pago->user_id_pse = 'PSE' . $request->document;
             $pago->save();
 
             return $this->success_message(['bank_url' => $responsePse['transaction']['bank_url']]);
@@ -117,29 +121,31 @@ class PseController extends Controller
 
       public function status($codePayment)
       {
-            $pago = Pago::where('codigo_pago', $codePayment)->first();
+            $payment = Pago::where('codigo_pago', $codePayment)->get();
             $responsePse = null;
-            if ($pago) {
+            if ($payment) {
                   $http = new Client();
-                  $response = $http->get(env('URL_BASE_PAYMENTEZ') . '/pse/order/' . $pago->id_transaccion_pse . '/', [
+                  $response = $http->get(env('URL_BASE_PAYMENTEZ') . '/pse/order/' . $payment->first()->id_transaccion_pse . '/', [
                         'headers' => [
                               "auth-token" => $this->getAuthToken(),
                               "Content-Type" => "application/json",
                         ],
                   ]);
                   $responsePse =  json_decode($response->getBody()->getContents(), true);
-                  $pago->estado = $responsePse['transaction']['status'];
-                  $pago->estado_banco = $responsePse['transaction']['status_bank'];
-                  $pago->save();
+                  $payment->first()->estado_id = $this->getStatus($responsePse['transaction']['status']);
+                  $payment->first()->estado_banco = $responsePse['transaction']['status_bank'];
+                  $payment->first()->fecha_pago =  $responsePse['transaction']['paid_date'];
+                  $payment->first()->save();
+                  $payment->first()->load('state');
             }
-            return $this->success_message(['pago' => $pago, 'responsePse' => $responsePse]);
+            return $this->success_response(StatusPseResource::collection($payment));
       }
 
 
       public function transaccions($document)
       {
-            $transaccions = Pago::where('identificacion', $document)->get();
-            return $this->success_response(TransaccionsPseResource::collection($transaccions));
+            $transaccions = Pago::with('state')->where('identificacion', $document)->get();
+            return $this->success_response(StatusPseResource::collection($transaccions));
       }
 
       public function webHook(Request $request)
@@ -148,14 +154,16 @@ class PseController extends Controller
             $transaccion = Pago::where('id_transaccion_pse', $request->transaction['id'])->first();
             $transaction_id = $transaccion->id_transaccion_pse;
             $app_code = env('API_LOGIN_DEV');
-            $user_id = 'PSE' . $transaccion->identificacion;
+            $user_id = $transaccion->user_id_pse;
             $app_key = env('API_KEY_DEV');
             $for_md5 = $transaction_id . '_' . $app_code . '_' . $user_id . '_' . $app_key;
             $stoken = md5($for_md5);
             if ($request->transaction['stoken'] === $stoken) {
-                  $transaccion->estado = $request->transaction['status'] === '1' ? 'approved' : 'failure';
+                  $transaccion->estado_id = $this->getStatusWebHook($request->transaction['status']);
                   $transaccion->save();
+                  return (new \Illuminate\Http\Response)->setStatusCode(200);
             }
+            return (new \Illuminate\Http\Response)->setStatusCode(203);
       }
 
 
@@ -196,6 +204,48 @@ class PseController extends Controller
                         break;
                   default:
                         return 14;
+                        break;
+            }
+      }
+
+      private function getStatus($status)
+      {
+            switch ($status) {
+                  case 'pending':
+                        return 1;
+                        break;
+                  case 'approved':
+                        return 2;
+                        break;
+                  case 'cancelled':
+                        return 3;
+                        break;
+                  case 'rejected':
+                        return 4;
+                        break;
+                  default:
+                        return 5;
+                        break;
+            }
+      }
+
+      private function getStatusWebHook($status)
+      {
+            switch ($status) {
+                  case '0':
+                        return 1;
+                        break;
+                  case '1':
+                        return 2;
+                        break;
+                  case '2':
+                        return 3;
+                        break;
+                  case '4':
+                        return 4;
+                        break;
+                  default:
+                        return 5;
                         break;
             }
       }
