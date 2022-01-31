@@ -4,10 +4,10 @@ namespace App\Modules\PaymentGateway\src\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
+use App\Modules\PaymentGateway\src\Help\Helpers;
 use App\Modules\PaymentGateway\src\Models\Pago;
 use App\Modules\PaymentGateway\src\Resources\StatusPseResource;
 use GuzzleHttp\Client;
-use DateTime;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
 
@@ -39,9 +39,10 @@ class PseController extends Controller
       public function banks()
       {
             $http = new Client();
+            $help = new Helpers();
             $response = $http->get(env('URL_BASE_PAYMENTEZ') . '/banks/PSE/', [
                   'headers' => [
-                        "auth-token" => $this->getAuthToken(),
+                        "auth-token" => $help->getAuthToken(),
                         "Content-Type" => "application/json",
                   ],
             ]);
@@ -52,11 +53,13 @@ class PseController extends Controller
 
       public function transferBank(Request $request)
       {
-            $id_transaccion = Uuid::uuid1();
+
             $http = new Client();
+            $help = new Helpers();
+            $id_transaccion = Uuid::uuid1();
             $response = $http->post(env('URL_BASE_PAYMENTEZ') . '/order/', [
                   'headers' => [
-                        "auth-token" => $this->getAuthToken(),
+                        "auth-token" => $help->getAuthToken(),
                         "Content-Type" => "application/json",
                   ],
                   'json' => [
@@ -94,14 +97,14 @@ class PseController extends Controller
             $pago->id_parque = $request->parkSelected;
             $pago->id_servicio = $request->serviceParkSelected;
             $pago->identificacion = $request->document;
-            $pago->tipo_identificacion = $this->getTypeDocument($request->documentTypeSelected);
+            $pago->tipo_identificacion =  $help->getTypeDocument($request->documentTypeSelected);
             $pago->codigo_pago = $id_transaccion;
             $pago->id_transaccion_pse = $responsePse['transaction']['id'];
             $pago->email = toUpper($request->email);
             $pago->nombre = toUpper($request->name);
             $pago->apellido = toUpper($request->lastName);
             $pago->telefono = $request->phone;
-            $pago->estado_id = $this->getStatus($responsePse['transaction']['status']);
+            $pago->estado_id = $help->getStatus($responsePse['transaction']['status']);
             $pago->estado_banco = $responsePse['transaction']['status_bank'];
             $pago->concepto = toUpper($request->concept);
             $pago->moneda = $responsePse['transaction']['currency'];
@@ -125,14 +128,15 @@ class PseController extends Controller
             $responsePse = null;
             if ($payment) {
                   $http = new Client();
+                  $help = new Helpers();
                   $response = $http->get(env('URL_BASE_PAYMENTEZ') . '/pse/order/' . $payment->first()->id_transaccion_pse . '/', [
                         'headers' => [
-                              "auth-token" => $this->getAuthToken(),
+                              "auth-token" =>  $help->getAuthToken(),
                               "Content-Type" => "application/json",
                         ],
                   ]);
                   $responsePse =  json_decode($response->getBody()->getContents(), true);
-                  $payment->first()->estado_id = $this->getStatus($responsePse['transaction']['status']);
+                  $payment->first()->estado_id = $help->getStatus($responsePse['transaction']['status']);
                   $payment->first()->estado_banco = $responsePse['transaction']['status_bank'];
                   $payment->first()->fecha_pago =  $responsePse['transaction']['paid_date'];
                   $payment->first()->save();
@@ -150,7 +154,7 @@ class PseController extends Controller
 
       public function webHook(Request $request)
       {
-
+            $help = new Helpers();
             $transaccion = Pago::where('id_transaccion_pse', $request->transaction['id'])->first();
             $transaction_id = $transaccion->id_transaccion_pse;
             $app_code = env('API_LOGIN_DEV');
@@ -159,94 +163,11 @@ class PseController extends Controller
             $for_md5 = $transaction_id . '_' . $app_code . '_' . $user_id . '_' . $app_key;
             $stoken = md5($for_md5);
             if ($request->transaction['stoken'] === $stoken) {
-                  $transaccion->estado_id = $this->getStatusWebHook($request->transaction['status']);
+                  $transaccion->estado_id = $help->getStatusWebHook($request->transaction['status']);
                   $transaccion->save();
                   return (new \Illuminate\Http\Response)->setStatusCode(200);
             }
             return (new \Illuminate\Http\Response)->setStatusCode(203);
       }
 
-
-
-      private function getAuthToken()
-      {
-            $server_application_code = env('API_LOGIN_DEV');
-            $server_app_key = env('API_KEY_DEV');
-            $date = new DateTime();
-            $unix_timestamp = $date->getTimestamp();
-            $uniq_token_string = $server_app_key . $unix_timestamp;
-            $uniq_token_hash = hash('sha256', $uniq_token_string);
-            $auth_token = base64_encode($server_application_code . ";" . $unix_timestamp . ";" . $uniq_token_hash);
-            return $auth_token;
-      }
-
-
-      private function getTypeDocument($type)
-      {
-            switch ($type) {
-                  case 'CC':
-                        return 1;
-                        break;
-                  case 'TI':
-                        return 2;
-                        break;
-                  case 'NIT':
-                        return 7;
-                        break;
-                  case 'CE':
-                        return 4;
-                        break;
-                  case 'PP':
-                        return 6;
-                        break;
-                  case 'RC':
-                        return 3;
-                        break;
-                  default:
-                        return 14;
-                        break;
-            }
-      }
-
-      private function getStatus($status)
-      {
-            switch ($status) {
-                  case 'pending':
-                        return 1;
-                        break;
-                  case 'approved':
-                        return 2;
-                        break;
-                  case 'cancelled':
-                        return 3;
-                        break;
-                  case 'rejected':
-                        return 4;
-                        break;
-                  default:
-                        return 5;
-                        break;
-            }
-      }
-
-      private function getStatusWebHook($status)
-      {
-            switch ($status) {
-                  case '0':
-                        return 1;
-                        break;
-                  case '1':
-                        return 2;
-                        break;
-                  case '2':
-                        return 3;
-                        break;
-                  case '4':
-                        return 4;
-                        break;
-                  default:
-                        return 5;
-                        break;
-            }
-      }
 }
