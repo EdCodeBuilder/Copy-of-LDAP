@@ -235,7 +235,12 @@ class ProfileScheduleController extends Controller
                 $message = __('validation.handler.updated');
             }
 
-            $this->dispatch( new ConfirmStatusSubscriptionCitizen( $user->profiles_view, $status, $text ) );
+            $this->dispatch( new ConfirmStatusSubscriptionCitizen(
+                $user->profiles_view,
+                $status,
+                $text,
+                auth('api')->user()->email
+            ) );
 
             return $this->success_message(
                 $message,

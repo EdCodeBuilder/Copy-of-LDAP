@@ -133,7 +133,13 @@ class FileController extends Controller
                 'observation'   => $observation,
                 'user_ldap_id'       =>  auth('api')->user()->id,
             ]);
-            $this->dispatch(new ConfirmStatusFileCitizen($profile, $status, $file, $observation));
+            $this->dispatch(new ConfirmStatusFileCitizen(
+                $profile,
+                $status,
+                $file,
+                $observation,
+                auth('api')->user()->email
+            ));
         });
         return $this->success_message(
             __('validation.handler.success')
