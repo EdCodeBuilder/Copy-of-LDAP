@@ -2,9 +2,11 @@
 
 namespace App\Modules\Contractors\src\Constants;
 
+use App\Modules\Contractors\src\Models\Contract;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use phpDocumentor\Reflection\Types\This;
 
 class GlobalQuery
 {
@@ -17,16 +19,8 @@ class GlobalQuery
     {
         return $builder->when($request->has('doesnt_have_arl'), function ($q) {
             return $q->whereNull('modifiable')->whereHas('contracts', function ($query) {
-                return $query->where('contract_type_id', '!=', 3)
-                    ->whereDate('final_date', '>=', now()->format('Y-m-d'))
-                    ->withCount([
-                        'files as arl_files_count' => function ($q) {
-                            return $q->where('file_type_id', 1);
-                        },
-                        'files as other_files_count' => function ($q) {
-                            return $q->where('file_type_id', '!=', 1);
-                        },
-                    ])->having('arl_files_count', 0);
+                $contracts = new GlobalQuery();
+                return $query->whereIn('id', $contracts->contracts());
             });
         })->when(
             $request->has(['start_date', 'final_date']),
@@ -36,16 +30,8 @@ class GlobalQuery
             }
         )->when($request->has('doesnt_have_secop'), function ($q) {
             return $q->whereHas('contracts', function ($query) {
-                return $query->where('contract_type_id', '!=', 3)
-                    ->whereDate('final_date', '>=', now()->format('Y-m-d'))
-                    ->withCount([
-                        'files as arl_files_count' => function ($q) {
-                            return $q->where('file_type_id', 1);
-                        },
-                        'files as other_files_count' => function ($q) {
-                            return $q->where('file_type_id', '!=', 1);
-                        },
-                    ])->having('other_files_count', 0);
+                $contracts = new GlobalQuery();
+                return $query->whereIn('id', $contracts->contracts('other_files_count'));
             });
         })->when($request->has('query'), function ($q) use ($request) {
             $data = toLower($request->get('query'));
@@ -58,5 +44,27 @@ class GlobalQuery
         })->when($request->has('doesnt_have_data'), function ($q) use ($request) {
             return $q->whereNotNull('modifiable');
         });
+    }
+
+    public function contracts($files = 'arl_files_count')
+    {
+        return Contract::query()
+            ->where('contract_type_id', '!=', 3)
+            ->whereDate('final_date', '>=', now()->format('Y-m-d'))
+            ->latest()
+            ->withCount([
+                'files as arl_files_count' => function ($q) {
+                    return $q->where('file_type_id', 1);
+                },
+                'files as other_files_count' => function ($q) {
+                    return $q->where('file_type_id', '!=', 1);
+                },
+            ])
+            ->get(['id', 'contractor_id', 'arl_files_count', 'created_at'])
+            ->sortByDesc('created_at')
+            ->unique('contractor_id')
+            ->filter(function ($value, $key) use ($files) {
+                return $value[$files] == 0;
+            })->pluck('id')->toArray();
     }
 }

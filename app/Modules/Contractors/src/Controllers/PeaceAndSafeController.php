@@ -302,7 +302,7 @@ class PeaceAndSafeController extends Controller
                     return $query->where('contract', $contract);
                 })->with([
                     'contracts' => function($query) use ($contract) {
-                        return $query->where('contract', $contract)->first();
+                        return $query->where('contract', $contract)->latest()->first();
                     }
                 ])->firstOrFail();
 
@@ -613,7 +613,9 @@ class PeaceAndSafeController extends Controller
                     );
                 }
             }
-            $certification->username = $this->user->getFirstAttribute('samaccountname');
+            $certification->username = isset($this->user)
+                    ? $this->user->getFirstAttribute('samaccountname')
+                    : $username;
             $certification->save();
             $total = $this->hasUnprocessedData($user->usua_codi);
             if ( $total['total'] > 0 ) {
@@ -634,7 +636,7 @@ class PeaceAndSafeController extends Controller
             $this->disableLDAP();
             $text = $this->createText(
                 $certification->name,
-                $this->user->getFirstAttribute('postalcode'),
+                $certification->document,
                 $complete_text,
                 toUpper($username)
             );
@@ -804,8 +806,37 @@ class PeaceAndSafeController extends Controller
     public function disableLDAP()
     {
         try {
+            if (isset($this->user)) {
+                // Find inactive OU
+                $ou = $this->ldap->search()->ous()->find('INACTIVOS');
+                // Get a new account control object for the user.
+                $ac = $this->user->getUserAccountControlObject();
+                // Mark the account as disabled (514).
+                $ac->accountIsDisabled();
+                // Set the account control on the user and save it.
+                $this->user->setUserAccountControl($ac);
+                // Add two days for expiration date
+                $this->user->setAccountExpiry(now()->timestamp);
+                // Sets the option to force the password change at the next logon.
+                $this->user->setFirstAttribute('pwdlastset', 0);
+                // Save the user.
+                $this->user->save();
+                // Move user to new OU
+                return $this->user->move($ou);
+            }
+            return true;
+        } catch (Exception $exception) {
+            return false;
+        }
+    }
+
+    public function disableLDAPManual($username)
+    {
+        try {
             // Find inactive OU
             $ou = $this->ldap->search()->ous()->find('INACTIVOS');
+            // Find user
+            $this->user = $this->ldap->search()->findBy('samaccountname', toLower($username));
             // Get a new account control object for the user.
             $ac = $this->user->getUserAccountControlObject();
             // Mark the account as disabled (514).
@@ -821,7 +852,7 @@ class PeaceAndSafeController extends Controller
             // Move user to new OU
             return $this->user->move($ou);
         } catch (Exception $exception) {
-            return false;
+            return $exception->getMessage();
         }
     }
 

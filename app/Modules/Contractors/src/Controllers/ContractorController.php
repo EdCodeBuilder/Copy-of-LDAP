@@ -102,15 +102,17 @@ class ContractorController extends Controller
             ])
             ->whereDate('final_date', '>=', now()->format('Y-m-d'))
             ->where('contract_type_id', '!=', 3)
-            ->distinct()
-            ->get(['files_count', 'contractor_id']);
+            ->latest()
+            ->get(['files_count', 'contractor_id', 'created_at'])
+            ->sortByDesc('created_at')
+            ->unique('contractor_id');
 
         $with_arl = $collection
-                        ->where('files_count', '>', 0)
-                        ->unique('contractor_id')
+                        ->filter(function ($value, $key) {
+                            return $value['files_count'] > 0;
+                        })
                         ->count();
         $without_arl = $collection
-            ->where('files_count', '=', 0)
             ->whereNotIn(
                 'contractor_id',
                 Contractor::query()
@@ -119,7 +121,9 @@ class ContractorController extends Controller
                     ->pluck('id')
                     ->toArray()
             )
-            ->unique('contractor_id')
+            ->filter(function ($value, $key) {
+                return $value['files_count'] == 0;
+            })
             ->count();
 
         return $this->success_message([
