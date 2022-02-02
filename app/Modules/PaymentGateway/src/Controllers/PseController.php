@@ -67,7 +67,7 @@ class PseController extends Controller
                               'id' => 'PSE',
                               'extra_params' => [
                                     'bank_code' => $request->BankTypeSelected,
-                                    'response_url' => 'http://localhost:43513/pasarela-pagos/' . $id_transaccion->toString(),
+                                    'response_url' => env('REDIRECT_TRANSACTION_PAY_URL') . $id_transaccion->toString(),
                                     'user' => [
                                           'name' => $request->name,
                                           'fiscal_number' => (int)$request->document,
