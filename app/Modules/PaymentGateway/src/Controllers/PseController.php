@@ -49,8 +49,6 @@ class PseController extends Controller
             return json_decode($response->getBody()->getContents(), true);
       }
 
-
-
       public function transferBank(Request $request)
       {
 
@@ -67,7 +65,7 @@ class PseController extends Controller
                               'id' => 'PSE',
                               'extra_params' => [
                                     'bank_code' => $request->BankTypeSelected,
-                                    'response_url' => 'http://localhost:43513/pasarela-pagos/' . $id_transaccion->toString(),
+                                    'response_url' => env('REDIRECT_TRANSACTION_PAY_URL') . $id_transaccion->toString(),
                                     'user' => [
                                           'name' => $request->name,
                                           'fiscal_number' => (int)$request->document,
@@ -120,8 +118,6 @@ class PseController extends Controller
             return $this->success_message(['bank_url' => $responsePse['transaction']['bank_url']]);
       }
 
-
-
       public function status($codePayment)
       {
             $payment = Pago::where('codigo_pago', $codePayment)->get();
@@ -144,7 +140,6 @@ class PseController extends Controller
             }
             return $this->success_response(StatusPseResource::collection($payment));
       }
-
 
       public function transaccions($document)
       {
@@ -169,5 +164,4 @@ class PseController extends Controller
             }
             return (new \Illuminate\Http\Response)->setStatusCode(203);
       }
-
 }
