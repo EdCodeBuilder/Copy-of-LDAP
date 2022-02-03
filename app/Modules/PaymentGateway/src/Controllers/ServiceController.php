@@ -93,10 +93,13 @@ class ServiceController extends Controller
       public function delete($id)
       {
             $service = ServiceOffered::find($id);
-            if ($service->parks->first()) {
-                  ParkService::destroy($service->parks->first()->pivot->id_parque_servicio);
+            if ($service->parks) {
+                  foreach ($service->parks as $park) {
+                        ParkService::destroy($park->pivot->id_parque_servicio);
+                  }
             }
             $service->destroy($id);
+            
             return $this->success_message(['service_id' => $id, 'message' => 'Servicio eliminado']);
       }
 

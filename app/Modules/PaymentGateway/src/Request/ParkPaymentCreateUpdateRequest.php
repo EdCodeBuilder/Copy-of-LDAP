@@ -28,7 +28,7 @@ class ParkPaymentCreateUpdateRequest extends FormRequest
             $park = new ParkPse();
             return [
                   'name_park'             =>  'required|string',
-                  'code_park'             =>  "required|numeric|unique:{$park->getConnectionName()}.{$park->getTable()},codigo_parque,{$this->route('id')},id_parque",
+                  'code_park'             =>  "required|numeric|unique:{$park->getConnectionName()}.{$park->getTable()},codigo_parque,{$this->route('id')},id_parque,deleted_at,NULL",
                   'contac_park'           =>  'required|string',
                   'phones_park'           =>  'required|string',
                   'address_park'          =>  'required|string',

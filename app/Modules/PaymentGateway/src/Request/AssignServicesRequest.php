@@ -29,8 +29,8 @@ class AssignServicesRequest extends FormRequest
             $park = new ParkPse();
             $service = new ServiceOffered();
             return [
-                  'park_id'             =>  "required|numeric|exists:{$park->getConnectionName()}.{$park->getTable()},{$park->getKeyName()}",
-                  'service_id'          =>  "required|numeric|exists:{$service->getConnectionName()}.{$service->getTable()},{$service->getKeyName()}",
+                  'park_id'             =>  "required|numeric|exists:{$park->getConnectionName()}.{$park->getTable()},{$park->getKeyName()},deleted_at,NULL",
+                  'service_id'          =>  "required|numeric|exists:{$service->getConnectionName()}.{$service->getTable()},{$service->getKeyName()},deleted_at,NULL",
             ];
       }
 }

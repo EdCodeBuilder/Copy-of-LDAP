@@ -26,8 +26,8 @@ class ServiceOfferedCreateUpdateRequest extends FormRequest
       {
             $service = new ServiceOffered();
             return [
-                  'name_service'             =>  'required|string',
-                  'code_service'             =>  "required|numeric|unique:{$service->getConnectionName()}.{$service->getTable()},codigo_servicio,{$this->route('id')},id_servicio",
+                  'name_service'    =>  'required|string',
+                  'code_service'    =>  "required|numeric|unique:{$service->getConnectionName()}.{$service->getTable()},codigo_servicio,{$this->route('id')},id_servicio,deleted_at,NULL",
             ];
       }
 }

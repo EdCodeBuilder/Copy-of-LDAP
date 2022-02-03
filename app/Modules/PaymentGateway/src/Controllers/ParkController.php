@@ -102,11 +102,13 @@ class ParkController extends Controller
       public function delete($id)
       {
             $park = ParkPse::find($id);
-            if ($park->servicesOffered->first()) {
-                  ParkService::destroy($park->servicesOffered->first()->pivot->id_parque_servicio);
+            if ($park->servicesOffered) {
+                  foreach ($park->servicesOffered as $service) {
+                        ParkService::destroy($service->pivot->id_parque_servicio);
+                  }
             }
             $park->destroy($id);
-
+            
             return $this->success_message(['park_id' => $id, 'message' => 'Parque eliminado']);
       }
 
