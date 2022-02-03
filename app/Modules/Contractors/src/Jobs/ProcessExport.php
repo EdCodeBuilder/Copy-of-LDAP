@@ -6,6 +6,7 @@ namespace App\Modules\Contractors\src\Jobs;
 
 use App\Jobs\NotifyUserOfCompletedExport;
 use App\Models\Security\User;
+use App\Modules\Contractors\src\Constants\GlobalQuery;
 use App\Modules\Contractors\src\Exports\DataExport;
 use App\Modules\Contractors\src\Models\ContractorView;
 use Illuminate\Bus\Queueable;
@@ -86,26 +87,15 @@ class ProcessExport implements ShouldQueue
             ->when($request->has('doesnt_have_arl'), function ($q) {
                 return $q->whereNull('modifiable')
                     ->whereHas('contracts', function ($query) {
-                        return $query->where('contract_type_id', '!=', 3)
-                            ->whereDate('final_date', '>=', now()->format('Y-m-d'))
-                            ->withCount([
-                                'files as arl_files_count' => function ($q) {
-                                    return $q->where('file_type_id', 1);
-                                },
-                            ])->having('arl_files_count', 0);
+                        $contracts = new GlobalQuery();
+                        return $query->whereIn('id', $contracts->contracts());
                     });
             })
             ->when($request->has('doesnt_have_secop'), function ($q) {
                 return $q->whereHas('contracts', function ($query) {
-                        return $query->where('contract_type_id', '!=', 3)
-                            ->whereDate('final_date', '>=', now()->format('Y-m-d'))
-                            ->withCount([
-                                'files as other_files_count' => function ($q) {
-                                    return $q->where('file_type_id', '!=', 1);
-                                },
-                            ])
-                            ->having('other_files_count', 0);
-                    });
+                    $contracts = new GlobalQuery();
+                    return $query->whereIn('id', $contracts->contracts('other_files_count'));
+                });
             })
             ->when(
                 $request->has(['start_date', 'final_date']),

@@ -35,6 +35,12 @@ class ConfirmStatusFileCitizen implements ShouldQueue
      * @var string
      */
     private $observation;
+
+    /**
+     * @var string
+     */
+    private $test_mail;
+
     /**
      * @var File
      */
@@ -47,13 +53,15 @@ class ConfirmStatusFileCitizen implements ShouldQueue
      * @param Status $status
      * @param File $file
      * @param $observation
+     * @param null $test_mail
      */
-    public function __construct(ProfileView $profile, Status $status, File $file, $observation)
+    public function __construct(ProfileView $profile, Status $status, File $file, $observation, $test_mail = null)
     {
         $this->user = $profile;
         $this->status = $status;
         $this->file = $file;
         $this->observation = $observation;
+        $this->test_mail = $test_mail;
     }
 
     /**
@@ -64,11 +72,10 @@ class ConfirmStatusFileCitizen implements ShouldQueue
      */
     public function handle(Mailer $mailer)
     {
-        $email = isset( $this->user->user->email ) ? (string) $this->user->user->email : null;
+        $email = isset( $this->user->email ) ? (string) $this->user->email : null;
         if (env('APP_ENV') != 'production') {
-            $email = isset(auth('api')->user()->email)
-                ? auth('api')->user()->email
-                : explode(',', env('SAMPLE_CITIZEN_PORTAL_EMAIL', 'daniel.prado@idrd.gov.co'));
+            $email = $this->test_mail
+                ?? explode(',', env('SAMPLE_CITIZEN_PORTAL_EMAIL', 'daniel.prado@idrd.gov.co'));
         }
         if ( isset( $email )  && filter_var( $email, FILTER_VALIDATE_EMAIL) ) {
             $mailer->to($email)->send( new NotificationFileMail( $this->user, $this->status, $this->file, $this->observation) );

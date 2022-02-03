@@ -32,6 +32,11 @@ class ConfirmStatusSubscriptionCitizen implements ShouldQueue
     /**
      * @var string
      */
+    private $test_mail;
+
+    /**
+     * @var string
+     */
     private $observation;
 
     /**
@@ -40,12 +45,14 @@ class ConfirmStatusSubscriptionCitizen implements ShouldQueue
      * @param ProfileView $profile
      * @param Status $status
      * @param $observation
+     * @param null $test_mail
      */
-    public function __construct(ProfileView $profile, Status $status, $observation)
+    public function __construct(ProfileView $profile, Status $status, $observation, $test_mail = null)
     {
         $this->user = $profile;
         $this->status = $status;
         $this->observation = $observation;
+        $this->test_mail = $test_mail;
     }
 
     /**
@@ -56,11 +63,10 @@ class ConfirmStatusSubscriptionCitizen implements ShouldQueue
      */
     public function handle(Mailer $mailer)
     {
-        $email = isset( $this->user->user->email ) ? (string) $this->user->user->email : null;
+        $email = isset( $this->user->email ) ? (string) $this->user->email : null;
         if (env('APP_ENV') != 'production') {
-            $email = isset(auth('api')->user()->email)
-                ? auth('api')->user()->email
-                : explode(',', env('SAMPLE_CITIZEN_PORTAL_EMAIL', 'daniel.prado@idrd.gov.co'));
+            $email = $this->test_mail
+                ?? explode(',', env('SAMPLE_CITIZEN_PORTAL_EMAIL', 'daniel.prado@idrd.gov.co'));
         }
         if ( $email  && filter_var( $email, FILTER_VALIDATE_EMAIL) ) {
             $mailer->to($email)->send( new NotificationSubscriptionMail( $this->user, $this->status, $this->observation ) );
