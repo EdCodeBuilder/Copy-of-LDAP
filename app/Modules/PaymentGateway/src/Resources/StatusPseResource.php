@@ -30,7 +30,8 @@ class StatusPseResource extends JsonResource
                   'user_id_pse' => $this->user_id_pse ? $this->user_id_pse : '_',
                   'code_payment' => $this->codigo_pago ? $this->codigo_pago : '_',
                   'email' => $this->email ? $this->email :'_',
-                  'status' => $this->whenLoaded('state')
+                  'status' => $this->whenLoaded('state'),
+                  'method' => $this->whenLoaded('method')
             ];
       }
 }

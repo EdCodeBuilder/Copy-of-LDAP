@@ -18,8 +18,10 @@ Route::prefix('payment-gateway')->group(function () {
       Route::get('banks', [PseController::class, 'banks']);
       Route::post('transferBank', [PseController::class, 'transferBank']);
       Route::get('status/{codePayment}', [PseController::class, 'status']);
-      Route::get('transaccions/{document}', [PseController::class, 'transaccions']);
+      Route::post('transaccions', [PseController::class, 'transaccions']);
+      Route::get('status_refresh/{codePayment}', [PseController::class, 'statusRefresh']);
       Route::post('webhook', [PseController::class, 'webHook']);
+      Route::get('voucher/{codePayment}', [PseController::class, 'voucher']);
 
       //Private routes park
       Route::post('create_park', [ParkController::class, 'create']);
@@ -36,5 +38,4 @@ Route::prefix('payment-gateway')->group(function () {
       Route::post('assign_services', [ParkServiceController::class, 'assign']);
       Route::post('update_assign/{id}', [ParkServiceController::class, 'update']);
       Route::delete('delete_assign/{id}', [ParkServiceController::class, 'delete']);
-
 });

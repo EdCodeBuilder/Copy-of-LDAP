@@ -15,8 +15,8 @@ class CreatePagoPse extends Migration
       {
             Schema::connection('mysql_pse')->create('pago_pse', function (Blueprint $table) {
                   $table->bigIncrements('id');
-                  $table->integer('id_parque');
-                  $table->integer('id_servicio');
+                  $table->bigInteger('parque_id');
+                  $table->bigInteger('servicio_id');
                   $table->bigInteger('identificacion');
                   $table->integer('tipo_identificacion');
                   $table->text('codigo_pago');
@@ -36,10 +36,14 @@ class CreatePagoPse extends Migration
                   $table->integer('id_reserva')->nullable();
                   $table->text('fecha_pago')->nullable();
                   $table->text('user_id_pse');
+                  $table->unsignedBigInteger('medio_id');
                   $table->timestamps();
                   $table->softDeletes();
 
                   $table->foreign('estado_id')->references('id')->on('estado_pse')->onDelete('cascade')->onUpdate('cascade');
+                  $table->foreign('medio_id')->references('id')->on('medio_pago')->onDelete('cascade')->onUpdate('cascade');
+                  // $table->foreign('parque_id')->references('id_parque')->on('parque')->onDelete('cascade')->onUpdate('cascade');
+                  // $table->foreign('servicio_id')->references('id_servicio')->on('servicio')->onDelete('cascade')->onUpdate('cascade');
             });
 
       }

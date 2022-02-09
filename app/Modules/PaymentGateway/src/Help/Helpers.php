@@ -3,6 +3,8 @@
 namespace App\Modules\PaymentGateway\src\Help;
 
 use DateTime;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class Helpers
 {
@@ -86,5 +88,34 @@ class Helpers
                         return 5;
                         break;
             }
+      }
+
+      public function sendEmailReservation($payment)
+      {
+            $reservation =  DB::connection('mysql_pse')->table('reserva_sintetica')->where('id', '=', $payment->first()->id_reserva)->first();
+            $park_endowment = DB::connection('mysql_parks')->table('parquedotacion')->where('Id', '=', $reservation->id_dotacion)->first();
+            $park = DB::connection('mysql_parks')->table('parque')->where('Id', '=', $park_endowment->Id_Parque)->first();
+            $horai = date('g:i A', strtotime($reservation->hora_inicio));
+            $horaf = date('g:i A', strtotime($reservation->hora_fin));
+            $texto = "Se realiza la reserva de la cancha con código " . $reservation->id_dotacion . " del parque " . $park->Nombre . " Dirección: "
+                  . $park->Direccion . " En el horario: " . $horai . " a " . $horaf . " en la fecha: " . $reservation->fecha . " a nombre de: " . $payment->first()->nombre . " "
+                  . $payment->first()->apellido . ". Identificado con documento número: " . $payment->first()->identificacion . ". Datos de contacto " . " email: " . $payment->first()->email . " teléfono: "
+                  . $payment->first()->telefono . ". Por un valor de: $ " . number_format($payment->first()->total, 2, ',', '.');
+            $park_email = $park->Email == '' || $park->Email == null ? 'ajmsolcontainfo@gmail.com' : $park->Email;
+            Mail::send(
+                  'mail.email',
+                  [
+                        'texto' => $texto
+                  ],
+                  function ($m) use ($reservation, $payment, $park_email) {
+                        $m->from('no-reply@idrd.gov.co', 'Reserva Cancha código' . $reservation->id_dotacion);
+                        $m->bcc($park_email);
+                        $m->bcc('jhonnyzb1@hotmail.com');
+                        $m->bcc('mpb1620@hotmail.com');
+                        // $m->bcc('karla.ortiz@idrd.gov.co');
+                        // $m->bcc('carmen.vergara@idrd.gov.co');
+                        $m->to($payment->first()->email, $payment->first()->nombre)->subject('Reserva Cancha sintetica ' . $reservation->id_dotacion);
+                  }
+            );
       }
 }

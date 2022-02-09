@@ -38,7 +38,6 @@ class Status extends Model
 
       public function payments()
       {
-
             return $this->hasMany(Pago::class, 'estado_id', 'id');
       }
 }

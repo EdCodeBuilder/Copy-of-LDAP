@@ -2,11 +2,13 @@
 
 namespace App\Modules\PaymentGateway\src\Controllers;
 
+use App\Helpers\FPDF;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Modules\PaymentGateway\src\Help\Helpers;
 use App\Modules\PaymentGateway\src\Models\Pago;
 use App\Modules\PaymentGateway\src\Resources\StatusPseResource;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
@@ -92,8 +94,8 @@ class PseController extends Controller
 
             $responsePse = json_decode($response->getBody()->getContents(), true);
             $pago = new Pago;
-            $pago->id_parque = $request->parkSelected;
-            $pago->id_servicio = $request->serviceParkSelected;
+            $pago->parque_id = $request->parkSelected;
+            $pago->servicio_id = $request->serviceParkSelected;
             $pago->identificacion = $request->document;
             $pago->tipo_identificacion =  $help->getTypeDocument($request->documentTypeSelected);
             $pago->codigo_pago = $id_transaccion;
@@ -110,9 +112,10 @@ class PseController extends Controller
             $pago->iva = 0;
             $pago->permiso = $request->permitNumber;
             $pago->tipo_permiso = $request->permitTypeSelected;
-            $pago->id_reserva = null;
+            $pago->id_reserva = $request->reservationId;
             $pago->fecha_pago = null;
             $pago->user_id_pse = 'PSE' . $request->document;
+            $pago->medio_id = 1;
             $pago->save();
 
             return $this->success_message(['bank_url' => $responsePse['transaction']['bank_url']]);
@@ -121,8 +124,8 @@ class PseController extends Controller
       public function status($codePayment)
       {
             $payment = Pago::where('codigo_pago', $codePayment)->get();
-            $responsePse = null;
-            if ($payment) {
+            if ($payment->first()->estado_id != 2) {
+                  $responsePse = null;
                   $http = new Client();
                   $help = new Helpers();
                   $response = $http->get(env('URL_BASE_PAYMENTEZ') . '/pse/order/' . $payment->first()->id_transaccion_pse . '/', [
@@ -136,15 +139,116 @@ class PseController extends Controller
                   $payment->first()->estado_banco = $responsePse['transaction']['status_bank'];
                   $payment->first()->fecha_pago =  $responsePse['transaction']['paid_date'];
                   $payment->first()->save();
-                  $payment->first()->load('state');
+                  $payment->first()->load('state', 'method');
+                  try {
+                        if ($payment->first()->id_reserva) {
+                              if ($payment->first()->state->id == 2) {
+                                    $help->sendEmailReservation($payment);
+                              }
+                        }
+                        return $this->success_response(StatusPseResource::collection($payment));
+                  } catch (\Exception $e) {
+                        return $this->success_response(StatusPseResource::collection($payment));
+                  }
             }
+            $payment->first()->load('state', 'method');
+            return $this->success_response(StatusPseResource::collection($payment));
+
+            // logica si utilizamos el webhook
+            // $payment = Pago::where('codigo_pago', $codePayment)->get();
+            // $payment->first()->load('state', 'method');
+            // if ($payment->first()->id_reserva) {
+            //       if ($payment->first()->state->id == 2) {
+            //             $help = new Helpers();
+            //             $help->sendEmailReservation($payment);
+            //       }
+            // }
+            // return $this->success_response(StatusPseResource::collection($payment));
+
+      }
+
+
+      public function statusRefresh($codePayment)
+      {
+            // refresh estado transaccion
+            $payment = Pago::where('codigo_pago', $codePayment)->get();
+            if ($payment->first()->estado_id != 2) {
+                  $responsePse = null;
+                  $http = new Client();
+                  $help = new Helpers();
+                  $response = $http->get(env('URL_BASE_PAYMENTEZ') . '/pse/order/' . $payment->first()->id_transaccion_pse . '/', [
+                        'headers' => [
+                              "auth-token" =>  $help->getAuthToken(),
+                              "Content-Type" => "application/json",
+                        ],
+                  ]);
+                  $responsePse =  json_decode($response->getBody()->getContents(), true);
+                  $payment->first()->estado_id = $help->getStatus($responsePse['transaction']['status']);
+                  $payment->first()->estado_banco = $responsePse['transaction']['status_bank'];
+                  $payment->first()->fecha_pago =  $responsePse['transaction']['paid_date'];
+                  $payment->first()->save();
+                  $payment->first()->load('state', 'method');
+                  try {
+                        if ($payment->first()->id_reserva) {
+                              if ($payment->first()->state->id == 2) {
+                                    $help->sendEmailReservation($payment);
+                              }
+                        }
+                        return $this->success_response(StatusPseResource::collection($payment));
+                  } catch (\Exception $e) {
+                        return $this->success_response(StatusPseResource::collection($payment));
+                  }
+            }
+            $payment->first()->load('state', 'method');
             return $this->success_response(StatusPseResource::collection($payment));
       }
 
-      public function transaccions($document)
+
+      public function transaccions(Request $request)
       {
-            $transaccions = Pago::with('state')->where('identificacion', $document)->get();
+            $dt = Carbon::create($request->date)->toDateString();
+            $transaccions = Pago::with('state', 'method')->where('identificacion', $request->document)->whereDate('created_at', $dt)->get();
             return $this->success_response(StatusPseResource::collection($transaccions));
+      }
+
+      public function voucher(Request $request)
+      {
+            $transaccion =  Pago::with('state', 'method')->where('codigo_pago', $request->codePayment)->first();
+            $pdf = new FPDF('L', 'mm', 'Letter');
+            $pdf->AddPage();
+            $pdf->setSourceFile(storage_path("app/templates/COMPROBANTE_PAGO.pdf"));
+            $tplId = $pdf->importPage(1);
+            $pdf->useTemplate($tplId, 0, 0, null, null, true);
+            $pdf->SetFont('Arial', '', 10);
+            $pdf->SetXY(146, 28);
+            $pdf->Cell(40, 40, $transaccion->fecha_pago);
+            $pdf->SetXY(31, 93);
+            $pdf->Cell(40, 40, $transaccion->identificacion);
+            $pdf->SetXY(135, 93);
+            $pdf->Cell(40, 40, $transaccion->id_transaccion_pse);
+            $pdf->SetXY(31, 109);
+            $pdf->Cell(40, 40, $transaccion->total);
+            $pdf->SetXY(31, 125);
+            $pdf->Cell(40, 40, $transaccion->email);
+            $pdf->SetXY(135, 125);
+            $pdf->Cell(40, 40, $transaccion->moneda);
+            $pdf->SetXY(31, 142);
+            $pdf->Cell(40, 40, $transaccion->nombre . ' ' . $transaccion->apellido);
+            $pdf->SetXY(135, 142);
+            $pdf->Cell(40, 40, $transaccion->telefono);
+            $pdf->SetXY(31, 159);
+            $pdf->Cell(40, 40, $transaccion->codigo_pago);
+            $pdf->SetXY(135, 159);
+            $pdf->Cell(40, 40, $transaccion->user_id_pse);
+            $pdf->SetXY(31, 175);
+            $pdf->Cell(40, 40, $transaccion->concepto);
+            $pdf->SetXY(135, 175);
+            $pdf->Cell(40, 40, $transaccion->iva);
+            $pdf->SetXY(31, 192);
+            $pdf->Cell(40, 40, $transaccion->method->Nombre);
+            $pdf->SetXY(135, 192);
+            $pdf->Cell(40, 40, $transaccion->state->descripcion);
+            $pdf->Output('D', 'Comprobante_' . $transaccion->codigo_pago . '.pdf');
       }
 
       public function webHook(Request $request)
