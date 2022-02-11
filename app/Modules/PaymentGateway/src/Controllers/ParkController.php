@@ -37,7 +37,7 @@ class ParkController extends Controller
        * @return JsonResponse
        */
       public function index()
-      {
+      {     
             return $this->success_response(ParkPseResource::collection(ParkPse::all()));
       }
 
