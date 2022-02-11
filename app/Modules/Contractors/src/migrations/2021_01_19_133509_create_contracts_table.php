@@ -32,7 +32,7 @@ class CreateContractsTable extends Migration
             $table->unsignedBigInteger('contractor_id')->nullable()->comment('Identificador del contratista');
             $table->timestamps();
             $table->softDeletes();
-            $table->unique(['contract_type_id', 'contract']);
+            // $table->unique(['contract_type_id', 'contract']);
             $ldap_database = env('DB_LDAP_DATABASE');
             $table->foreign('subdirectorate_id')
                 ->references('id')
