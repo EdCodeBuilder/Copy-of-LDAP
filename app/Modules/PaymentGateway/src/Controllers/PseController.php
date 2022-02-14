@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Modules\PaymentGateway\src\Help\Helpers;
 use App\Modules\PaymentGateway\src\Models\Pago;
+use App\Modules\PaymentGateway\src\Request\CreateTransferBankRequest;
 use App\Modules\PaymentGateway\src\Resources\StatusPseResource;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
@@ -51,9 +52,8 @@ class PseController extends Controller
             return json_decode($response->getBody()->getContents(), true);
       }
 
-      public function transferBank(Request $request)
+      public function transferBank(CreateTransferBankRequest $request)
       {
-
             $http = new Client();
             $help = new Helpers();
             $id_transaccion = Uuid::uuid1();

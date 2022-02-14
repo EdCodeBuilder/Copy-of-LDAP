@@ -42,7 +42,7 @@ Route::prefix('payment-gateway')->group(function () {
       Route::post('assign_services', [ParkServiceController::class, 'assign']);
       Route::post('update_assign/{id}', [ParkServiceController::class, 'update']);
       Route::delete('delete_assign/{id}', [ParkServiceController::class, 'delete']);
-      //Route::post('park_services', [ParkServiceController::class, 'search']);
+      Route::post('park_services', [ParkServiceController::class, 'search']);
 
       //private routes reports
       Route::post('report', [ReportController::class, 'index']);

@@ -109,16 +109,12 @@ class ParkServiceController extends Controller
        */
       public function search(Request $request)
       {
-            // $parks_services = ParkService::with(
-            //       ['park' => function ($query) use ($request) {
-            //             $query->where('nombre_parque', 'like', '%' . $request->word . '%');
-            //       }]
-            //       // ['service' => function ($query) use ($request) {
-            //       //       $query->orWhere('servicio_nombre', 'like', '%' .  $request->word . '%');
-            //       // }],
-            // )->get();
-            // return $parks_services;
-
-            // return $this->success_response(ParkServiceResource::collection($parks_services));
+            $parks_services = ParkService::with('park', 'service')
+                  ->join('parque', 'parque.id_parque', '=', 'parque_servicio.id_parque')
+                  ->join('servicio', 'servicio.id_servicio', '=', 'parque_servicio.id_servicio')
+                  ->where('parque.nombre_parque', 'LIKE', "%$request->word%")
+                  ->orWhere('servicio.servicio_nombre', 'LIKE', "%$request->word%")
+                  ->get();
+            return $this->success_response(ParkServiceResource::collection($parks_services));
       }
 }
