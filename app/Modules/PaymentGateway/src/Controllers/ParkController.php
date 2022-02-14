@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\PaymentGateway\src\Models\ParkService;
 use App\Modules\PaymentGateway\src\Request\ParkPaymentCreateUpdateRequest;
 use App\Modules\PaymentGateway\src\Resources\ServicePseResource;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 /**
@@ -37,7 +38,7 @@ class ParkController extends Controller
        * @return JsonResponse
        */
       public function index()
-      {     
+      {
             return $this->success_response(ParkPseResource::collection(ParkPse::all()));
       }
 
@@ -108,7 +109,7 @@ class ParkController extends Controller
                   }
             }
             $park->destroy($id);
-            
+
             return $this->success_message(['park_id' => $id, 'message' => 'Parque eliminado']);
       }
 
@@ -125,5 +126,23 @@ class ParkController extends Controller
       public function services($id)
       {
             return $this->success_response(ServicePseResource::collection(ParkPse::find($id)->servicesOffered));
+      }
+
+      /**
+       * @group Pasarela de pagos - Parques
+       *
+       * parks busqueda
+       *
+       * Muestra un listado de parques por busqueda.
+       *
+       *
+       * @return JsonResponse
+       */
+      public function search(Request $request)
+      {
+            $parks = ParkPse::where('nombre_parque', 'like', '%' . $request->word . '%')
+                  ->orWhere('codigo_parque', 'like', '%' .  $request->word . '%')
+                  ->get();
+            return $this->success_response(ParkPseResource::collection($parks));
       }
 }

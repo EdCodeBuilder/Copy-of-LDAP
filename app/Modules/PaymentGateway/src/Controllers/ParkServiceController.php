@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\PaymentGateway\src\Models\ParkService;
 use App\Modules\PaymentGateway\src\Request\AssignServicesRequest;
 use App\Modules\PaymentGateway\src\Resources\ParkServiceResource;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 /**
@@ -94,5 +95,30 @@ class ParkServiceController extends Controller
       {
             ParkService::destroy($id);
             return $this->success_message(['park_service_id' => $id, 'message' => 'Parque_servicio eliminado']);
+      }
+
+      /**
+       * @group Pasarela de pagos - Servicios-parques
+       *
+       * servicios-parques busqueda
+       *
+       * Muestra un listado de servicios-parques por busqueda.
+       *
+       *
+       * @return JsonResponse
+       */
+      public function search(Request $request)
+      {
+            // $parks_services = ParkService::with(
+            //       ['park' => function ($query) use ($request) {
+            //             $query->where('nombre_parque', 'like', '%' . $request->word . '%');
+            //       }]
+            //       // ['service' => function ($query) use ($request) {
+            //       //       $query->orWhere('servicio_nombre', 'like', '%' .  $request->word . '%');
+            //       // }],
+            // )->get();
+            // return $parks_services;
+
+            // return $this->success_response(ParkServiceResource::collection($parks_services));
       }
 }

@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Modules\PaymentGateway\src\Exports;
+
+use App\Modules\PaymentGateway\src\Models\Pago;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Concerns\Exportable;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
+
+class PaymentzExport implements FromCollection, WithHeadings, WithMapping
+{
+      use Exportable;
+
+      protected $paymentz;
+
+      public function __construct($paymentz = null)
+      {
+            $this->paymentz = $paymentz;
+      }
+
+      /**
+       * @return \Illuminate\Support\Collection
+       */
+      public function collection()
+      {
+            return $this->paymentz;
+      }
+
+      public function map($paymentz): array
+      {
+            return [
+                  $paymentz->id,
+                  $paymentz->fecha_pago,
+                  $paymentz->total,
+                  $paymentz->codigo_parque,
+                  $paymentz->nombre_parque,
+                  $paymentz->servicio_nombre,
+                  $paymentz->identificacion,
+                  $paymentz->email,
+                  $paymentz->nombre,
+                  $paymentz->apellido,
+                  $paymentz->telefono,
+                  $paymentz->concepto,
+            ];
+      }
+
+      public function headings(): array
+      {
+            return ["ID", "FECHA", "TOTAL", "CODIGO", "PARQUE", 'SERVICIO', 'IDENTIFICACION', 'EMAIL', 'NOMBRE', 'APELLIDO', 'TELEFONO', 'CONCEPTO'];
+      }
+}

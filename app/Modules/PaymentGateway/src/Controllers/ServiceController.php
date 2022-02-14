@@ -8,6 +8,7 @@ use App\Modules\PaymentGateway\src\Models\ParkService;
 use App\Modules\PaymentGateway\src\Models\ServiceOffered;
 use App\Modules\PaymentGateway\src\Request\ServiceOfferedCreateUpdateRequest;
 use App\Modules\PaymentGateway\src\Resources\ServicePseResource;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 /**
@@ -99,8 +100,25 @@ class ServiceController extends Controller
                   }
             }
             $service->destroy($id);
-            
+
             return $this->success_message(['service_id' => $id, 'message' => 'Servicio eliminado']);
       }
 
+      /**
+       * @group Pasarela de pagos - Servicios
+       *
+       * servicios busqueda
+       *
+       * Muestra un listado de servicios por busqueda.
+       *
+       *
+       * @return JsonResponse
+       */
+      public function search(Request $request)
+      {
+            $services = ServiceOffered::where('servicio_nombre', 'like', '%' . $request->word . '%')
+                  ->orWhere('codigo_servicio', 'like', '%' .  $request->word . '%')
+                  ->get();
+            return $this->success_response(ServicePseResource::collection($services));
+      }
 }
