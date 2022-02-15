@@ -27,6 +27,9 @@ class ReportPaymentResource extends JsonResource
                   'last_name' =>  isset($this->apellido) ? $this->apellido : '_',
                   'phone' =>  isset($this->telefono) ? $this->telefono : '_',
                   'concept' => isset($this->concepto) ? $this->concepto : '_',
+                  'method' =>  isset($this->medio_pago) ? $this->medio_pago : '_',
+                  'Transaction_pse' => isset($this->id_transaccion_pse) ? $this->id_transaccion_pse : '_',
+                  'code_pay' => isset($this->codigo_pago) ? $this->codigo_pago : '_',
             ];
       }
 }

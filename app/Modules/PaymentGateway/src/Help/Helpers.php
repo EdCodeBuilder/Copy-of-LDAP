@@ -109,7 +109,7 @@ class Helpers
                   ],
                   function ($m) use ($reservation, $payment, $park_email) {
                         $m->from('no-reply@idrd.gov.co', 'Reserva Cancha código' . $reservation->id_dotacion);
-                        $m->bcc($park_email);
+                        //$m->bcc($park_email);
                         $m->bcc('jhonnyzb1@hotmail.com');
                         $m->bcc('mpb1620@hotmail.com');
                         // $m->bcc('karla.ortiz@idrd.gov.co');
@@ -117,5 +117,20 @@ class Helpers
                         $m->to($payment->first()->email, $payment->first()->nombre)->subject('Reserva Cancha sintetica ' . $reservation->id_dotacion);
                   }
             );
+      }
+
+      public function statusVoucher($statusId)
+      {
+            switch ($statusId) {
+                  case '1':
+                        return ['r' => 0, 'g' => 0, 'b' => 255];
+                        break;
+                  case '2':
+                        return ['r' => 0, 'g' => 128, 'b' => 0];
+                        break;
+                  default:
+                        return ['r' => 255, 'g' => 0, 'b' => 0];
+                        break;
+            }
       }
 }

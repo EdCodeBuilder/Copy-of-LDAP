@@ -43,8 +43,10 @@ class ReportController extends Controller
             $paymentz = DB::connection('mysql_pse')->table('pago_pse')
                   ->leftJoin('parque', 'pago_pse.parque_id', '=', 'parque.id_parque')
                   ->leftJoin('servicio', 'pago_pse.servicio_id', '=', 'servicio.id_servicio')
+                  ->leftJoin('medio_pago', 'pago_pse.medio_id', '=', 'medio_pago.id')
                   ->where('estado_id', 2)
                   ->whereBetween('pago_pse.created_at', [$di, $de])
+                  ->select('pago_pse.*', 'parque.nombre_parque', 'parque.codigo_parque', 'servicio.*', 'medio_pago.Nombre as medio_pago')
                   ->get();
             return $this->success_response(ReportPaymentResource::collection($paymentz));
       }
@@ -56,8 +58,10 @@ class ReportController extends Controller
             $paymentz = DB::connection('mysql_pse')->table('pago_pse')
                   ->leftJoin('parque', 'pago_pse.parque_id', '=', 'parque.id_parque')
                   ->leftJoin('servicio', 'pago_pse.servicio_id', '=', 'servicio.id_servicio')
+                  ->leftJoin('medio_pago', 'pago_pse.medio_id', '=', 'medio_pago.id')
                   ->where('estado_id', 2)
                   ->whereBetween('pago_pse.created_at', [$di, $de])
+                  ->select('pago_pse.*', 'parque.nombre_parque', 'parque.codigo_parque', 'servicio.*', 'medio_pago.Nombre as medio_pago')
                   ->get();
             return Excel::download(new PaymentzExport($paymentz), 'Reporte_Pagos.xlsx');
       }

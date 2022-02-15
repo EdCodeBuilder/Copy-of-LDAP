@@ -43,11 +43,14 @@ class PaymentzExport implements FromCollection, WithHeadings, WithMapping
                   $paymentz->apellido,
                   $paymentz->telefono,
                   $paymentz->concepto,
+                  $paymentz->medio_pago,
+                  $paymentz->id_transaccion_pse,
+                  $paymentz->codigo_pago,
             ];
       }
 
       public function headings(): array
       {
-            return ["ID", "FECHA", "TOTAL", "CODIGO", "PARQUE", 'SERVICIO', 'IDENTIFICACION', 'EMAIL', 'NOMBRE', 'APELLIDO', 'TELEFONO', 'CONCEPTO'];
+            return ["ID", "FECHA", "TOTAL", "CODIGO", "PARQUE", 'SERVICIO', 'IDENTIFICACION', 'EMAIL', 'NOMBRE', 'APELLIDO', 'TELEFONO', 'CONCEPTO', 'METODO PAGO', 'TRANSACCION ID PSE', 'CODIGO PAGO'];
       }
 }

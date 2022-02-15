@@ -213,6 +213,7 @@ class PseController extends Controller
 
       public function voucher(Request $request)
       {
+            $help = new Helpers();
             $transaccion =  Pago::with('state', 'method')->where('codigo_pago', $request->codePayment)->first();
             $pdf = new FPDF('L', 'mm', 'Letter');
             $pdf->AddPage();
@@ -222,6 +223,16 @@ class PseController extends Controller
             $pdf->SetFont('Arial', '', 10);
             $pdf->SetXY(146, 28);
             $pdf->Cell(40, 40, $transaccion->fecha_pago);
+            $pdf->SetFont('Courier', 'U', 30);
+            $pdf->SetTextColor(
+                  $help->statusVoucher($transaccion->estado_id)['r'],
+                  $help->statusVoucher($transaccion->estado_id)['g'],
+                  $help->statusVoucher($transaccion->estado_id)['b']
+            );
+            $pdf->SetXY(135, 70);
+            $pdf->Cell(40, 40, $transaccion->state->descripcion);
+            $pdf->SetFont('Arial', '', 10);
+            $pdf->SetTextColor(0, 0, 0);
             $pdf->SetXY(31, 93);
             $pdf->Cell(40, 40, $transaccion->identificacion);
             $pdf->SetXY(135, 93);
@@ -268,4 +279,5 @@ class PseController extends Controller
             }
             return (new \Illuminate\Http\Response)->setStatusCode(203);
       }
+
 }
