@@ -33,7 +33,7 @@ class Certificados_TributariosController extends Controller
             ->firstOrFail();
             $certification = new Certification();
             $certification->document = $contractor->document;
-            $certification->name = $contractor->full_name; 
+            $certification->name = $contractor->full_name;
             $certification->type = "TRB";
             $certification->save();
             $this->dispatch(new VerificationCodeTributario($contractor, $certification));
@@ -60,10 +60,10 @@ class Certificados_TributariosController extends Controller
     public function validarUsuario(ValidacionRequest $request){
         try {
             $data=Certification::query()->where("document", $request->get("document"))->where("code", $request->get("code"))->firstOrFail();
-            
+
             $pdf = $this->conexionSeven($request);
             return $this->success_message($pdf);
-            
+
         } catch (\Exception $exception) {
             if ($exception instanceof ModelNotFoundException) {
                 return $this->error_response(

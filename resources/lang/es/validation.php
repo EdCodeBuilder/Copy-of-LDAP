@@ -151,7 +151,7 @@ return [
     */
     'handler'   =>  [
         'invalid_request'           => 'A la solicitud le falta un parámetro requerido, incluye un valor de parámetro no válido, incluye un parámetro más de una vez o está mal formado.',
-        'resource_not_found'        => 'No existe ninguna instacia para el valor especificado.',
+        'resource_not_found'        => 'No existe ninguna instancia para el valor especificado.',
         'resource_not_found_url'    => 'La URL solicitada no existe.',
         'unauthenticated'           => 'No estás autenticado para esta solicitud.',
         'unauthorized'              => 'No estás autorizado para esta solicitud.',

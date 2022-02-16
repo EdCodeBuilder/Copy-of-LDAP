@@ -266,7 +266,11 @@ class ProfileController extends Controller
                 'user_ldap_id'       =>  auth('api')->user()->id,
             ]);
             if ( in_array( $request->get('status_id'), [Profile::VERIFIED, Profile::RETURNED] ) ) {
-                $this->dispatch( new ConfirmStatusCitizen( ProfileView::find($profile->id), $observation ) );
+                $this->dispatch( new ConfirmStatusCitizen(
+                    ProfileView::find($profile->id),
+                    $observation,
+                    auth('api')->user()->email
+                ) );
             }
             DB::commit();
             return $this->success_message(

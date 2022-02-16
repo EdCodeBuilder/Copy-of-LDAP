@@ -5,7 +5,7 @@ namespace App\Modules\PaymentGateway\src\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ParkPse extends Model
+class ParkService extends Model
 {
       use SoftDeletes;
       /**
@@ -20,14 +20,14 @@ class ParkPse extends Model
        *
        * @var string
        */
-      protected $table = 'parque';
+      protected $table = 'parque_servicio';
 
       /**
        * The primary key for the model.
        *
        * @var string
        */
-      protected $primaryKey = 'id_parque';
+      protected $primaryKey = 'id_parque_servicio';
 
       /**
        * The attributes that should be mutated to dates.
@@ -42,17 +42,17 @@ class ParkPse extends Model
        * @var array
        */
       protected $fillable = [
-            'nombre_parque',
-            'codigo_parque',
-            'nombre_contacto',
-            'telefonos',
-            'direccion',
-            'email',
+            'id_parque',
+            'id_servicio',
       ];
 
-      public function servicesOffered()
+      public function park()
       {
-            return $this->belongsToMany(ServiceOffered::class, 'parque_servicio', 'id_parque', 'id_servicio')
-                  ->withPivot('id_parque_servicio');
+            return $this->belongsTo(ParkPse::class, 'id_parque', 'id_parque');
+      }
+      
+      public function service()
+      {
+            return $this->belongsTo(ServiceOffered::class, 'id_servicio', 'id_servicio');
       }
 }

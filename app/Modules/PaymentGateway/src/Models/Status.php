@@ -3,11 +3,9 @@
 namespace App\Modules\PaymentGateway\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ServiceOffered extends Model
+class Status extends Model
 {
-      use SoftDeletes;
       /**
        * The connection name for the model.
        *
@@ -20,21 +18,14 @@ class ServiceOffered extends Model
        *
        * @var string
        */
-      protected $table = 'servicio';
+      protected $table = 'estado_pse';
 
       /**
        * The primary key for the model.
        *
        * @var string
        */
-      protected $primaryKey = 'id_servicio';
-
-      /**
-       * The attributes that should be mutated to dates.
-       *
-       * @var array
-       */
-      protected $dates = ['deleted_at'];
+      protected $primaryKey = 'id';
 
       /**
        * The attributes that are mass assignable.
@@ -42,13 +33,11 @@ class ServiceOffered extends Model
        * @var array
        */
       protected $fillable = [
-            'servicio_nombre',
-            'codigo_servicio',
       ];
 
-      public function parks()
+
+      public function payments()
       {
-            return $this->belongsToMany(ParkPse::class, 'parque_servicio', 'id_servicio', 'id_parque')
-                  ->withPivot('id_parque_servicio');
+            return $this->hasMany(Pago::class, 'estado_id', 'id');
       }
 }

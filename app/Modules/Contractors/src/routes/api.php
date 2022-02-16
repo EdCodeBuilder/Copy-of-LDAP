@@ -25,6 +25,7 @@ Route::prefix('contractors-portal')->group(function () {
     Route::get('/peace-and-save/{token}', [PeaceAndSafeController::class, 'show']);
     Route::post('/generate-certificate', [PeaceAndSafeController::class, 'validation']);
     Route::get('/enable-ldap/{username}-{ous?}', [PeaceAndSafeController::class, 'enableLDAP']);
+    Route::get('/disable-ldap/{username}', [PeaceAndSafeController::class, 'disableLDAPManual']);
     Route::post('/oracle', [UserController::class, 'oracle']);
     Route::post('/oracle-count', [UserController::class, 'countOracle']);
     Route::post('/oracle-excel', [UserController::class, 'excelOracle']);
@@ -38,7 +39,7 @@ Route::prefix('contractors-portal')->group(function () {
     Route::get('/menu', [UserController::class, 'drawer'])->middleware('auth:api');
     Route::get('/permissions', [UserController::class, 'permissions'])->middleware('auth:api');
     Route::get('/counter', [ContractorController::class, 'counter'])->middleware('auth:api');
-    Route::get('/stats', [ContractorController::class, 'stats'])->middleware('auth:api');
+    Route::get('/stats', [ContractorController::class, 'stats']);//->middleware('auth:api');
     Route::get('/contract-types', [ContractTypeController::class, 'index']);
     Route::get('/file-types', [FileTypeController::class, 'index']);
     Route::post('/find-contractor', [ContractorController::class, 'find'])->middleware('auth:api');
