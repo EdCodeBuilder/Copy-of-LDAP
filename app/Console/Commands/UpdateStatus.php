@@ -69,5 +69,9 @@ class UpdateStatus extends Command
                   }
             }
             $this->info('finalizo');
+            echo "se revisaron " .$payments->count()." pagos en espera\n";
+            $paymentsAux = Pago::where('estado_id', 1)->get();
+            echo "Qudan por revisar " .$paymentsAux->count()." pagos en espera\n";
+
       }
 }
