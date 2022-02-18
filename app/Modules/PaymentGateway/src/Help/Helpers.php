@@ -111,7 +111,7 @@ class Helpers
                         $m->from('no-reply@idrd.gov.co', 'Reserva Cancha código' . $reservation->id_dotacion);
                         //$m->bcc($park_email);
                         $m->bcc('jhonnyzb1@hotmail.com');
-                        $m->bcc('mpb1620@hotmail.com');
+                        $m->bcc('daniel.forero@idrd.gov.co');
                         // $m->bcc('karla.ortiz@idrd.gov.co');
                         // $m->bcc('carmen.vergara@idrd.gov.co');
                         $m->to($payment->first()->email, $payment->first()->nombre)->subject('Reserva Cancha sintetica ' . $reservation->id_dotacion);
@@ -140,7 +140,7 @@ class Helpers
                         $m->from('no-reply@idrd.gov.co', 'Reserva Cancha código' . $reservation->id_dotacion);
                         //$m->bcc($park_email);
                         $m->bcc('jhonnyzb1@hotmail.com');
-                        $m->bcc('mpb1620@hotmail.com');
+                        $m->bcc('daniel.forero@idrd.gov.co');
                         // $m->bcc('karla.ortiz@idrd.gov.co');
                         // $m->bcc('carmen.vergara@idrd.gov.co');
                         $m->to($payment->email, $payment->nombre)->subject('Reserva Cancha sintetica ' . $reservation->id_dotacion);

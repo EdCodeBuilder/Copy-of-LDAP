@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
-        \App\Console\Commands\UpdateStatus::class,
+        //\App\Console\Commands\UpdateStatus::class,
     ];
 
     /**
@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('update:statuspse')->everyMinute();
+        //$schedule->command('update:statuspse')->everyMinute();
     }
 
     /**
