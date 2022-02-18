@@ -45,6 +45,7 @@ Route::prefix('payment-gateway')->group(function () {
       Route::post('park_services', [ParkServiceController::class, 'search']);
 
       //private routes reports
+      Route::get('totalPays', [ReportController::class, 'json']);
       Route::post('report', [ReportController::class, 'index']);
       Route::get('excel/{dateInit}/{dateEnd}', [ReportController::class, 'excel']);
 });

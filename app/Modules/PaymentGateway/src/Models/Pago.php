@@ -44,4 +44,13 @@ class Pago extends Model
       {
             return $this->belongsTo(MethodPayment::class, 'medio_id', 'id')->select(['id', 'Nombre']);
       }
+      public function service()
+      {
+            return $this->belongsTo(ServiceOffered::class, 'servicio_id', 'id_servicio')->select(['id_servicio', 'servicio_nombre', 'codigo_servicio']);
+      }
+      
+      public function park()
+      {
+            return $this->belongsTo(ParkPse::class, 'parque_id', 'id_parque')->select(['id_parque', 'nombre_parque', 'codigo_parque']);
+      }
 }

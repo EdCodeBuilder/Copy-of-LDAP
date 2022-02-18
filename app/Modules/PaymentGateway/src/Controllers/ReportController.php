@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Modules\PaymentGateway\src\Models\Pago;
 
 /**
  * @group Pasarela de pagos - Parques
@@ -64,5 +65,11 @@ class ReportController extends Controller
                   ->select('pago_pse.*', 'parque.nombre_parque', 'parque.codigo_parque', 'servicio.*', 'medio_pago.Nombre as medio_pago')
                   ->get();
             return Excel::download(new PaymentzExport($paymentz), 'Reporte_Pagos.xlsx');
+      }
+
+      public function json(Request $request)
+      {
+            $tabla = Pago::with('service','park','state')->get();
+            return response()->json($tabla , 200);
       }
 }
