@@ -15,6 +15,7 @@ use App\Modules\Contractors\src\Jobs\VerificationCodeTributario;
 use App\Modules\Contractors\src\Request\ValidacionRequest;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
+use App\Helpers\FPDF;
 
 class Certificados_TributariosController extends Controller
 {
@@ -63,7 +64,7 @@ class Certificados_TributariosController extends Controller
 
             $pdf = $this->conexionSeven($request);
             return $this->success_message($pdf);
-
+            
         } catch (\Exception $exception) {
             if ($exception instanceof ModelNotFoundException) {
                 return $this->error_response(
@@ -93,12 +94,12 @@ class Certificados_TributariosController extends Controller
     }
 
     public function consultaSV(ConsultaRequest $request){
-        $data=DB::connection("oracle")->select("SELECT F.PVD_CODI, FAC_ANOP,P.PVR_NOCO,LIQ_NOMB,(SELECT SUM(A1.DFA_VALO)  FROM PO_DFACT A1 WHERE A1.PVD_CODI=F.PVD_CODI and A1.DFA_ANOP=F.FAC_ANOP) VAL_BRUT, SUM (LIQ_VALO)*-1 VAL_RETE, SUM(LIQ_BASE) VAL_BASE FROM PO_FACTU F, PO_DVFAC D, PO_PVDOR P
+        $data=DB::connection("oracle")->select("SELECT F.PVD_CODI, FAC_ANOP,P.PVR_NOCO,LIQ_NOMB,(SELECT SUM(A1.DFA_VALO)  FROM PO_DFACT A1 WHERE A1.PVD_CODI=F.PVD_CODI and A1.DFA_ANOP=F.FAC_ANOP) VAL_BRUT
+        ,  case when SUM (LIQ_VALO)-1 <0 then 0 else SUM (LIQ_VALO)-1 end  VAL_RETE, SUM(LIQ_BASE) VAL_BASE FROM PO_FACTU F, PO_DVFAC D, PO_PVDOR P
         WHERE  F.PVD_CODI={$request->get('document')}
         AND F.FAC_ANOP={$request->get('year')}
-        AND F.FAC_CONT= D.FAC_CONT
-        AND F.emp_codi= D.emp_codi
-        AND LIQ_CODI IN ('RTEFTEVARI','RETE')
+        AND F.FAC_CONT= D.FAC_CONT(+)
+        AND LIQ_CODI IN ('RTEFTEVARI','RETE','TOTAL')
         and liq_valo <>0
         and f.fac_esta ='A'
         AND P.EMP_CODI= F.EMP_CODI
@@ -106,4 +107,26 @@ class Certificados_TributariosController extends Controller
         GROUP BY F.PVD_CODI, FAC_ANOP,P.PVR_NOCO,LIQ_NOMB");
         return $this->success_message($data);
     }
+
+    public function createPDF($data){
+        $collection=collect($data[0]??[]);
+        $pdf=new FPDF("L", "mm", "Letter");
+        $pdf->AddPage();
+        $pdf->setSourceFile(storage_path("app/templates/Certificado_Ingresos_Retenciones.pdf"));
+        $template=$pdf->importPage(1);
+        $pdf->useTemplate($template, 0, 0, null, null, true);
+        $pdf->SetFont("Helvetica");
+        $pdf->SetFontSize(10);
+        $pdf->SetTextColor(0,0,0);
+        $pdf->Text(0, 0, utf8_decode($collection->get("fac_anop")));
+        $pdf->Text(2, 2, utf8_decode($collection->get("pvr_noco")));
+        $pdf->Text(3, 3, utf8_decode($collection->get("pvd_codi")));
+        $pdf->Text(4, 4, utf8_decode($collection->get("liq_nomb")));
+        $pdf->Text(5, 5, utf8_decode($collection->get("val_brut")));
+        $pdf->Text(6, 6, utf8_decode($collection->get("val_base")));
+        $pdf->Text(7, 7, utf8_decode($collection->get("val_rete")));
+        
+        return $pdf->Output("I", "Ingresos y Retenciones.pdf");
+    }
 }
+
