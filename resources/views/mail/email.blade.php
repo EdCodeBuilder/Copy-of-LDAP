@@ -249,6 +249,7 @@
 									<h2>Reserva Realizada</h2>
 									<h3>{{$texto}}</h3>
 									<h4 class="">Para los fines pertinentes podra consultar y ver la factura de pago en el siguiente link</h4>
+									<!-- <p><a href="https://sim.idrd.gov.co/pasarela-pagos/transactions" class="btn btn-primary">Validar pago</a> -->
 									<p><a href="https://sim.idrd.gov.co/pasarela-pagos-dev/transactions" class="btn btn-primary">Validar pago</a>
 									<br>
 									<small style="font-size: small">IMPORTANTE: Este correo es informativo,
