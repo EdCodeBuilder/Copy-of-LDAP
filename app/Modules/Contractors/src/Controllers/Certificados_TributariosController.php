@@ -64,7 +64,7 @@ class Certificados_TributariosController extends Controller
 
             $pdf = $this->conexionSeven($request);
             return $this->success_message($pdf);
-            
+
         } catch (\Exception $exception) {
             if ($exception instanceof ModelNotFoundException) {
                 return $this->error_response(
@@ -95,7 +95,7 @@ class Certificados_TributariosController extends Controller
 
     public function consultaSV(ConsultaRequest $request){
         $data=DB::connection("oracle")->select("SELECT F.PVD_CODI, FAC_ANOP,P.PVR_NOCO,LIQ_NOMB,(SELECT SUM(A1.DFA_VALO)  FROM PO_DFACT A1 WHERE A1.PVD_CODI=F.PVD_CODI and A1.DFA_ANOP=F.FAC_ANOP) VAL_BRUT
-        ,  case when SUM (LIQ_VALO)-1 <0 then 0 else SUM (LIQ_VALO)-1 end  VAL_RETE, SUM(LIQ_BASE) VAL_BASE FROM PO_FACTU F, PO_DVFAC D, PO_PVDOR P
+        ,SUM(LIQ_BASE) VAL_BASE, case WHEN liq_nomb='TOTAL' THEN  0 ELSE SUM (LIQ_VALO)*-1 END VAL_RETE  FROM PO_FACTU F, PO_DVFAC D, PO_PVDOR P
         WHERE  F.PVD_CODI={$request->get('document')}
         AND F.FAC_ANOP={$request->get('year')}
         AND F.FAC_CONT= D.FAC_CONT(+)
@@ -125,7 +125,7 @@ class Certificados_TributariosController extends Controller
         $pdf->Text(5, 5, utf8_decode($collection->get("val_brut")));
         $pdf->Text(6, 6, utf8_decode($collection->get("val_base")));
         $pdf->Text(7, 7, utf8_decode($collection->get("val_rete")));
-        
+
         return $pdf->Output("I", "Ingresos y Retenciones.pdf");
     }
 }
