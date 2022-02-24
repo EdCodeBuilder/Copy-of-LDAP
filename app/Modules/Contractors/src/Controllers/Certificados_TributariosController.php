@@ -90,7 +90,11 @@ class Certificados_TributariosController extends Controller
             ]
             ]);
             $data=json_decode($response->getBody()->getContents(), true);
-            return $data;
+            $pdf=$this->createPDF($data["data"]);
+            return $this->success_message([
+               "file_name"=>"Ingresos_Retenciones.pdf",
+               "file"=>"data:application/pdf;base64,".base64_encode($pdf)
+            ]);
     }
 
     public function consultaSV(ConsultaRequest $request){
@@ -108,25 +112,58 @@ class Certificados_TributariosController extends Controller
         return $this->success_message($data);
     }
 
+
     public function createPDF($data){
-        $collection=collect($data[0]??[]);
+        $collection=collect($data??[]);
         $pdf=new FPDF("L", "mm", "Letter");
         $pdf->AddPage();
         $pdf->setSourceFile(storage_path("app/templates/Certificado_Ingresos_Retenciones.pdf"));
         $template=$pdf->importPage(1);
         $pdf->useTemplate($template, 0, 0, null, null, true);
         $pdf->SetFont("Helvetica");
-        $pdf->SetFontSize(10);
-        $pdf->SetTextColor(0,0,0);
-        $pdf->Text(0, 0, utf8_decode($collection->get("fac_anop")));
-        $pdf->Text(2, 2, utf8_decode($collection->get("pvr_noco")));
-        $pdf->Text(3, 3, utf8_decode($collection->get("pvd_codi")));
-        $pdf->Text(4, 4, utf8_decode($collection->get("liq_nomb")));
-        $pdf->Text(5, 5, utf8_decode($collection->get("val_brut")));
-        $pdf->Text(6, 6, utf8_decode($collection->get("val_base")));
-        $pdf->Text(7, 7, utf8_decode($collection->get("val_rete")));
+        $pdf->SetFontSize(8);
+        $pdf->SetTextColor(0,0,1);
+        $name=null;
+        $document=null;
+        $year=null;
+        $i=0;
+        $retef=[];
 
-        return $pdf->Output("I", "Ingresos y Retenciones.pdf");
+        $collection->map(function($collect) use(&$name, &$document, &$year, &$i, &$pdf, &$retef){
+            if($i==0){
+                $name=$collect["pvr_noco"]??"";
+                $document=$collect["pvd_codi"]??"";
+                $year=$collect["fac_anop"]??"";
+            }
+            $concepto=$collect["liq_nomb"]??"";
+            $valbruto="$ ".number_format($collect["val_brut"]??0, 2, ".", ",");
+            $valbase="$ ".number_format($collect["val_base"]??0, 2, ".", ",");
+            $valrete="$ ".number_format($collect["val_rete"]??0, 2, ".", ",");
+            $retef[toLower($concepto)]=intval($collect["val_rete"]??0);
+            if(toLower($concepto)=="total"){
+                $pdf->Text(90, 146, utf8_decode($valbruto));
+            }else{
+                $pdf->Text(34, 126+($i*4), utf8_decode($collect["liq_nomb"]??""));
+                $pdf->Text(90, 126+($i*4), utf8_decode($valbruto));
+                $pdf->Text(140, 126+($i*4), utf8_decode($valbase));
+                $pdf->Text(175, 126+($i*4), utf8_decode($valrete));
+                $i++;
+            }           
+        });
+        $ret=$retef["rte fuente"]??0;
+        $tot=$retef["total"]??0;
+        $pdf->Text(175, 146, utf8_decode(
+            $ret>1
+            ? "$ ".number_format($ret, 2, ".", ",")
+            :"$ ".number_format($tot, 2, ".", ",")
+            )
+        );
+        $pdf->Text(70, 77, utf8_decode($year));
+        $pdf->Text(70, 98, utf8_decode($name));
+        $pdf->Text(70, 106, utf8_decode($document));
+        $pdf->Text(70, 186, utf8_decode(now()->format("Y-m-d H:i:s")));
+        
+        return $pdf->Output("S", "Ingresos_Retenciones.pdf", true);
     }
 }
 
