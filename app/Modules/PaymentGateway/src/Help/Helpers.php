@@ -3,6 +3,7 @@
 namespace App\Modules\PaymentGateway\src\Help;
 
 use DateTime;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
@@ -92,6 +93,7 @@ class Helpers
 
       public function sendEmailReservation($payment)
       {
+            $environment = App::environment();
             $reservation =  DB::connection('mysql_pse')->table('reserva_sintetica')->where('id', '=', $payment->first()->id_reserva)->first();
             $park_endowment = DB::connection('mysql_parks')->table('parquedotacion')->where('Id', '=', $reservation->id_dotacion)->first();
             $park = DB::connection('mysql_parks')->table('parque')->where('Id', '=', $park_endowment->Id_Parque)->first();
@@ -105,15 +107,19 @@ class Helpers
             Mail::send(
                   'mail.email',
                   [
-                        'texto' => $texto
+                        'texto' => $texto,
+                        'entorno' => $environment,
                   ],
-                  function ($m) use ($reservation, $payment, $park_email) {
+                  function ($m) use ($reservation, $payment, $park_email, $environment) {
                         $m->from('no-reply@idrd.gov.co', 'Reserva Cancha código' . $reservation->id_dotacion);
-                        //$m->bcc($park_email);
-                        $m->bcc('jhonnyzb1@hotmail.com');
-                        $m->bcc('daniel.forero@idrd.gov.co');
-                        // $m->bcc('karla.ortiz@idrd.gov.co');
-                        // $m->bcc('carmen.vergara@idrd.gov.co');
+                        if ($environment == 'production') {
+                              $m->bcc($park_email);
+                              $m->bcc('karla.ortiz@idrd.gov.co');
+                              $m->bcc('carmen.vergara@idrd.gov.co');
+                        } else {
+                              $m->bcc('jhonnyzb1@hotmail.com');
+                              $m->bcc('jhon.zabala@idrd.gov.co');
+                        }
                         $m->to($payment->first()->email, $payment->first()->nombre)->subject('Reserva Cancha sintetica ' . $reservation->id_dotacion);
                   }
             );
@@ -121,6 +127,7 @@ class Helpers
 
       public function emailReservationCron($payment)
       {
+            $environment = App::environment();
             $reservation =  DB::connection('mysql_pse')->table('reserva_sintetica')->where('id', '=', $payment->id_reserva)->first();
             $park_endowment = DB::connection('mysql_parks')->table('parquedotacion')->where('Id', '=', $reservation->id_dotacion)->first();
             $park = DB::connection('mysql_parks')->table('parque')->where('Id', '=', $park_endowment->Id_Parque)->first();
@@ -134,15 +141,19 @@ class Helpers
             Mail::send(
                   'mail.email',
                   [
-                        'texto' => $texto
+                        'texto' => $texto,
+                        'entorno' => $environment,
                   ],
-                  function ($m) use ($reservation, $payment, $park_email) {
+                  function ($m) use ($reservation, $payment, $park_email, $environment) {
                         $m->from('no-reply@idrd.gov.co', 'Reserva Cancha código' . $reservation->id_dotacion);
-                        //$m->bcc($park_email);
-                        $m->bcc('jhonnyzb1@hotmail.com');
-                        $m->bcc('daniel.forero@idrd.gov.co');
-                        // $m->bcc('karla.ortiz@idrd.gov.co');
-                        // $m->bcc('carmen.vergara@idrd.gov.co');
+                        if ($environment == 'production') {
+                              $m->bcc($park_email);
+                              $m->bcc('karla.ortiz@idrd.gov.co');
+                              $m->bcc('carmen.vergara@idrd.gov.co');
+                        } else {
+                              $m->bcc('jhonnyzb1@hotmail.com');
+                              $m->bcc('jhon.zabala@idrd.gov.co');
+                        }
                         $m->to($payment->email, $payment->nombre)->subject('Reserva Cancha sintetica ' . $reservation->id_dotacion);
                   }
             );
