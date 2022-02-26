@@ -60,11 +60,11 @@ class Certificados_TributariosController extends Controller
 
     public function validarUsuario(ValidacionRequest $request){
         try {
-            $data=Certification::query()->where("document", $request->get("document"))->where("code", $request->get("code"))->firstOrFail();
-
-            $pdf = $this->conexionSeven($request);
-            return $this->success_message($pdf);
-
+            Certification::query()
+                ->where("document", $request->get("document"))
+                ->where("code", $request->get("code"))
+                ->firstOrFail();
+            return $this->conexionSeven($request);
         } catch (\Exception $exception) {
             if ($exception instanceof ModelNotFoundException) {
                 return $this->error_response(
@@ -148,7 +148,7 @@ class Certificados_TributariosController extends Controller
                 $pdf->Text(140, 126+($i*4), utf8_decode($valbase));
                 $pdf->Text(175, 126+($i*4), utf8_decode($valrete));
                 $i++;
-            }           
+            }
         });
         $ret=$retef["rte fuente"]??0;
         $tot=$retef["total"]??0;
@@ -162,7 +162,7 @@ class Certificados_TributariosController extends Controller
         $pdf->Text(70, 98, utf8_decode($name));
         $pdf->Text(70, 106, utf8_decode($document));
         $pdf->Text(70, 186, utf8_decode(now()->format("Y-m-d H:i:s")));
-        
+
         return $pdf->Output("S", "Ingresos_Retenciones.pdf", true);
     }
 }
