@@ -57,8 +57,8 @@ class CertificateComplianceExportTemplate
             //$this->worksheet->getProtection()->setSheet(true);
 
             //$this->worksheet->getCell('D13')->setValue(toUpper($this->certificate->supervisor));
-            $this->worksheet->getCell('O9')->setValue($this->certificate->entry);
-            $this->worksheet->getCell('U9')->setValue($this->certificate->funding_source);
+            $this->worksheet->getCell('Q9')->setValue($this->certificate->entry);
+            $this->worksheet->getCell('W9')->setValue($this->certificate->funding_source);
             //$this->worksheet->getCell('U9')->setValue('COMPONENTE GASTO '.$this->certificate->component);
 
             
@@ -108,20 +108,26 @@ class CertificateComplianceExportTemplate
                 $this->worksheet->getCell("K$i")->setValue(isset($collection['source']) ? (string) $collection['source'] : null);
                 $this->worksheet->getCell("L$i")->setValue(isset($this->certificate->component) ? (string) $this->certificate->component : null);
 
-                $this->worksheet->getCell("M$i")->setValue(date('d/m/Y',strtotime($collection['start_date'])) );
-                $this->worksheet->getCell("N$i")->setValue(date('d/m/Y',strtotime($collection['final_date'])) );
+                $this->worksheet->getCell("M$i")->setValue(isset($collection['pmr']) ? (string) $collection['pmr'] : null);
+                $this->worksheet->getCell("N$i")->setValue(isset($collection['position']) ? (string) $collection['position'] : null);
+
+                $this->worksheet->getCell("O$i")->setValue(date('d/m/Y',strtotime($collection['start_date'])) );
+                $this->worksheet->getCell("P$i")->setValue(date('d/m/Y',strtotime($collection['final_date'])) );
                 //$this->worksheet->getCell("L$i")->setValue(isset($collection['final_date']) ? (string) $collection['final_date'] : null);
-                $this->worksheet->getCell("O$i")->setValue('X');
                 $this->worksheet->getCell("Q$i")->setValue('X');
-                $this->worksheet->getCell("S$i")->setValue(isset($collection['pago_mensual']) ? (double) $collection['pago_mensual'] : null);
+                $this->worksheet->getCell("R$i")->setValue(' ');
+                $this->worksheet->getCell("S$i")->setValue('X');
+                $this->worksheet->getCell("T$i")->setValue(' ');
+                $this->worksheet->getCell("U$i")->setValue(isset($collection['pago_mensual']) ? (double) $collection['pago_mensual'] : null);
                 //$this->worksheet->getCell("R$i")->setValue(toUpper($this->certificate->settlement_period));
-                $this->worksheet->getCell("T$i")->setValue("{$collection['startPeriod']} AL {$collection['finalPeriod']}"); 
-                $this->worksheet->getCell("U$i")->setValue(isset($collection['dias_trabajados']) ? (int) $collection['dias_trabajados'] : null);
+                $this->worksheet->getCell("V$i")->setValue("{$collection['startPeriod']} AL {$collection['finalPeriod']}"); 
+                $this->worksheet->getCell("W$i")->setValue(isset($collection['dias_trabajados']) ? (int) $collection['dias_trabajados'] : null);
                 //$this->worksheet->getCell("T$i")->setValue(isset($collection['total_pagar']) ? (double) $collection['total_pagar'] : null);
-                $this->worksheet->getCell("W$i")->setValue(toUpper($this->certificate->supervisor));
                 $aux_total = ( (int) $collection['dias_trabajados'] / 30 * (double) $collection['pago_mensual']);
                 $total_pagar_aux += $aux_total;
-                $this->worksheet->getCell("V$i")->setValue($aux_total);
+                $this->worksheet->getCell("X$i")->setValue($aux_total);
+                $this->worksheet->getCell("Y$i")->setValue(toUpper($this->certificate->supervisor));
+
                 //$this->worksheet->setCellValue('T$i','=ROUND(Q$i/30*S$i;0)');
                 //$this->worksheet->getCell("T$i")->setValue('=ROUND(Q$i/30*S$i;0)');
                 /* $this->worksheet->setCellValueExplicit(
@@ -134,7 +140,7 @@ class CertificateComplianceExportTemplate
             $i++;
             
             //$collection->sum('pages');
-            $this->worksheet->getCell("V$i")->setValue($total_pagar_aux);
+            $this->worksheet->getCell("X$i")->setValue($total_pagar_aux);
             
 
             //$i += 7;

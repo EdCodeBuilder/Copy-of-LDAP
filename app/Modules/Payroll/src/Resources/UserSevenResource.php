@@ -50,6 +50,8 @@ class UserSevenResource extends JsonResource
             'exspense_concept' =>  isset($this->arb_cpro) ? $this->arb_cpro : null,
             'balance' =>  isset($this->dmp_sald) ? $this->dmp_sald : null,
             'pay' =>  isset($this->dmp_sald) ? $this->con_vlri : null,
+            'pmr' =>  isset($this->arb_ceco) ? $this->arb_ceco : null,
+            'position' =>  isset($this->arb_ref1) ? $this->arb_ref1 : null,
             'id_aux' =>  isset($this->id_aux) ? $this->id_aux : null,
         ];
     }
