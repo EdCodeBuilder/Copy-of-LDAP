@@ -40,13 +40,13 @@ class Certificados_TributariosController extends Controller
                 "year"=>$request->get('year'),
                 "type"=>"TRB"
             ],[
-                "name"=>$contractor->full_name, 
-                "contractor_id"=>$contractor->id   
+                "name"=>$contractor->full_name,
+                "contractor_id"=>$contractor->id
             ]);
             $this->dispatch(new VerificationCodeTributario($contractor, $certification));
             $email=mask_email($contractor->email);
             return $this->success_message("Hemos enviado un código de verificación al correo $email.");
-            
+
         } catch (\Exception $exception) {
             if ($exception instanceof ModelNotFoundException) {
                 return $this->error_response(
@@ -202,6 +202,7 @@ class Certificados_TributariosController extends Controller
         if (!isset( $certification->token )) {
             $certification->token = $token;
         }
+        $certification->code = null;
         $certification->increment('downloads');
         $certification->save();
         return $pdf->Output("I", "Ingresos_Retenciones.pdf");
