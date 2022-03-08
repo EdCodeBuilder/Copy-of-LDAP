@@ -88,7 +88,7 @@ class Certificados_TributariosController extends Controller
         }
     }
 
-    public function conexionSeven(ValidacionRequest $request, Certification $certification){
+    public function conexionSeven(Request $request, Certification $certification){
         $http=new Client();
         $response=$http->post("http://66.70.171.168/api/contractors-portal/certificado-tributario/oracle", [
             "json"=>$request->all(), "headers"=>[
