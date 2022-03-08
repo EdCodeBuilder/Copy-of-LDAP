@@ -65,5 +65,5 @@ Route::prefix('contractors-portal')->group(function () {
     ])->middleware('auth:api');
     Route::post('certificado-tributario', [Certificados_TributariosController::class, "index"]);
     Route::post('certificado-tributario/token', [Certificados_TributariosController::class, "validarUsuario"]);
-    Route::post('certificado-tributario/oracle', [Certificados_TributariosController::class, "conexionSeven"]);
+    Route::post('certificado-tributario/oracle', [Certificados_TributariosController::class, "consultaSV"]);
 });
