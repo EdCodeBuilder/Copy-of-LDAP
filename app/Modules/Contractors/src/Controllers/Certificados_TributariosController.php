@@ -109,7 +109,7 @@ class Certificados_TributariosController extends Controller
             ]);
     }
 
-    public function consultaSV(ConsultaRequest $request){
+    public function consultaSV(Request $request){
         $data=DB::connection("oracle")->select("SELECT F.PVD_CODI, FAC_ANOP,P.PVR_NOCO,LIQ_NOMB,(SELECT SUM(A1.DFA_VALO)  FROM PO_DFACT A1 WHERE A1.PVD_CODI=F.PVD_CODI and A1.DFA_ANOP=F.FAC_ANOP) VAL_BRUT
         ,SUM(LIQ_BASE) VAL_BASE, case WHEN liq_nomb='TOTAL' THEN  0 ELSE SUM (LIQ_VALO)*-1 END VAL_RETE  FROM PO_FACTU F, PO_DVFAC D, PO_PVDOR P
         WHERE  F.PVD_CODI={$request->get('document')}
