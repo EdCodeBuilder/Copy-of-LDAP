@@ -217,9 +217,19 @@ class PeaceAndSafeController extends Controller
         try {
             $certification = Certification::where('token', $token)->firstOrFail();
 
-            $area = $certification->type == 'ALM'
-                ? 'almacén'
-                : 'sistemas';
+            $area = null;
+
+            switch ($certification->type) {
+                case 'ALM':
+                    $area = 'Almacén';
+                    break;
+                case 'SYS':
+                    $area = 'Sistemas';
+                    break;
+                case 'TRB':
+                    $area = 'Contabilidad';
+                    break;
+            }
 
             return $this->success_message([
                 'id'        =>  $certification->id,

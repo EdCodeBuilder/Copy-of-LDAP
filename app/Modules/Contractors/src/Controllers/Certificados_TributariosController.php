@@ -41,10 +41,10 @@ class Certificados_TributariosController extends Controller
                 "year"=>$request->get('year'),
                 "type"=>"TRB"
             ],[
-                "name"=>$contractor->full_name,
-                "document"=>$request->get('document'),
-                "contractor_id"=>$contractor->id,
-                "year"=>$request->get('year'),
+                "name"  => $contractor->full_name,
+                "document" => $request->get('document'),
+                "contractor_id" => $contractor->id,
+                "year" => $request->get('year'),
                 "type"=>"TRB"
             ]);
             $this->dispatch(new VerificationCodeTributario($contractor, $certification));
