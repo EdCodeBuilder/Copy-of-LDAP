@@ -105,7 +105,7 @@ class Certificados_TributariosController extends Controller
                     "NO SE ENCONTRÓ INFORMACIÓN TRIBUTARIA del año {$request->get('year')} para el contratista identificado con el número de documento {$request->get('document')}"
                 );
             }
-            $pdf=$this->createPDF($data["data"], $certification);
+            $pdf = $this->createPDF($data["data"], $certification);
             return $this->success_message([
                "file_name"=>"Ingresos_Retenciones.pdf",
                "file"=>"data:application/pdf;base64,".base64_encode($pdf)
@@ -209,7 +209,7 @@ class Certificados_TributariosController extends Controller
         $certification->code = null;
         $certification->increment('downloads');
         $certification->save();
-        return $pdf->Output("I", "Ingresos_Retenciones.pdf");
+        return $pdf->Output("S", "Ingresos_Retenciones.pdf");
     }
 }
 
