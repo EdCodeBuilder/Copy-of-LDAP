@@ -29,6 +29,7 @@ class Certificados_TributariosController extends Controller
     {
         parent::__construct();
     }
+
     public function index(ValidacionUsuarioRequest $request){
         try {
             $contractor = Contractor::query()
@@ -41,7 +42,10 @@ class Certificados_TributariosController extends Controller
                 "type"=>"TRB"
             ],[
                 "name"=>$contractor->full_name,
-                "contractor_id"=>$contractor->id
+                "document"=>$request->get('document'),
+                "contractor_id"=>$contractor->id,
+                "year"=>$request->get('year'),
+                "type"=>"TRB"
             ]);
             $this->dispatch(new VerificationCodeTributario($contractor, $certification));
             $email=mask_email($contractor->email);
@@ -66,8 +70,7 @@ class Certificados_TributariosController extends Controller
 
     public function validarUsuario(ValidacionRequest $request){
         try {
-            $certification=Certification::query()
-                ->where("document", $request->get("document"))
+            $certification=Certification::where("document", $request->get("document"))
                 ->where("code", $request->get("code"))
                 ->where("type", "TRB")
                 ->firstOrFail();
