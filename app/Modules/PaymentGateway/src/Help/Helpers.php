@@ -151,8 +151,8 @@ class Helpers
                               $m->bcc('karla.ortiz@idrd.gov.co');
                               $m->bcc('carmen.vergara@idrd.gov.co');
                         } else {
-                              $m->bcc('jhonnyzb1@hotmail.com');
                               $m->bcc('jhon.zabala@idrd.gov.co');
+                              $m->bcc('daniel.forero@idrd.gov.co');
                         }
                         $m->to($payment->email, $payment->nombre)->subject('Reserva Cancha sintetica ' . $reservation->id_dotacion);
                   }

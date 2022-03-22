@@ -16,6 +16,6 @@ class ValidacionUsuarioRequest extends FormRequest{
         return true;
     }
     public function rules(){
-        return ["document"=>"required|numeric", "birthdate"=>"required|date|date_format:Y-m-d"];    
+        return ["document"=>"required|numeric", "birthdate"=>"required|date|date_format:Y-m-d", "year"=>"required|numeric|date_format:Y"];
     }
 }

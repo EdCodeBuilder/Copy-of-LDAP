@@ -44,6 +44,7 @@ class Certification extends Model implements Auditable
         'expires_at',
         'token',
         'type',
+        'year',
         'contractor_id',
     ];
 
@@ -74,6 +75,7 @@ class Certification extends Model implements Auditable
         'expires_at',
         'token',
         'type',
+        'year',
         'contractor_id',
     ];
 
