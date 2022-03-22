@@ -84,7 +84,7 @@ class PseController extends Controller
                         'order' => [
                               'country' => 'COL',
                               'currency' => 'COP',
-                              'dev_reference' => '1',
+                              'dev_reference' => $id_transaccion->toString(),
                               'amount' => (int)$request->totalPay,
                               'vat' => 0,
                               'description' => $request->concept
@@ -187,7 +187,7 @@ class PseController extends Controller
                   $payment->first()->estado_banco = $responsePse['transaction']['status_bank'];
                   $payment->first()->fecha_pago =  $responsePse['transaction']['paid_date'];
                   $payment->first()->save();
-                  $payment->first()->load('state', 'method');
+                  $payment->first()->load('park', 'service', 'state', 'method');
                   try {
                         if ($payment->first()->id_reserva) {
                               if ($payment->first()->state->id == 2) {
@@ -199,7 +199,7 @@ class PseController extends Controller
                         return $this->success_response(StatusPseResource::collection($payment));
                   }
             }
-            $payment->first()->load('state', 'method');
+            $payment->first()->load('park', 'service', 'state', 'method');
             return $this->success_response(StatusPseResource::collection($payment));
       }
 
@@ -207,14 +207,14 @@ class PseController extends Controller
       public function transaccions(Request $request)
       {
             $dt = Carbon::create($request->date)->toDateString();
-            $transaccions = Pago::with('state', 'method')->where('identificacion', $request->document)->whereDate('created_at', $dt)->get();
+            $transaccions = Pago::with('park', 'service', 'state', 'method')->where('identificacion', $request->document)->whereDate('created_at', $dt)->get();
             return $this->success_response(StatusPseResource::collection($transaccions));
       }
 
       public function voucher(Request $request)
       {
             $help = new Helpers();
-            $transaccion =  Pago::with('state', 'method')->where('codigo_pago', $request->codePayment)->first();
+            $transaccion =  Pago::with('park', 'service',  'state', 'method')->where('codigo_pago', $request->codePayment)->first();
             $pdf = new FPDF('L', 'mm', 'Letter');
             $pdf->AddPage();
             $pdf->setSourceFile(storage_path("app/templates/COMPROBANTE_PAGO.pdf"));
@@ -259,6 +259,10 @@ class PseController extends Controller
             $pdf->Cell(40, 40, $transaccion->method->Nombre);
             $pdf->SetXY(135, 192);
             $pdf->Cell(40, 40, $transaccion->state->descripcion);
+            $pdf->SetXY(31, 208);
+            $pdf->Cell(40, 40, $transaccion->service ? $transaccion->service->servicio_nombre : '-');
+            $pdf->SetXY(135, 227);
+            $pdf->MultiCell(70, 3, $transaccion->park ? $transaccion->park->nombre_parque : '-', 0, 'L');
             $pdf->Output('D', 'Comprobante_' . $transaccion->codigo_pago . '.pdf');
       }
 
@@ -279,5 +283,4 @@ class PseController extends Controller
             }
             return (new \Illuminate\Http\Response)->setStatusCode(203);
       }
-
 }

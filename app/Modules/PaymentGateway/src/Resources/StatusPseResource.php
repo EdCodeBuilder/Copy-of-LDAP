@@ -29,7 +29,9 @@ class StatusPseResource extends JsonResource
                   'date_payment' => $this->fecha_pago ? $this->fecha_pago : '_',
                   'user_id_pse' => $this->user_id_pse ? $this->user_id_pse : '_',
                   'code_payment' => $this->codigo_pago ? $this->codigo_pago : '_',
-                  'email' => $this->email ? $this->email :'_',
+                  'email' => $this->email ? $this->email : '_',
+                  'park' => $this->whenLoaded('park'),
+                  'service' => $this->whenLoaded('service'),
                   'status' => $this->whenLoaded('state'),
                   'method' => $this->whenLoaded('method')
             ];
