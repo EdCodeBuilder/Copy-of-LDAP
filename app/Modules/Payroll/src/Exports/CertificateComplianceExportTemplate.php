@@ -106,8 +106,9 @@ class CertificateComplianceExportTemplate
                 $this->worksheet->getCell("J$i")->setValue(isset($collection['registry_number']) ? (string) $collection['registry_number'] : null);
 
                 $this->worksheet->getCell("K$i")->setValue(isset($collection['source']) ? (string) $collection['source'] : null);
-                $this->worksheet->getCell("L$i")->setValue(isset($this->certificate->component) ? (string) $this->certificate->component : null);
-
+                // $this->worksheet->getCell("L$i")->setValue(isset($this->certificate->component) ? (string) $this->certificate->component : null);
+                $this->worksheet->getCell("L$i")->setValue(isset($collection['exspense_concept']) ? (string) $collection['exspense_concept'] : null);
+                
                 $this->worksheet->getCell("M$i")->setValue(isset($collection['pmr']) ? (string) $collection['pmr'] : null);
                 $this->worksheet->getCell("N$i")->setValue(isset($collection['position']) ? (string) $collection['position'] : null);
 
