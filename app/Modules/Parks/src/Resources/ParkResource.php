@@ -97,6 +97,7 @@ class ParkResource extends JsonResource
                 ]
             ],
             'map'   =>  $this->setMap(),
+            'pse_payments'   =>  $this->when(auth('api')->check(), $this->payments()),
             'plans' =>  EmergencyPlanResource::collection($this->emergency_plans),
             'created_at'    => isset($this->created_at) ? $this->created_at->format('Y-m-d H:i:s') : null,
             'updated_at'    => isset($this->updated_at) ? $this->updated_at->format('Y-m-d H:i:s') : null,
@@ -195,5 +196,22 @@ class ParkResource extends JsonResource
         return isAValidDate( $date )
             ? Carbon::parse( $date )->format('Y-m-d')
             : toUpper($date);
+    }
+
+    public function payments()
+    {
+        if (isset($this->Id_IDRD)) {
+            $aux = substr($this->Id_IDRD, 3);
+            $aux2 = substr($this->Id_IDRD, 0, 2);
+            $code = '1'.$aux2.'0'.$aux;
+            return \App\Modules\PaymentGateway\src\Models\Pago::query()
+                ->whereHas('park', function ($query) use ($code) {
+                    $query->where('codigo_parque', $code);
+                })
+                ->where('estado_id', 2)
+                ->sum('total');
+        }
+
+        return null;
     }
 }

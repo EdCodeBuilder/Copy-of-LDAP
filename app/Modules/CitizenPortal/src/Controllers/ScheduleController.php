@@ -86,6 +86,11 @@ class ScheduleController extends Controller
             ->when($request->has('activity_id'), function ($query) use ($request) {
                 return $query->whereIn('activity_id', $request->get('activity_id'));
             })
+            ->when($request->has('park_code'), function ($query) use ($request) {
+                return $query
+                    ->whereIn('park_code', $request->get('park_code'))
+                    ->orWhereIn('park_id', $request->get('park_code'));
+            })
             ->when($request->has('stage_id'), function ($query) use ($request) {
                 return $query->whereIn('stage_id', $request->get('stage_id'));
             })

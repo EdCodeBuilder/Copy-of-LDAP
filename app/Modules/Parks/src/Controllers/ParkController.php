@@ -567,9 +567,12 @@ class ParkController extends Controller
      * @param $park
      * @return JsonResponse
      */
-    public function economic($park)
+    public function economic(Park $park)
     {
-        $data = EconomicUsePark::with('economic_use')->whereHas('economic_use')->where('IdParque', $park)->get();
+        $data = EconomicUsePark::with('economic_use')
+            ->whereHas('economic_use')
+            ->where('IdParque', $park->getKey())
+            ->get();
         if ( $data ) {
             return $this->success_response( EconomicUseParkResource::collection( $data ) );
         }

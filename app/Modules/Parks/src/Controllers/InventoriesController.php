@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Modules\Parks\src\Constants\Roles;
 use App\Modules\Parks\src\Models\Endowment;
 use App\Modules\Parks\src\Models\Material;
+use App\Modules\Parks\src\Models\Park;
 use App\Modules\Parks\src\Models\ParkEndowment;
 use App\Modules\Parks\src\Request\ParkEndowmentCreateRequest;
 use App\Modules\Parks\src\Request\ParkEndowmentUpdateRequest;
 use App\Modules\Parks\src\Resources\EndowmentResource;
 use App\Modules\Parks\src\Resources\EndowmentResourceC;
 use App\Modules\Parks\src\Resources\MaterialResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 
@@ -21,7 +23,7 @@ class InventoriesController extends Controller
 	public function __construct()
 	{
 		parent::__construct();
-		$this->middleware('auth:api')->only(['inventory', 'create', 'update', 'destroy', 'endowments', 'material']);
+		$this->middleware('auth:api')->only(['create', 'update', 'destroy', 'endowments', 'material']);
 		$this->middleware(Roles::actions(ParkEndowment::class, 'create_or_manage'))->only('create');
 		$this->middleware(Roles::actions(ParkEndowment::class, 'update_or_manage'))->only('update');
 		$this->middleware(Roles::actions(ParkEndowment::class, 'destroy_or_manage'))->only('destroy');
@@ -40,14 +42,13 @@ class InventoriesController extends Controller
 	 * @param $equipment
 	 * @return JsonResponse
 	 */
-	public function inventory($park, $equipment)
+	public function index(Park $park, $equipment)
 	{
-		$parks = ParkEndowment::whereHas('endowment', function ($query) use ($equipment) {
-			return $query->where('Id_Equipamento', $equipment);
-		})
-			->where('Id_Parque', $park)
-			->paginate($this->per_page);
-		return $this->success_response(EndowmentResource::collection($parks));
+        $endowment = $park->park_endowment()->whereHas('endowment', function ($query) use ($equipment) {
+            return $query->where('Id_Equipamento', $equipment);
+        })
+        ->paginate($this->per_page);
+		return $this->success_response(EndowmentResource::collection($endowment));
 	}
 
 	/**
@@ -67,8 +68,8 @@ class InventoriesController extends Controller
 	 *
 	 * @param ParkEndowmentCreateRequest $request
 	 * @return JsonResponse
-	 */
-	public function create(ParkEndowmentCreateRequest $request)
+     */
+	public function store(Park $park, ParkEndowmentCreateRequest $request)
 	{
 		try {
 			$Parkendowment = new ParkEndowment();
@@ -77,7 +78,11 @@ class InventoriesController extends Controller
 			$Parkendowment->save();
 			return $this->success_message(__('validation.handler.success'), Response::HTTP_CREATED);
 		} catch (\Exception $e) {
-			return $e->getMessage();
+            return $this->error_response(
+                __('validation.handler.service_unavailable'),
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                $e->getMessage()
+            );
 		}
 	}
 
@@ -108,7 +113,11 @@ class InventoriesController extends Controller
 			$parkendowment->save();
 			return $this->success_message(__('validation.handler.updated'));
 		} catch (\Exception $e) {
-			return $e->getMessage();
+			return $this->error_response(
+                __('validation.handler.service_unavailable'),
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                $e->getMessage()
+            );
 		}
 	}
 
@@ -138,7 +147,11 @@ class InventoriesController extends Controller
 			$parkendowment->delete();
 			return $this->success_message(__('validation.handler.deleted'), Response::HTTP_OK, Response::HTTP_NO_CONTENT);
 		} catch (\Exception $e) {
-			return $e->getMessage();
+            return $this->error_response(
+                __('validation.handler.service_unavailable'),
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                $e->getMessage()
+            );
 		}
 	}
 
