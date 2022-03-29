@@ -111,7 +111,7 @@ class Helpers
                         'entorno' => $environment,
                   ],
                   function ($m) use ($reservation, $payment, $park_email, $environment) {
-                        $m->from('no-reply@idrd.gov.co', 'Reserva Cancha código' . $reservation->id_dotacion);
+                        $m->from('mails@idrd.gov.co', 'Reserva Cancha código' . $reservation->id_dotacion);
                         if ($environment == 'production') {
                               $m->bcc($park_email);
                               $m->bcc('karla.ortiz@idrd.gov.co');
@@ -145,7 +145,7 @@ class Helpers
                         'entorno' => $environment,
                   ],
                   function ($m) use ($reservation, $payment, $park_email, $environment) {
-                        $m->from('no-reply@idrd.gov.co', 'Reserva Cancha código' . $reservation->id_dotacion);
+                        $m->from('mails@idrd.gov.co', 'Reserva Cancha código' . $reservation->id_dotacion);
                         if ($environment == 'production') {
                               $m->bcc($park_email);
                               $m->bcc('karla.ortiz@idrd.gov.co');
