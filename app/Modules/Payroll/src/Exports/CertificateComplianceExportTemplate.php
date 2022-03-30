@@ -91,7 +91,14 @@ class CertificateComplianceExportTemplate
                     $this->worksheet->mergeCells("U$i:U$y");
 
                     $filteredCollectionByIdentificaction = $this->collections->where('identification', $collection['identification']);
-                    $totalPagoMes = $filteredCollectionByIdentificaction->sum('pago_mensual');
+                    
+                    $totalPagoMes = 0;
+
+                    foreach($filteredCollectionByIdentificaction as $key => $collectionIdentification){
+                        $totalPagoMes += round( (int) $collectionIdentification['dias_trabajados'] / 30 * (double) $collectionIdentification['pago_mensual'] ) ;
+                    }
+                    //$totalPagoMes = $filteredCollectionByIdentificaction->sum('pago_mensual');
+
                     $this->worksheet->getCell("U$i")->setValue(isset($totalPagoMes) ? (double) $totalPagoMes : null);
                     
                     $contador++;
