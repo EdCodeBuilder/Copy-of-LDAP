@@ -54,7 +54,7 @@ class CertificateComplianceExportTemplate
             //$this->file->setActiveSheetIndex(1);
             $this->file->setActiveSheetIndex(0);
             $this->worksheet = $this->file->getActiveSheet();
-            //$this->worksheet->getProtection()->setSheet(true);
+            $this->worksheet->getProtection()->setSheet(true);
 
             //$this->worksheet->getCell('D13')->setValue(toUpper($this->certificate->supervisor));
             $this->worksheet->getCell('Q9')->setValue($this->certificate->entry);
@@ -80,8 +80,6 @@ class CertificateComplianceExportTemplate
                 
                 $this->worksheet->mergeCells("D$i:E$i");
                 $this->worksheet->getStyle("C$i:U$i")->applyFromArray($style);
-                //$this->worksheet->getCell("C$i")->setValue($contador);
-                //$contador++;
 
                 //combinar celdas por identificación
                 if(! $collectionAux->contains( $collection['identification'] ) ){
@@ -89,10 +87,12 @@ class CertificateComplianceExportTemplate
                     $y--;
                     $this->worksheet->getCell("C$i")->setValue($contador);
                     $this->worksheet->mergeCells("C$i:C$y");
+                    $this->worksheet->mergeCells("G$i:G$y");
+                    $this->worksheet->mergeCells("U$i:U$y");
 
-
-                    /* $this->worksheet->getCell("D$i")->setValue(isset($collection['person_name']) ? (string) $collection['person_name'] : null);
-                    $this->worksheet->mergeCells("D$i:D$y"); */
+                    $filteredCollectionByIdentificaction = $this->collections->where('identification', $collection['identification']);
+                    $totalPagoMes = $filteredCollectionByIdentificaction->sum('pago_mensual');
+                    $this->worksheet->getCell("U$i")->setValue(isset($totalPagoMes) ? (double) $totalPagoMes : null);
                     
                     $contador++;
                     $collectionAux->push($collection['identification']);
@@ -119,12 +119,12 @@ class CertificateComplianceExportTemplate
                 $this->worksheet->getCell("R$i")->setValue(' ');
                 $this->worksheet->getCell("S$i")->setValue('X');
                 $this->worksheet->getCell("T$i")->setValue(' ');
-                $this->worksheet->getCell("U$i")->setValue(isset($collection['pago_mensual']) ? (double) $collection['pago_mensual'] : null);
+                // $this->worksheet->getCell("U$i")->setValue(isset($collection['pago_mensual']) ? (double) $collection['pago_mensual'] : null);
                 //$this->worksheet->getCell("R$i")->setValue(toUpper($this->certificate->settlement_period));
                 $this->worksheet->getCell("V$i")->setValue("{$collection['startPeriod']} AL {$collection['finalPeriod']}"); 
                 $this->worksheet->getCell("W$i")->setValue(isset($collection['dias_trabajados']) ? (int) $collection['dias_trabajados'] : null);
                 //$this->worksheet->getCell("T$i")->setValue(isset($collection['total_pagar']) ? (double) $collection['total_pagar'] : null);
-                $aux_total = ( (int) $collection['dias_trabajados'] / 30 * (double) $collection['pago_mensual']);
+                $aux_total = round( (int) $collection['dias_trabajados'] / 30 * (double) $collection['pago_mensual'] );
                 $total_pagar_aux += $aux_total;
                 $this->worksheet->getCell("X$i")->setValue($aux_total);
                 $this->worksheet->getCell("Y$i")->setValue(toUpper($this->certificate->supervisor));
@@ -143,7 +143,6 @@ class CertificateComplianceExportTemplate
             //$collection->sum('pages');
             $this->worksheet->getCell("X$i")->setValue($total_pagar_aux);
             
-
             //$i += 7;
             $i += 4;
             $filaIdentificacion = $i + 1;
@@ -205,7 +204,7 @@ class CertificateComplianceExportTemplate
                 }
             }
             
-            $this->worksheet->getStyle("F13")//A13:U$i
+            $this->worksheet->getStyle("A1:Z$i")//A13:U$i
                             ->getProtection()
                             ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_PROTECTED);
             
