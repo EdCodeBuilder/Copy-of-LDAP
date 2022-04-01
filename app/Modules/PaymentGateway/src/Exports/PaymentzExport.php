@@ -32,7 +32,7 @@ class PaymentzExport implements FromCollection, WithHeadings, WithMapping
       {
             return [
                   $paymentz->id,
-                  $paymentz->fecha_pago,
+                  $paymentz->created_at,
                   $paymentz->total,
                   $paymentz->codigo_parque,
                   $paymentz->nombre_parque,

@@ -39,37 +39,37 @@ class ReportController extends Controller
        */
       public function index(Request $request)
       {
-            $di = Carbon::create($request->dateInit)->toDateString();
-            $de = Carbon::create($request->dateEnd)->toDateString();
+            $di = Carbon::createFromFormat('Y-m-d', $request->dateInit)->startOfDay();
+            $de = Carbon::createFromFormat('Y-m-d', $request->dateEnd)->endOfDay();
             $paymentz = DB::connection('mysql_pse')->table('pago_pse')
                   ->leftJoin('parque', 'pago_pse.parque_id', '=', 'parque.id_parque')
                   ->leftJoin('servicio', 'pago_pse.servicio_id', '=', 'servicio.id_servicio')
                   ->leftJoin('medio_pago', 'pago_pse.medio_id', '=', 'medio_pago.id')
                   ->where('estado_id', 2)
                   ->whereBetween('pago_pse.created_at', [$di, $de])
-                  ->select('pago_pse.*', 'parque.nombre_parque', 'parque.codigo_parque', 'servicio.*', 'medio_pago.Nombre as medio_pago')
+                  ->select('pago_pse.*', 'servicio.id_servicio', 'servicio.servicio_nombre', 'servicio.codigo_servicio', 'parque.nombre_parque', 'parque.codigo_parque', 'medio_pago.Nombre as medio_pago')
                   ->get();
             return $this->success_response(ReportPaymentResource::collection($paymentz));
       }
 
       public function excel($dateInit, $dateEnd)
       {
-            $di = Carbon::create($dateInit)->toDateString();
-            $de = Carbon::create($dateEnd)->toDateString();
+            $di = Carbon::createFromFormat('Y-m-d', $dateInit)->startOfDay();
+            $de = Carbon::createFromFormat('Y-m-d', $dateEnd)->endOfDay();
             $paymentz = DB::connection('mysql_pse')->table('pago_pse')
                   ->leftJoin('parque', 'pago_pse.parque_id', '=', 'parque.id_parque')
                   ->leftJoin('servicio', 'pago_pse.servicio_id', '=', 'servicio.id_servicio')
                   ->leftJoin('medio_pago', 'pago_pse.medio_id', '=', 'medio_pago.id')
                   ->where('estado_id', 2)
                   ->whereBetween('pago_pse.created_at', [$di, $de])
-                  ->select('pago_pse.*', 'parque.nombre_parque', 'parque.codigo_parque', 'servicio.*', 'medio_pago.Nombre as medio_pago')
+                  ->select('pago_pse.*', 'servicio.id_servicio', 'servicio.servicio_nombre', 'servicio.codigo_servicio', 'parque.nombre_parque', 'parque.codigo_parque', 'medio_pago.Nombre as medio_pago')
                   ->get();
             return Excel::download(new PaymentzExport($paymentz), 'Reporte_Pagos.xlsx');
       }
 
       public function json(Request $request)
       {
-            $tabla = Pago::with('service','park','state')->where('estado_id', 1)->get();
-            return response()->json($tabla , 200);
+            $tabla = Pago::with('service', 'park', 'state')->where('estado_id', 1)->get();
+            return response()->json($tabla, 200);
       }
 }

@@ -16,7 +16,7 @@ class ReportPaymentResource extends JsonResource
       {
             return [
                   'id'        =>  isset($this->id) ? (int) $this->id : '_',
-                  'date_payment'      =>  isset($this->fecha_pago) ? $this->fecha_pago : '_',
+                  'date_payment'      =>  isset($this->created_at) ? $this->created_at : '_',
                   'amount'      =>  isset($this->total) ? $this->total : '_',
                   'park_code'      =>  isset($this->codigo_parque) ? $this->codigo_parque : '_',
                   'name_park'      =>  isset($this->nombre_parque) ? $this->nombre_parque : '_',
