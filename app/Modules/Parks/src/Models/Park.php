@@ -172,6 +172,20 @@ class Park extends Model implements Auditable
         return ['park'];
     }
 
+    /**
+     * Retrieve the model for a bound value.
+     *
+     * @param  mixed  $value
+     * @return Model|void|null
+     */
+    public function resolveRouteBinding($value)
+    {
+        return $this
+                ->where('Id', $value)
+                ->orWhere('Id_IDRD', $value)
+                ->first() ?? abort(404);
+    }
+
     /*
      * ---------------------------------------------------------
      * Accessors and Mutator
@@ -356,6 +370,16 @@ class Park extends Model implements Auditable
     public function park_endowment()
     {
         return $this->hasMany( ParkEndowment::class, 'Id_Parque', 'Id' );
+    }
+
+    /**
+     * Park has furnitures
+     *
+     * @return HasMany
+     */
+    public function park_furnitures()
+    {
+        return $this->hasMany( ParkFurniture::class, 'idParque', 'Id' );
     }
 
     /**

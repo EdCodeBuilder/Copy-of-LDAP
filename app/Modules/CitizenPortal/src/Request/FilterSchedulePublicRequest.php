@@ -40,6 +40,8 @@ class FilterSchedulePublicRequest extends FormRequest
         $activity = new Activity();
         $stage = new Stage();
         return [
+            'park_code' => 'nullable|array',
+            'park_code.*'     =>  ['required'],
             'program_id' => 'nullable|array',
             'program_id.*'     =>  [
                 'required',

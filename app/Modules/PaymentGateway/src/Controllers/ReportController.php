@@ -69,7 +69,7 @@ class ReportController extends Controller
 
       public function json(Request $request)
       {
-            $tabla = Pago::with('service', 'park', 'state')->where('estado_id', 1)->get();
-            return response()->json($tabla, 200);
+            $tabla = Pago::with('service','park','state')->where('estado_id', 2)->get();
+            return response()->json($tabla , 200);
       }
 }

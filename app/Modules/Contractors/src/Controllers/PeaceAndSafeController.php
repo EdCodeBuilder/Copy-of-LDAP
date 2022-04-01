@@ -67,10 +67,10 @@ class PeaceAndSafeController extends Controller
             $contractor = Contractor::query()
                 ->where('document', $request->get('document'))
                 ->whereHas('contracts', function ($query) use ($contract) {
-                    return $query->where('contract', $contract);
+                    return $query->where('contract', $contract)->latest();
                 })->with([
                     'contracts' => function($query) use ($contract) {
-                        return $query->where('contract', $contract)->first();
+                        return $query->where('contract', $contract)->latest()->first();
                     }
                 ])->firstOrFail();
 

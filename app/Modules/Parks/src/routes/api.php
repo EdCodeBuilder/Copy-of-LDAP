@@ -7,6 +7,7 @@ use App\Modules\Parks\src\Controllers\EnclosureController;
 use App\Modules\Parks\src\Controllers\MapController;
 use App\Modules\Parks\src\Controllers\NeighborhoodController;
 use App\Modules\Parks\src\Controllers\OriginController;
+use App\Modules\Parks\src\Controllers\ParkFurnitureController;
 use App\Modules\Parks\src\Controllers\PermissionsController;
 use App\Modules\Parks\src\Controllers\RoleController;
 use App\Modules\Parks\src\Controllers\RolePermissionsController;
@@ -113,14 +114,18 @@ Route::prefix('api')->group( function () {
         Route::get('{park}/sectors', [ParkController::class, 'sectors']);
 
        //Route::get('{park}/equipment/{equipment}', [ParkController::class, 'fields']);
-	Route::prefix('inventories')->group( function () {
-		Route::get('{park}/equipment/{equipment}', [InventoriesController::class, 'inventory']);
-		Route::post('parks-Endowment', [InventoriesController::class, 'create']);
-		Route::post('parks-Endowment/{id}', [InventoriesController::class, 'update']);
-		Route::delete('parks-Endowment/{id}', [InventoriesController::class, 'destroy']);
-		Route::get('endowments', [InventoriesController::class, 'endowments']);
-		Route::get('material', [InventoriesController::class, 'material']);
-	});
+        Route::get('endowments', [InventoriesController::class, 'endowments']);
+        Route::get('material', [InventoriesController::class, 'material']);
+
+        Route::prefix('{park}/equipment')->group( function () {
+            Route::get('{equipment}', [InventoriesController::class, 'index']);
+            // Route::post('{equipment}', [InventoriesController::class, 'store']);
+            // Route::post('{equipment}', [InventoriesController::class, 'update']);
+            // Route::delete('{equipment}', [InventoriesController::class, 'destroy']);
+        });
+        Route::prefix('{park}/furnishings')->group( function () {
+            Route::get('', [ParkFurnitureController::class, 'index']);
+        });
 
 
         Route::middleware('auth:api')->prefix('users')->group(function () {
