@@ -224,7 +224,7 @@ class PseController extends Controller
             $pdf->useTemplate($tplId, 0, 0, null, null, true);
             $pdf->SetFont('Arial', '', 10);
             $pdf->SetXY(146, 28);
-            $pdf->Cell(40, 40, $transaccion->fecha_pago);
+            $pdf->Cell(40, 40, $transaccion->created_at);
             $pdf->SetFont('Courier', 'U', 30);
             $pdf->SetTextColor(
                   $help->statusVoucher($transaccion->estado_id)['r'],
@@ -253,8 +253,8 @@ class PseController extends Controller
             $pdf->Cell(40, 40, $transaccion->codigo_pago);
             $pdf->SetXY(135, 159);
             $pdf->Cell(40, 40, $transaccion->user_id_pse);
-            $pdf->SetXY(31, 175);
-            $pdf->Cell(40, 40, $transaccion->concepto);
+            $pdf->SetXY(31, 193);
+            $pdf->MultiCell(70, 3,$transaccion->concepto, 0, 'L');
             $pdf->SetXY(135, 175);
             $pdf->Cell(40, 40, $transaccion->iva);
             $pdf->SetXY(31, 192);

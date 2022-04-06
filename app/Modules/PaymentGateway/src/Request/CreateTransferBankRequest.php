@@ -29,9 +29,8 @@ class CreateTransferBankRequest extends FormRequest
       {
             $park = new ParkPse();
             $service = new ServiceOffered();
-            $reservation = new Reservation();
             return [
-                  'reservationId'          =>  "numeric|nullable|exists:{$reservation->getConnectionName()}.{$reservation->getTable()},{$reservation->getKeyName()},deleted_at,NULL",
+                  'reservationId'          =>  "numeric|nullable",
                   'permitTypeSelected'     =>  "required|string",
                   'permitNumber'           =>  "required|numeric",
                   'name'                   =>  "required|string",

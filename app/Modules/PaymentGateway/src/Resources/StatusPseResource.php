@@ -2,6 +2,7 @@
 
 namespace App\Modules\PaymentGateway\src\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class StatusPseResource extends JsonResource
@@ -26,7 +27,7 @@ class StatusPseResource extends JsonResource
                   'currently' => $this->moneda ? $this->moneda : '_',
                   'amount' => $this->total ? $this->total : '_',
                   'tax' => $this->iva ? $this->iva : '_',
-                  'date_payment' => $this->fecha_pago ? $this->fecha_pago : '_',
+                  'date_payment' => $this->created_at ? $this->created_at->format('Y-m-d H:i:s') : '_',
                   'user_id_pse' => $this->user_id_pse ? $this->user_id_pse : '_',
                   'code_payment' => $this->codigo_pago ? $this->codigo_pago : '_',
                   'email' => $this->email ? $this->email : '_',
