@@ -7,6 +7,8 @@ use App\Models\Security\DocumentType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use function Clue\StreamFilter\fun;
+use function foo\func;
 
 class DocumentTypeController extends Controller
 {
@@ -26,13 +28,18 @@ class DocumentTypeController extends Controller
      */
     public function index(Request $request)
     {
-        $data = $this->setQuery(DocumentType::query(), 'Id_TipoDocumento')
+        $data = $this->setQuery(DocumentType::query(), (new DocumentType())->getKeyName())
                     ->when($request->has('document_types'), function ($query) use($request) {
                         $types = $request->get('document_types');
                         return is_array($types)
                             ? $query->whereIn('Id_TipoDocumento', $types)
                             : $query->where('Id_TipoDocumento', $types);
-                    })->get();
+                    })
+                    ->when($request->has('age'), function ($query) use ($request) {
+                        $keys = $request->get('age', 18) < 18 ? [2, 3, 6, 12] : [1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+                        return $query->whereKey($keys);
+                    })
+                    ->get();
         return $this->success_response(
             DocumentTypeResource::collection($data)
         );

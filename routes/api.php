@@ -6,10 +6,16 @@ use App\Http\Controllers\Auth\NotificationController;
 use App\Http\Controllers\Auth\UserModuleController;
 use App\Http\Controllers\GlobalData\AnimationsController;
 use App\Http\Controllers\GlobalData\AreaController;
+use App\Http\Controllers\GlobalData\BloodTypeController;
 use App\Http\Controllers\GlobalData\ContributionController;
 use App\Http\Controllers\GlobalData\CountryStateCityController;
+use App\Http\Controllers\GlobalData\DisabilitiesController;
 use App\Http\Controllers\GlobalData\DocumentTypeController;
+use App\Http\Controllers\GlobalData\EthnicGroupController;
+use App\Http\Controllers\GlobalData\GenderIdentityController;
+use App\Http\Controllers\GlobalData\PopulationGroupController;
 use App\Http\Controllers\GlobalData\SexController;
+use App\Http\Controllers\GlobalData\SexualOrientationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ActiveDirectory\ActiveDirectoryController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -46,6 +52,12 @@ Route::prefix('api')->group(function () {
     Route::get('offices/{office}/areas', [AreaController::class, 'areas']);
 
     Route::get('sex', [SexController::class, 'index']);
+    Route::get('gender-identities', [GenderIdentityController::class, 'index']);
+    Route::get('sexual-orientation', [SexualOrientationController::class, 'index']);
+    Route::get('ethnic-groups', [EthnicGroupController::class, 'index']);
+    Route::get('population-groups', [PopulationGroupController::class, 'index']);
+    Route::get('blood-types', [BloodTypeController::class, 'index']);
+    Route::get('disabilities', [DisabilitiesController::class, 'index']);
 
     Route::get('arl', [ContributionController::class, 'arl']);
     Route::get('eps', [ContributionController::class, 'eps']);
