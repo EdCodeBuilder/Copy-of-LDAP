@@ -6,6 +6,7 @@ return [
     'invalid_code' =>   'El código de verificación ingresado no es válido.',
     'invalid_token' =>  'No se encuentra un certificado válido para este token :token',
     'valid_token'   =>  "Este certificado fue emitido originalmente en la fecha correspondiente a :date a nombre de :name con número de documento :document bajo el contrato :contract para el área de :area",
+    'valid_trib'    =>  "Este certificado fue emitido originalmente en la fecha correspondiente a :date a nombre de :name con número de documento :document con información suministrada por el área de Contabilidad",
     'not_found'     =>  'No se encuentra el usuario con los parámetros establecidos.',
     'contract_date' =>  'La solicitud de expedición de Paz y Salvo debe realizarse desde el día de finalización de su contrato de prestación de servicios que es :date',
     'no_accounts'   =>  'Usuario sin cuenta de ORFEO Y sin Cuentas Institucionales',

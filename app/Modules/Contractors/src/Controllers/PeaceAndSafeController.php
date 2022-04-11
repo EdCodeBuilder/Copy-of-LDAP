@@ -231,15 +231,25 @@ class PeaceAndSafeController extends Controller
                     break;
             }
 
+            $message = $certification->type == "TRB"
+                ? __("contractor.valid_trib", [
+                    'date'      => $certification->created_at->format('Y-m-d H:i:s'),
+                    'name'      => $certification->name,
+                    'document'  => $certification->document,
+                    'contract'  => $certification->contract,
+                    'area'      => $area
+                ])
+                : __('contractor.valid_token', [
+                    'date'      => $certification->created_at->format('Y-m-d H:i:s'),
+                    'name'      => $certification->name,
+                    'document'  => $certification->document,
+                    'contract'  => $certification->contract,
+                    'area'      => $area
+                ]);
+
             return $this->success_message([
                 'id'        =>  $certification->id,
-                'message' => __('contractor.valid_token', [
-                            'date'      => $certification->created_at->format('Y-m-d H:i:s'),
-                            'name'      => $certification->name,
-                            'document'  => $certification->document,
-                            'contract'  => $certification->contract,
-                            'area'      => $area
-                        ])
+                'message' => $message
             ]);
         } catch (Exception $exception) {
             return $this->error_response(
