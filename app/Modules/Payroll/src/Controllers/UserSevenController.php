@@ -102,9 +102,10 @@ class UserSevenController extends Controller
     {
         try {
             $certificate = new CertificateCompliance;
-            $certificate->supervisor = $request->get('supervisorName');
-            $certificate->component = $request->get('supervisorComponent');
-            $certificate->profession = $request->get('supervisorProfession');
+            $certificate->supervisor_name = $request->get('supervisorName');
+            $certificate->supervisor_identification = $request->get('supervisorIdentification');
+            $certificate->supervisor_profession = $request->get('supervisorProfession');
+            $certificate->observations = $request->get('observations');
             $certificate->funding_source = $request->get('fundingSource');
             $certificate->entry = $request->get('entry');
             $certificate->total_pay = $request->get('totalPay');

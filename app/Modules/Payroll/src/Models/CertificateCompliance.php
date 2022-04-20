@@ -36,22 +36,14 @@ class CertificateCompliance extends Model implements Auditable
      * @var array
      */
     protected $fillable = [
-        'supervisor',
-        'component',
-        'profession',
+        'supervisor_name',
+        'supervisor_identification',
+        'supervisor_profession',
+        'observations',
         'funding_source',
         'entry',
         'total_pay',
         'settlement_period',
-        /* 'name',
-        'document',
-        'contract',
-        'virtual_file',
-        'username',
-        'expires_at',
-        'token',
-        'type',
-        'contractor_id', */
     ];
 
     /**
@@ -73,21 +65,14 @@ class CertificateCompliance extends Model implements Auditable
      * @var array
      */
     protected $auditInclude = [
-        'supervisor',
-        'component',
+        'supervisor_name',
+        'supervisor_identification',
+        'supervisor_profession',
+        'observations',
         'funding_source',
         'entry',
         'total_pay',
         'settlement_period',
-        /* 'name',
-        'document',
-        'contract',
-        'virtual_file',
-        'username',
-        'expires_at',
-        'token',
-        'type',
-        'contractor_id', */
     ];
 
     /**

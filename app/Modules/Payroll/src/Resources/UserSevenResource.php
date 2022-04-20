@@ -33,6 +33,8 @@ class UserSevenResource extends JsonResource
             'pay' =>  isset($this->con_vlri) ? $this->con_vlri : null,
             'pmr' =>  isset($this->arb_ceco) ? $this->arb_ceco : null,
             'position' =>  isset($this->arb_ref1) ? $this->arb_ref1 : null,
+            'is_reserve' =>  isset($this->mpr_rese) ? $this->mpr_rese : null,
+            'full_payment' =>  isset($this->con_valt) ? $this->con_valt : null,
             'id_aux' =>  isset($this->id_aux) ? $this->id_aux : null,
         ];
     }

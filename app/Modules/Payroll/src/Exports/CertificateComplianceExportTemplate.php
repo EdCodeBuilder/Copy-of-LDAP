@@ -56,10 +56,8 @@ class CertificateComplianceExportTemplate
             $this->worksheet = $this->file->getActiveSheet();
             $this->worksheet->getProtection()->setSheet(true);
 
-            //$this->worksheet->getCell('D13')->setValue(toUpper($this->certificate->supervisor));
             $this->worksheet->getCell('Q9')->setValue($this->certificate->entry);
             $this->worksheet->getCell('W9')->setValue($this->certificate->funding_source);
-            //$this->worksheet->getCell('U9')->setValue('COMPONENTE GASTO '.$this->certificate->component);
 
             
             $style = array(
@@ -92,15 +90,18 @@ class CertificateComplianceExportTemplate
 
                     $filteredCollectionByIdentificaction = $this->collections->where('identification', $collection['identification']);
                     
-                    $totalPagoMes = 0;
+                    // Mostrar total pago mes, la sumatoria de todos los TOTAL A PAGAR POR PMU SEGUN LLOS DÍAS, de cada contratista 
+                    // $totalPagoMes = 0;
+                    // foreach($filteredCollectionByIdentificaction as $key => $collectionIdentification){
+                    //     $totalPagoMes += round( (int) $collectionIdentification['dias_trabajados'] / 30 * (double) $collectionIdentification['pago_mensual'] ) ;
+                    // }
+                    // $this->worksheet->getCell("U$i")->setValue(isset($totalPagoMes) ? (double) $totalPagoMes : null);
 
-                    foreach($filteredCollectionByIdentificaction as $key => $collectionIdentification){
-                        $totalPagoMes += round( (int) $collectionIdentification['dias_trabajados'] / 30 * (double) $collectionIdentification['pago_mensual'] ) ;
-                    }
+                    //Mostrar pago mes suimando TOTAL POR PMU sin tenerr en cuenta los días, porr cada contratista
                     //$totalPagoMes = $filteredCollectionByIdentificaction->sum('pago_mensual');
 
-                    $this->worksheet->getCell("U$i")->setValue(isset($totalPagoMes) ? (double) $totalPagoMes : null);
-                    
+                    //Mostrar pogo mes campo full_payment que viene desde SEVEN
+                    $this->worksheet->getCell("U$i")->setValue(isset($collection['full_payment']) ? (double) $collection['full_payment'] : null);                   
                     $contador++;
                     $collectionAux->push($collection['identification']);
                 }
@@ -113,7 +114,6 @@ class CertificateComplianceExportTemplate
                 $this->worksheet->getCell("J$i")->setValue(isset($collection['registry_number']) ? (string) $collection['registry_number'] : null);
 
                 $this->worksheet->getCell("K$i")->setValue(isset($collection['source']) ? (string) $collection['source'] : null);
-                // $this->worksheet->getCell("L$i")->setValue(isset($this->certificate->component) ? (string) $this->certificate->component : null);
                 $this->worksheet->getCell("L$i")->setValue(isset($collection['exspense_concept']) ? (string) $collection['exspense_concept'] : null);
 
                 $this->worksheet->getCell("M$i")->setValue(isset($collection['position']) ? (string) $collection['position'] : null);                
@@ -121,7 +121,7 @@ class CertificateComplianceExportTemplate
 
                 $this->worksheet->getCell("O$i")->setValue(date('d/m/Y',strtotime($collection['start_date'])) );
                 $this->worksheet->getCell("P$i")->setValue(date('d/m/Y',strtotime($collection['final_date'])) );
-                //$this->worksheet->getCell("L$i")->setValue(isset($collection['final_date']) ? (string) $collection['final_date'] : null);
+
                 $this->worksheet->getCell("Q$i")->setValue('X');
                 $this->worksheet->getCell("R$i")->setValue(' ');
                 $this->worksheet->getCell("S$i")->setValue('X');
@@ -134,7 +134,8 @@ class CertificateComplianceExportTemplate
                 $aux_total = round( (int) $collection['dias_trabajados'] / 30 * (double) $collection['pago_mensual'] );
                 $total_pagar_aux += $aux_total;
                 $this->worksheet->getCell("X$i")->setValue($aux_total);
-                $this->worksheet->getCell("Y$i")->setValue(toUpper($this->certificate->supervisor));
+
+                $this->worksheet->getCell("Y$i")->setValue(isset($collection['is_reserve']) ?  (strcmp((string)$collection['is_reserve'], 'X') !== 0 ? 'VIGENCIA' : 'RESERVA' ) : 'VIGENCIA');                
 
                 //$this->worksheet->setCellValue('T$i','=ROUND(Q$i/30*S$i;0)');
                 //$this->worksheet->getCell("T$i")->setValue('=ROUND(Q$i/30*S$i;0)');
@@ -147,17 +148,18 @@ class CertificateComplianceExportTemplate
             }
             $i++;
             
-            //$collection->sum('pages');
+            //Total a pagar nomina
             $this->worksheet->getCell("X$i")->setValue($total_pagar_aux);
-            
+            // Notas u observaciones
+            $this->worksheet->getCell("C$i")->setValue(isset($this->certificate->observations) ? "OBSERVACIONES: " . toUpper( (string) $this->certificate->observations ) : null);
             //$i += 7;
             $i += 4;
             $filaIdentificacion = $i + 1;
             $filaCargo = $i + 2;
 
-            $this->worksheet->getCell("E$i")->setValue(toUpper($this->certificate->supervisor));
-            $this->worksheet->getCell("E$filaIdentificacion")->setValue(toUpper($this->certificate->component));
-            $this->worksheet->getCell("E$filaCargo")->setValue(toUpper($this->certificate->profession));
+            $this->worksheet->getCell("E$i")->setValue(toUpper($this->certificate->supervisor_name));
+            $this->worksheet->getCell("E$filaIdentificacion")->setValue(toUpper($this->certificate->supervisor_identification));
+            $this->worksheet->getCell("E$filaCargo")->setValue(toUpper($this->certificate->supervisor_profession));
 
             $auxFilaDosApoyo = $i + 7;
             $filaIdentificacionDos = $auxFilaDosApoyo+ 1;
@@ -172,36 +174,24 @@ class CertificateComplianceExportTemplate
                             $this->worksheet->getCell("G$filaCargo")->setValue(isset($item['profession']) ? (string) $item['profession'] : null);
                             break;
                         case 2:
-                            $this->worksheet->getCell("K$i")->setValue(isset($item['name']) ? (string) $item['name'] : null);
-                            $this->worksheet->getCell("K$filaIdentificacion")->setValue(isset($item['numberIdentification']) ? (string) $item['numberIdentification'] : null);
-                            $this->worksheet->getCell("K$filaCargo")->setValue(isset($item['profession']) ? (string) $item['profession'] : null);
+                            $this->worksheet->getCell("I$i")->setValue(isset($item['name']) ? (string) $item['name'] : null);
+                            $this->worksheet->getCell("I$filaIdentificacion")->setValue(isset($item['numberIdentification']) ? (string) $item['numberIdentification'] : null);
+                            $this->worksheet->getCell("I$filaCargo")->setValue(isset($item['profession']) ? (string) $item['profession'] : null);
                             break;
                         case 3:
-                            $this->worksheet->getCell("O$i")->setValue(isset($item['name']) ? (string) $item['name'] : null);
-                            $this->worksheet->getCell("O$filaIdentificacion")->setValue(isset($item['numberIdentification']) ? (string) $item['numberIdentification'] : null);
-                            $this->worksheet->getCell("O$filaCargo")->setValue(isset($item['profession']) ? (string) $item['profession'] : null);
-                            break;
-
-                        case 4:
                             $this->worksheet->getCell("E$auxFilaDosApoyo")->setValue(isset($item['name']) ? (string) $item['name'] : null);
                             $this->worksheet->getCell("E$filaIdentificacionDos")->setValue(isset($item['numberIdentification']) ? (string) $item['numberIdentification'] : null);
                             $this->worksheet->getCell("E$filaCargoDos")->setValue(isset($item['profession']) ? (string) $item['profession'] : null);
-                            
                             break;
-                        case 5:
+                        case 4:
                             $this->worksheet->getCell("G$auxFilaDosApoyo")->setValue(isset($item['name']) ? (string) $item['name'] : null);
                             $this->worksheet->getCell("G$filaIdentificacionDos")->setValue(isset($item['numberIdentification']) ? (string) $item['numberIdentification'] : null);
                             $this->worksheet->getCell("G$filaCargoDos")->setValue(isset($item['profession']) ? (string) $item['profession'] : null);
                             break;
-                        case 6:
-                            $this->worksheet->getCell("K$auxFilaDosApoyo")->setValue(isset($item['name']) ? (string) $item['name'] : null);
-                            $this->worksheet->getCell("K$filaIdentificacionDos")->setValue(isset($item['numberIdentification']) ? (string) $item['numberIdentification'] : null);
-                            $this->worksheet->getCell("K$filaCargoDos")->setValue(isset($item['profession']) ? (string) $item['profession'] : null);
-                            break;
-                        case 7:
-                            $this->worksheet->getCell("O$auxFilaDosApoyo")->setValue(isset($item['name']) ? (string) $item['name'] : null);
-                            $this->worksheet->getCell("O$filaIdentificacionDos")->setValue(isset($item['numberIdentification']) ? (string) $item['numberIdentification'] : null);
-                            $this->worksheet->getCell("O$filaCargoDos")->setValue(isset($item['profession']) ? (string) $item['profession'] : null);
+                        case 5:
+                            $this->worksheet->getCell("I$auxFilaDosApoyo")->setValue(isset($item['name']) ? (string) $item['name'] : null);
+                            $this->worksheet->getCell("I$filaIdentificacionDos")->setValue(isset($item['numberIdentification']) ? (string) $item['numberIdentification'] : null);
+                            $this->worksheet->getCell("I$filaCargoDos")->setValue(isset($item['profession']) ? (string) $item['profession'] : null);
                             break;
                         default:
                             # code...
