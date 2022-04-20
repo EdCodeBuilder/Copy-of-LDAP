@@ -135,7 +135,8 @@ class CertificateComplianceExportTemplate
                 $total_pagar_aux += $aux_total;
                 $this->worksheet->getCell("X$i")->setValue($aux_total);
 
-                $this->worksheet->getCell("Y$i")->setValue(isset($collection['is_reserve']) ?  (strcmp((string)$collection['is_reserve'], 'X') !== 0 ? 'VIGENCIA' : 'RESERVA' ) : 'VIGENCIA');                
+                // Poner si es reserva o el otro
+                // $this->worksheet->getCell("Y$i")->setValue(isset($collection['is_reserve']) ?  (strcmp((string)$collection['is_reserve'], 'X') !== 0 ? 'VIGENCIA' : 'RESERVA' ) : 'VIGENCIA');                
 
                 //$this->worksheet->setCellValue('T$i','=ROUND(Q$i/30*S$i;0)');
                 //$this->worksheet->getCell("T$i")->setValue('=ROUND(Q$i/30*S$i;0)');
