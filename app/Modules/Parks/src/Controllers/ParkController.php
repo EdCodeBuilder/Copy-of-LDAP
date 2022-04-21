@@ -507,6 +507,19 @@ class ParkController extends Controller
                     ]);
                 }
                 break;
+            case 'managed':
+                $parks = Park::query()
+                      ->select(['Id', 'Administracion'])
+                      ->where('Administracion', 'IDRD')
+                      ->get();
+                foreach ($parks as $park) {
+                    $user->allow(Roles::can(Park::class, 'update'), $park);
+                    $form->updateOrCreate([
+                           'user_id'   => $request->get('user_id'),
+                           'park_id'   =>  $park->Id,
+                    ]);
+                }
+                break;
         }
         return $this->success_message(
             __('validation.handler.success'),

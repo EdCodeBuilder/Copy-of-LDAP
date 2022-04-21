@@ -112,6 +112,10 @@ Route::prefix('api')->group( function () {
 
         Route::get('{park}/economic-use', [ParkController::class, 'economic']);
         Route::get('{park}/sectors', [ParkController::class, 'sectors']);
+        Route::get('get-upzs', [UpzController::class, 'upzs']);
+        Route::get('get-neighborhood', [NeighborhoodController::class, 'neighborhoods']);
+
+
 
        //Route::get('{park}/equipment/{equipment}', [ParkController::class, 'fields']);
         Route::get('endowments', [InventoriesController::class, 'endowments']);

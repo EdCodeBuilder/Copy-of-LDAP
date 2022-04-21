@@ -12,6 +12,7 @@ use App\Modules\Parks\src\Request\NeighborhoodRequest;
 use App\Modules\Parks\src\Request\UpzRequest;
 use App\Modules\Parks\src\Resources\LocationResource;
 use App\Modules\Parks\src\Resources\NeighborhoodResource;
+use App\Modules\Parks\src\Resources\NeighborhoodUpzLocalityResource;
 use App\Modules\Parks\src\Resources\UpzResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -181,4 +182,10 @@ class NeighborhoodController extends Controller
             Response::HTTP_NO_CONTENT
         );
     }
+
+    public function neighborhoods()
+      {
+            $neighborhood = Neighborhood::with('upz', 'upz.locality')->get();
+            return $this->success_response(NeighborhoodUpzLocalityResource::collection($neighborhood));
+      }
 }
