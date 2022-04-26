@@ -24,6 +24,9 @@ class Profile extends Model implements Auditable
         ],
     ];
 
+    const PROFILE_PERSONAL = 1; // Id de la tabla profile_types
+    const PROFILE_BENEFICIARY = 2; // Id de la tabla profile_types
+
     // Ids de la tabla status "estados"
 
     // Validate Profile

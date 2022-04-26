@@ -13,6 +13,7 @@ use App\Modules\CitizenPortal\src\Models\Observation;
 use App\Modules\CitizenPortal\src\Models\Profile;
 use App\Modules\CitizenPortal\src\Models\ProfileView;
 use App\Modules\CitizenPortal\src\Models\Status;
+use App\Modules\CitizenPortal\src\Notifications\FileStatusNotification;
 use App\Modules\CitizenPortal\src\Request\FileStatusRequest;
 use App\Modules\CitizenPortal\src\Resources\FileResource;
 use Exception;
@@ -139,6 +140,13 @@ class FileController extends Controller
                 $file,
                 $observation,
                 auth('api')->user()->email
+            ));
+            $profile->user->notify(new FileStatusNotification(
+                $profile,
+                $status,
+                $file,
+                $observation,
+                auth('api')->user()->full_name
             ));
         });
         return $this->success_message(

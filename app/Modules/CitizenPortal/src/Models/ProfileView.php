@@ -6,6 +6,7 @@ use App\Models\Security\DocumentType;
 use App\Models\Security\User;
 use App\Traits\FullTextSearch;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
@@ -198,5 +199,13 @@ class ProfileView extends Model
     public function user_schedules()
     {
         return $this->hasMany(CitizenSchedule::class, 'user_schedule_id', 'id');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(Citizen::class, 'user_id', 'id');
     }
 }

@@ -37,6 +37,7 @@ class ProfileResource extends JsonResource
             'full_name'      =>  isset($this->full_name) ? (string) $this->full_name : null,
             'email'      =>  isset($this->email) ? toLower($this->email) : null,
             'mobile_phone'      =>  isset($this->mobile_phone) && $this->mobile_phone != 0 ? (int) $this->mobile_phone : null,
+            'phone'      =>  isset($this->mobile_phone) && $this->mobile_phone != 0 ? (int) $this->mobile_phone : null,
             'whatsapp'      =>  isset($this->mobile_phone)
                 ? whatsapp_link(
                     $this->mobile_phone,
