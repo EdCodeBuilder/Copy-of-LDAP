@@ -17,6 +17,7 @@ use App\Modules\CitizenPortal\src\Models\Profile;
 use App\Modules\CitizenPortal\src\Models\ProfileView;
 use App\Modules\CitizenPortal\src\Models\Schedule;
 use App\Modules\CitizenPortal\src\Models\Status;
+use App\Modules\CitizenPortal\src\Notifications\ProfileStatusNotification;
 use App\Modules\CitizenPortal\src\Notifications\ValidatorNotification;
 use App\Modules\CitizenPortal\src\Request\AssignorRequest;
 use App\Modules\CitizenPortal\src\Request\ProfileFilterRequest;
@@ -255,10 +256,10 @@ class ProfileController extends Controller
             }
             $profile->save();
             $status = Status::find($request->get('status_id'));
-            $status = isset( $status->name ) ? (string) $status->name : null;
+            $statusName = isset( $status->name ) ? (string) $status->name : null;
             $observation = $request->has('observation') &&
             ($request->get('observation') != null || $request->get('observation') != '')
-                ? toUpper( $status.": ".$request->get('observation') )
+                ? toUpper( $statusName.": ".$request->get('observation') )
                 : $status;
             $profile->observations()->create([
                 'profile_id'    => $profile->id,
@@ -272,6 +273,12 @@ class ProfileController extends Controller
                     auth('api')->user()->email
                 ) );
             }
+            $profile->user->notify(new ProfileStatusNotification(
+                $profile,
+                $status,
+                $observation,
+                auth('api')->user()->full_name
+            ));
             DB::commit();
             return $this->success_message(
                 __('validation.handler.success')

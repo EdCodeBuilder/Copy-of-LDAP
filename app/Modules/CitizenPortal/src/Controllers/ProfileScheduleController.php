@@ -14,6 +14,7 @@ use App\Modules\CitizenPortal\src\Models\ProfileView;
 use App\Modules\CitizenPortal\src\Models\Schedule;
 use App\Modules\CitizenPortal\src\Models\ScheduleView;
 use App\Modules\CitizenPortal\src\Models\Status;
+use App\Modules\CitizenPortal\src\Notifications\ProfileScheduleStatusNotification;
 use App\Modules\CitizenPortal\src\Request\ProfileFilterRequest;
 use App\Modules\CitizenPortal\src\Request\StatusProfileScheduleRequest;
 use App\Modules\CitizenPortal\src\Resources\CitizenActivitiesResource;
@@ -244,6 +245,14 @@ class ProfileScheduleController extends Controller
                 $text,
                 auth('api')->user()->email
             ) );
+
+            $profile->user->notify(new ProfileScheduleStatusNotification(
+                $profile,
+                $status,
+                $schedule,
+                $text,
+                auth('api')->user()->full_name
+            ));
 
             return $this->success_message(
                 $message,
