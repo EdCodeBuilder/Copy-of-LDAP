@@ -3,7 +3,48 @@
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Support\Arr;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+
+if ( !function_exists('search_in_string') ) {
+    function search_in_string($string, $needle) {
+        $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
+        $string = preg_replace('/[^a-zA-Z0-9]/', '_', $string);
+        $string = preg_replace('!\s+!', ' ', mb_convert_case( strtolower( trim( strip_tags( $string ) ) ), MB_CASE_UPPER, 'UTF-8'));
+
+        $needle = iconv('UTF-8', 'ASCII//TRANSLIT', $needle);
+        $needle = preg_replace('/[^a-zA-Z0-9]/', '_', $needle);
+        $needle = preg_replace('!\s+!', ' ', mb_convert_case( strtolower( trim( strip_tags( $needle ) ) ), MB_CASE_UPPER, 'UTF-8'));
+        return str_contains($string, $needle);
+    }
+}
+
+if ( !function_exists('percent_filled') ) {
+    /**
+     * Calculate how much a data is completed
+     *
+     * @param $array
+     * @param $except
+     * @return float|int
+     */
+    function percent_filled($array, $except, $only = false) {
+        if ( ! $array || count($array) == 0 || !is_array($array)) {
+            return 0;
+        }
+        $data = $only ? Arr::only($array, $except) : Arr::except($array, $except);
+        $columns = array_keys($data);
+        $per_column = 100 / count($data);
+        $total      = 0;
+
+        foreach ($data as $key => $value) {
+            if ($value !== NULL && $value !== [] && in_array($key, $columns)) {
+                $total += $per_column;
+            }
+        }
+
+        return $total;
+    }
+}
 
 if ( !function_exists('toUpper') ) {
     /**
@@ -15,7 +56,7 @@ if ( !function_exists('toUpper') ) {
     function toUpper( $string = null )
     {
         if ( is_string($string) || is_numeric( $string ) ) {
-            return mb_convert_case( strtolower( trim( strip_tags( $string ) ) ), MB_CASE_UPPER, 'UTF-8');
+            return preg_replace('!\s+!', ' ', mb_convert_case( strtolower( trim( strip_tags( $string ) ) ), MB_CASE_UPPER, 'UTF-8'));
         }
 
         return null;
@@ -45,11 +86,10 @@ if ( !function_exists('validateDate') ) {
      * @param string $format
      * @return bool
      */
-    function valiateDate( $date, $format = 'Y-m-d' )
+    function valiateDate( $date, string $format = 'Y-m-d' )
     {
         try {
-            Carbon::parse($date)->format($format);
-            return true;
+            return Carbon::parse($date)->format($format);
         } catch (Exception $exception) {
             return false;
         }
@@ -66,7 +106,7 @@ if ( ! function_exists('toLower') ) {
     function toLower( $string = null )
     {
         if ( is_string($string) || is_numeric( $string ) ) {
-            return mb_convert_case( strtolower( trim( strip_tags( $string ) ) ), MB_CASE_LOWER, 'UTF-8');
+            return preg_replace('!\s+!', ' ', mb_convert_case( strtolower( trim( strip_tags( $string ) ) ), MB_CASE_LOWER, 'UTF-8'));
         }
 
         return null;
@@ -83,7 +123,7 @@ if ( ! function_exists('toTitle') ) {
     function toTitle( $string = null )
     {
         if ( is_string($string) || is_numeric( $string ) ) {
-            return mb_convert_case( strtolower( trim( strip_tags( $string ) ) ), MB_CASE_TITLE, 'UTF-8');
+            return preg_replace('!\s+!', ' ', mb_convert_case( strtolower( trim( strip_tags( $string ) ) ), MB_CASE_TITLE, 'UTF-8'));
         }
 
         return null;
@@ -100,7 +140,7 @@ if ( ! function_exists('toFirstUpper') ) {
     function toFirstUpper( $string = null )
     {
         if ( is_string($string) || is_numeric( $string ) ) {
-            $str = ucfirst( mb_convert_case( strtolower( trim( strip_tags( $string ) ) ), MB_CASE_LOWER, 'UTF-8') );
+            $str = preg_replace('!\s+!', ' ', ucfirst( mb_convert_case( strtolower( trim( strip_tags( $string ) ) ), MB_CASE_LOWER, 'UTF-8') ));
             preg_match_all("/\.\s*\w/", $str, $matches);
 
             foreach($matches[0] as $match){
@@ -263,10 +303,10 @@ if ( ! function_exists('random_img_name') ) {
     function random_img_name() {
         $s = strtoupper(md5(uniqid(rand(),true)));
         return substr($s,0,8) . '-' .
-                substr($s,8,4) . '-' .
-                substr($s,12,4). '-' .
-                substr($s,16,4). '-' .
-                substr($s,20);
+            substr($s,8,4) . '-' .
+            substr($s,12,4). '-' .
+            substr($s,16,4). '-' .
+            substr($s,20);
     }
 }
 
@@ -371,9 +411,17 @@ if (! function_exists('date_time_to_excel')) {
      */
     function date_time_to_excel($date = null, $fallbackFormat = 'Y-m-d H:i:s') {
         try {
+            if (is_null($date)) {
+                return null;
+            }
             return Date::dateTimeToExcel($date);
         } catch (\Exception $exception) {
-            return $date->format($fallbackFormat);
+            if ($date instanceof Carbon) {
+                return $date->format($fallbackFormat);
+            } else {
+                $check = valiateDate($date, $fallbackFormat);
+                return $check ?: $date;
+            }
         }
     }
 }
@@ -406,5 +454,20 @@ if (! function_exists('whatsapp_link')) {
             return "$url$queryString";
         }
         return null;
+    }
+}
+
+if (! function_exists('cop_money_format')) {
+    function cop_money_format(
+        $number = null,
+        $prefix = "$",
+        $suffix = null,
+        $decimal = 2,
+        $decimal_separator = '.',
+        $thousands_separator = ','
+    ) {
+        return $number
+            ? $prefix.' '.number_format($number, $decimal, $decimal_separator, $thousands_separator).' '.$suffix
+            : $number;
     }
 }

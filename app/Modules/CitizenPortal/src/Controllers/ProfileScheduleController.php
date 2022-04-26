@@ -224,13 +224,16 @@ class ProfileScheduleController extends Controller
                 'user_ldap_id'  =>  auth('api')->user()->id,
             ]);
 
-            if ($request->get('status_id') == Profile::UNSUBSCRIBED) {
+            if ($request->get('status_id') == Status::UNSUBSCRIBED) {
                 $message = __('validation.handler.deleted');
                 $user->status_id = $request->get('status_id');
                 $user->save();
                 $user->delete();
             } else {
                 $user->status_id = $request->get('status_id');
+                if (Status::SUBSCRIBED == (int) $request->get('status_id') && $schedule->is_paid) {
+                    $user->payment_at = now()->addDay()->endOfDay();
+                }
                 $user->save();
                 $message = __('validation.handler.updated');
             }

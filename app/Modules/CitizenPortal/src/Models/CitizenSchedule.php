@@ -4,6 +4,7 @@ namespace App\Modules\CitizenPortal\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use OwenIt\Auditing\Contracts\Auditable;
 
@@ -40,7 +41,15 @@ class CitizenSchedule extends Model implements Auditable
         'schedule_id',
         'profile_id',
         'status_id',
+        'payment_at',
     ];
+
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = ["payment_at"];
 
     /*
     * ---------------------------------------------------------
@@ -57,6 +66,7 @@ class CitizenSchedule extends Model implements Auditable
         'schedule_id',
         'profile_id',
         'status_id',
+        'payment_at',
     ];
 
     /**
@@ -81,7 +91,7 @@ class CitizenSchedule extends Model implements Auditable
      */
     public function scopeActive($query)
     {
-        return $query->where('status_id', '=', Profile::SUBSCRIBED);
+        return $query->where('status_id', '=', Status::SUBSCRIBED);
     }
 
     /*
@@ -89,6 +99,14 @@ class CitizenSchedule extends Model implements Auditable
     * Eloquent Relationships
     * ---------------------------------------------------------
     */
+
+    /**
+     * @return HasMany
+     */
+    public function files()
+    {
+        return $this->hasMany( File::class, 'id', 'citizen_schedule_id' );
+    }
 
     /**
      * @return HasOne

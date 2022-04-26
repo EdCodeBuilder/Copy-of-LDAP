@@ -10,6 +10,24 @@ class Status extends Model implements Auditable
 {
     use SoftDeletes, \OwenIt\Auditing\Auditable;
 
+    // Ids de la tabla status "estados"
+
+    // Validate Profile
+    const PENDING = 1;
+    const VALIDATING = 2;
+    const VERIFIED = 3;
+    const RETURNED = 4;
+
+    // Validate Subscription
+    const PENDING_SUBSCRIBE = 5;
+    const SUBSCRIBED = 6;
+    const UNSUBSCRIBED = 7;
+
+    // Document
+    const FILE_PENDING = 8;
+    const FILE_VERIFIED = 9;
+    const FILE_RETURNED = 10;
+
     /**
      * The connection name for the model.
      *
@@ -87,16 +105,19 @@ class Status extends Model implements Auditable
     public static function getColor($status)
     {
         switch ($status) {
-            case Profile::VALIDATING:
+            case Status::VALIDATING:
                 return 'warning';
-            case Profile::SUBSCRIBED:
-            case Profile::VERIFIED:
+            case Status::FILE_VERIFIED:
+            case Status::SUBSCRIBED:
+            case Status::VERIFIED:
                 return 'success';
-            case Profile::UNSUBSCRIBED:
-            case Profile::RETURNED:
+            case Status::UNSUBSCRIBED:
+            case Status::RETURNED:
+            case Status::FILE_RETURNED:
                 return 'error';
-            case Profile::PENDING_SUBSCRIBE:
-            case Profile::PENDING:
+            case Status::FILE_PENDING:
+            case Status::PENDING_SUBSCRIBE:
+            case Status::PENDING:
             default:
                 return 'yellow';
         }
@@ -133,10 +154,10 @@ class Status extends Model implements Auditable
     public function scopeProfile($query)
     {
         return $query->wherekey([
-            Profile::RETURNED,
-            Profile::PENDING,
-            Profile::VALIDATING,
-            Profile::VERIFIED,
+            Status::RETURNED,
+            Status::PENDING,
+            Status::VALIDATING,
+            Status::VERIFIED,
         ]);
     }
 
@@ -147,9 +168,22 @@ class Status extends Model implements Auditable
     public function scopeSubscription($query)
     {
         return $query->wherekey([
-            Profile::PENDING_SUBSCRIBE,
-            Profile::SUBSCRIBED,
-            Profile::UNSUBSCRIBED,
+            Status::PENDING_SUBSCRIBE,
+            Status::SUBSCRIBED,
+            Status::UNSUBSCRIBED,
+        ]);
+    }
+
+    /**
+     * @param $query
+     * @return mixed
+     */
+    public function scopeFiles($query)
+    {
+        return $query->wherekey([
+            Status::FILE_VERIFIED,
+            Status::FILE_RETURNED,
+            Status::FILE_PENDING,
         ]);
     }
 }

@@ -36,11 +36,14 @@ return [
     ],
 
     'validations'   => [
+        'full_name'     =>  'name',
         'file'  => 'file',
         'profile_type'  =>  'profile type',
         'document_type' =>  'document type',
         'document'  =>  'document',
-        'surname'   =>  'surname',
+        's_name'        =>  'middle name',
+        'surname'       =>  'surname',
+        's_surname'     =>  'lastname',
         'sex'   =>  'sex',
         'birthdate'   =>  'birthdate',
         'blood_type'    =>  'blood type',

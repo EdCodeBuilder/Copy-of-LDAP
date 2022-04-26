@@ -24,6 +24,8 @@ class Profile extends Model implements Auditable
         ],
     ];
 
+    // Ids de la tabla status "estados"
+
     // Validate Profile
     const PENDING = 1;
     const VALIDATING = 2;
@@ -34,6 +36,11 @@ class Profile extends Model implements Auditable
     const PENDING_SUBSCRIBE = 5;
     const SUBSCRIBED = 6;
     const UNSUBSCRIBED = 7;
+
+    // Document
+    const FILE_PENDING = 8;
+    const FILE_VERIFIED = 9;
+    const FILE_RETURNED = 10;
 
     /**
      * The connection name for the model.

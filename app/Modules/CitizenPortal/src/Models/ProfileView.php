@@ -23,7 +23,7 @@ class ProfileView extends Model
      *
      * @var string
      */
-    protected $table = 'profiles_view';
+    protected $table = 'profiles_view_upd';
 
     /**
      * The primary key for the model.
@@ -45,7 +45,9 @@ class ProfileView extends Model
         'document_type',
         'document',
         'name',
+        's_name',
         'surname',
+        's_surname',
         'email',
         'sex_id',
         'sex',
@@ -121,7 +123,7 @@ class ProfileView extends Model
      */
     public function getFullNameAttribute()
     {
-        return toUpper( "{$this->name} {$this->surname}" );
+        return toUpper( "{$this->name} {$this->s_name} {$this->surname} {$this->s_surname}" );
     }
 
 

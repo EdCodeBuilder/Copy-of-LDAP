@@ -2,13 +2,14 @@
 
 namespace App\Modules\CitizenPortal\src\Models;
 
+use App\Modules\CitizenPortal\src\Traits\CitizenNotifiable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Citizen extends Model implements Auditable
 {
-    use \OwenIt\Auditing\Auditable;
+    use \OwenIt\Auditing\Auditable, CitizenNotifiable;
 
     /**
      * The connection name for the model.

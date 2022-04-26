@@ -36,11 +36,14 @@ return [
     ],
 
     'validations'   => [
+        'full_name'     =>  'nombre',
         'file'  => 'archivo',
         'profile_type'  =>  'tipo de perfil',
         'document_type' =>  'tipo de documento',
         'document'  =>  'documento',
-        'surname'   =>  'apellidos',
+        's_name'        =>  'segundo nombre',
+        'surname'       =>  'primer apellido',
+        's_surname'     =>  'segundo apellido',
         'sex'   =>  'sexo',
         'birthdate'   =>  'fecha de nacimiento',
         'blood_type'    =>  'grupo sanguíneo',

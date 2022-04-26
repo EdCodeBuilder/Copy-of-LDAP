@@ -67,6 +67,9 @@ class StatusController extends Controller
             ->when($request->has('for_subscription'), function ($query) {
                 return $query->subscription();
             })
+            ->when($request->has('for_files'), function ($query) {
+                return $query->files();
+            })
             ->orderBy((new Status)->getSortableColumn($this->column), $this->order);
         return $this->success_response(
             StatusResource::collection(

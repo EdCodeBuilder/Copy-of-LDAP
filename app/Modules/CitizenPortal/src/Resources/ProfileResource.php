@@ -31,10 +31,12 @@ class ProfileResource extends JsonResource
             'document_type'      =>  isset($this->document_type) ? (string) $this->document_type : null,
             'document'      =>  isset($this->document) ? (int) $this->document : null,
             'name'      =>  $name,
+            's_name'      =>  isset($this->s_name) ? (string) $this->s_name : null,
             'surname'      =>  isset($this->surname) ? (string) $this->surname : null,
+            's_surname'      =>  isset($this->s_surname) ? (string) $this->s_surname : null,
             'full_name'      =>  isset($this->full_name) ? (string) $this->full_name : null,
             'email'      =>  isset($this->email) ? toLower($this->email) : null,
-            'phone'      =>  isset($this->mobile_phone) && $this->mobile_phone != 0 ? (int) $this->mobile_phone : null,
+            'mobile_phone'      =>  isset($this->mobile_phone) && $this->mobile_phone != 0 ? (int) $this->mobile_phone : null,
             'whatsapp'      =>  isset($this->mobile_phone)
                 ? whatsapp_link(
                     $this->mobile_phone,
@@ -157,15 +159,8 @@ class ProfileResource extends JsonResource
                 [
                     'icon'  => 'mdi-dots-horizontal',
                     'align' => "left",
-                    'text' => Str::ucfirst(__('citizen.validations.name')),
-                    'value'  =>  "name",
-                    'sortable' => false
-                ],
-                [
-                    'icon'  => 'mdi-dots-horizontal',
-                    'align' => "left",
-                    'text' => Str::ucfirst(__('citizen.validations.surname')),
-                    'value'  =>  "surname",
+                    'text' => Str::ucfirst(__('citizen.validations.full_name')),
+                    'value'  =>  "full_name",
                     'sortable' => false
                 ],
                 [
@@ -193,11 +188,39 @@ class ProfileResource extends JsonResource
                     'icon'  => 'mdi-whatsapp',
                     'align' => "left",
                     'text' => Str::ucfirst(__('citizen.validations.phone')),
-                    'value'  =>  "phone",
+                    'value'  =>  "mobile_phone",
                     'sortable' => false
                 ],
             ],
             'expanded'  => [
+                [
+                    'icon'  => 'mdi-dots-horizontal',
+                    'align' => "left",
+                    'text' => Str::ucfirst(__('citizen.validations.name')),
+                    'value'  =>  "name",
+                    'sortable' => false
+                ],
+                [
+                    'icon'  => 'mdi-dots-horizontal',
+                    'align' => "left",
+                    'text' => Str::ucfirst(__('citizen.validations.s_name')),
+                    'value'  =>  "s_name",
+                    'sortable' => false
+                ],
+                [
+                    'icon'  => 'mdi-dots-horizontal',
+                    'align' => "left",
+                    'text' => Str::ucfirst(__('citizen.validations.surname')),
+                    'value'  =>  "surname",
+                    'sortable' => false
+                ],
+                [
+                    'icon'  => 'mdi-dots-horizontal',
+                    'align' => "left",
+                    'text' => Str::ucfirst(__('citizen.validations.s_surname')),
+                    'value'  =>  "s_surname",
+                    'sortable' => false
+                ],
                 [
                     'icon'  => 'mdi-human-male-female',
                     'align' => "left",

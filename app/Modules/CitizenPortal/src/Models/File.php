@@ -42,6 +42,7 @@ class File extends Model implements Auditable
         'file_type_id',
         'status_id',
         'profile_id',
+        'citizen_schedule_id',
     ];
 
     /**
@@ -74,6 +75,7 @@ class File extends Model implements Auditable
         'file_type_id',
         'status_id',
         'profile_id',
+        'citizen_schedule_id',
         'verified_at',
     ];
 

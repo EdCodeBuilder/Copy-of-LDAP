@@ -28,6 +28,8 @@ class CitizenActivitiesResource extends JsonResource
             'schedule_status_id'    => $status,
             'schedule_status_color' => Status::getColor($status),
             'schedule_status_name'  => isset($status_name->name) ? (string) $status_name->name : null,
+            'citizen_schedule_payment_files'  => FileResource::collection($this->files),
+            'citizen_schedule_payment_at'   => isset($this->payment_at) ? $this->payment_at->format('Y-m-d H:i:s') : null,
             'citizen_schedule_created_at'   => isset($this->created_at) ? $this->created_at->format('Y-m-d H:i:s') : null,
             'citizen_schedule_updated_at'   => isset($this->updated_at) ? $this->updated_at->format('Y-m-d H:i:s') : null,
         ];
