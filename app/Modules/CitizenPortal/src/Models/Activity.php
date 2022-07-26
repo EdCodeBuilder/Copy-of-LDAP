@@ -133,6 +133,14 @@ class Activity extends Model implements Auditable
     }
 
     /**
+     * @return BelongsTo
+     */
+    public function ActivityAsisstance()
+    {
+        return $this->belongsTo(ActivityAsisstance::class);
+    }
+
+    /**
      * @param $column
      * @return string
      */

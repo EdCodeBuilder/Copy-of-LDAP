@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\CitizenPortal\src\Controllers\ActivityAsisstanceController;
 use App\Modules\CitizenPortal\src\Controllers\ActivityController;
 use App\Modules\CitizenPortal\src\Controllers\AgeGroupController;
 use App\Modules\CitizenPortal\src\Controllers\AuditController;
@@ -66,6 +67,10 @@ Route::prefix('citizen-portal')->group(function () {
         Route::resource('activities', ActivityController::class, [
             'only'     =>  ['index', 'store', 'update', 'destroy'],
             'parameters' =>  ['activities' => 'activity']
+        ]);
+        Route::resource('activity-asisstances', ActivityAsisstanceController::class, [
+            'only'     =>  ['index', 'store', 'update', 'destroy'],
+            'parameters' =>  ['activity-asisstances' => 'activity-asisstance']
         ]);
         Route::resource('week-days', WeekDayController::class, [
             'only'     =>  ['index', 'store', 'update', 'destroy'],

@@ -5,6 +5,7 @@ namespace App\Modules\CitizenPortal\src\Controllers;
 
 
 use App\Http\Controllers\Controller;
+use App\Models\Security\User;
 use App\Modules\CitizenPortal\src\Constants\Roles;
 use App\Modules\CitizenPortal\src\Models\Activity;
 use App\Modules\CitizenPortal\src\Models\CitizenSchedule;
@@ -14,6 +15,7 @@ use App\Modules\CitizenPortal\src\Resources\ActivityResource;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 class ActivityController extends Controller
 {
