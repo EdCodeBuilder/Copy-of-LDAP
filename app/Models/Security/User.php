@@ -27,6 +27,20 @@ class User extends Authenticatable implements Auditable
     use Notifiable, HasApiTokens, SoftDeletes, HasLdapUser, HasRolesAndAbilities, \OwenIt\Auditing\Auditable, CanResetPassword, FullTextSearch;
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = "users";
+
+    /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = "id";
+
+    /**
      * The email to reset password.
      *
      * @var string|null
@@ -107,6 +121,26 @@ class User extends Authenticatable implements Auditable
         'vacation_start_date' => 'datetime',
         'vacation_final_date' => 'datetime',
     ];
+
+    /**
+     * @param $column
+     * @return string
+     */
+    public function getSortableColumn($column)
+    {
+        switch ($column) {
+            case 'name':
+                return 'user_name';
+            case 'created_at':
+            case 'updated_at':
+            case 'deleted_at':
+                return $column;
+            default:
+                return in_array($column, $this->fillable)
+                    ? $column
+                    : $this->primaryKey;
+        }
+    }
 
     /*
      * ---------------------------------------------------------

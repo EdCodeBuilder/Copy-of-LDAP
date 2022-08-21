@@ -374,7 +374,7 @@ class UserController extends LoginController
      */
     public function index()
     {
-        $users = User::whereIs(...Roles::all())
+        /* $users = User::whereIs(...Roles::all())
             ->with([
                 'roles' => function ($query) {
                     return $query->whereIn('name', Roles::all());
@@ -383,6 +383,43 @@ class UserController extends LoginController
             ->get();
         return $this->success_response(
             UserResource::collection( $users )
+        ); */
+
+       /*  $query = $this->setQuery(User::query(), (new User)->getSortableColumn($this->column))
+            ->when(isset($this->query), function ($query) {
+                return $query->where('user_name', 'like', "%$this->query%");
+            })
+            ->orderBy((new User)->getSortableColumn($this->column), $this->order);
+        return $this->success_response(
+            UserResource::collection(
+                (int) $this->per_page > 0
+                    ? $query->paginate( $this->per_page )
+                    : $query->get()
+            ),
+            Response::HTTP_OK,
+            [
+                'headers'   => UserResource::headers()
+            ]
+        ); */
+
+        $query = $this->setQuery(User::query()->whereIs(...Roles::all()),
+        (new User)->getSortableColumn($this->column))
+        ->with([
+            'roles' => function ($query) {
+                return $query->whereIn('name', Roles::all());
+            }
+        ])
+        ->orderBy((new User)->getSortableColumn($this->column), $this->order);
+        return $this->success_response(
+            UserResource::collection(
+                (int) $this->per_page > 0
+                    ? $query->paginate( $this->per_page )
+                    : $query->get()
+            ),
+            Response::HTTP_OK,
+            [
+                'headers'   => UserResource::headers()
+            ]
         );
     }
 

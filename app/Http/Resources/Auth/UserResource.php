@@ -3,6 +3,9 @@
 namespace App\Http\Resources\Auth;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Modules\CitizenPortal\src\Constants\Roles;
+use App\Modules\CitizenPortal\src\Models\User;
+use Illuminate\Support\Str;
 
 class UserResource extends JsonResource
 {
@@ -33,12 +36,54 @@ class UserResource extends JsonResource
             "is_locked"      =>    isset( $this->is_locked ) ? (boolean) $this->is_locked : null,
             "vacation_start_date"  =>    isset( $this->vacation_start_date ) ? $this->vacation_start_date->format('Y-m-d H:i:s') : null,
             "vacation_final_date"  =>    isset( $this->vacation_final_date ) ? $this->vacation_final_date->format('Y-m-d H:i:s') : null,
-            'roles'       =>    RoleResource::collection( $this->whenLoaded('roles') ),
+            /* 'roles'       =>    RoleResource::collection( $this->whenLoaded('roles') ), */
             "expires_at"  =>    isset( $this->expires_at ) ? $this->expires_at->format('Y-m-d H:i:s') : null,
             "created_at"  =>    isset( $this->created_at ) ? $this->created_at->format('Y-m-d H:i:s') : null,
             "updated_at"  =>    isset( $this->updated_at ) ? $this->updated_at->format('Y-m-d H:i:s') : null,
             'ldap'        =>    $this->when( isset( $this->ldap ), new ActiveRecordResource( $this ), []),
             "deleted_at"  =>    isset( $this->deleted_at ) ? $this->deleted_at->format('Y-m-d H:i:s') : null,
+        ];
+    }
+
+    public static function headers()
+    {
+        return [
+            [
+                'align' => "right",
+                'text' => "#",
+                'value'  =>  "id",
+                'sortable' => true
+            ],
+            [
+                'align' => "left",
+                'text' => Str::ucfirst(__('citizen.validations.name')),
+                'value'  =>  "name",
+                'sortable' => false
+            ],
+            [
+                'align' => "left",
+                'text' => Str::ucfirst(__('citizen.validations.surnames')),
+                'value'  =>  "surname",
+                'sortable' => false
+            ],
+            [
+                'align' => "left",
+                'text' => Str::ucfirst(__('citizen.validations.document')),
+                'value'  =>  "document",
+                'sortable' => false
+            ],
+            [
+                'align' => "left",
+                'text' => Str::ucfirst(__('citizen.validations.content')),
+                'value'  =>  "email",
+                'sortable' => false
+            ],
+            [
+                'align' => "right",
+                'text' => Str::ucfirst(__('citizen.validations.actions')),
+                'value'  =>  "actions",
+                'sortable' => false
+            ],
         ];
     }
 }
