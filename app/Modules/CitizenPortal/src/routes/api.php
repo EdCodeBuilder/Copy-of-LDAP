@@ -72,6 +72,10 @@ Route::prefix('citizen-portal')->group(function () {
             'only'     =>  ['index', 'store', 'update', 'destroy'],
             'parameters' =>  ['activity-asisstances' => 'activity-asisstance']
         ]);
+        Route::resource('users-asisstances', UsersAsisstanceController::class, [
+            'only'     =>  ['index', 'store', 'update', 'destroy'],
+            'parameters' =>  ['users-asisstances' => 'users-asisstance']
+        ]);
         Route::resource('week-days', WeekDayController::class, [
             'only'     =>  ['index', 'store', 'update', 'destroy'],
             'parameters' =>  ['week-days' => 'day']
