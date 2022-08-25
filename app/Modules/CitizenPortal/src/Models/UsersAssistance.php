@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
-use OwenIt\Auditing\Contracts\Auditable;cls
+use OwenIt\Auditing\Contracts\Auditable;
 
-class UsersAssistance extends Model
+class UsersAssistance extends Model implements Auditable
 {
     use SoftDeletes, \OwenIt\Auditing\Auditable;
 
