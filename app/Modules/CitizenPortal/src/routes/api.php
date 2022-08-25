@@ -72,7 +72,7 @@ Route::prefix('citizen-portal')->group(function () {
             'only'     =>  ['index', 'store', 'update', 'destroy'],
             'parameters' =>  ['activity-asisstances' => 'activity-asisstance']
         ]);
-        Route::resource('users-asisstances', UsersAsisstanceController::class, [
+        Route::resource('users-asisstances', UsersAssistanceController::class, [
             'only'     =>  ['index', 'store', 'update', 'destroy'],
             'parameters' =>  ['users-asisstances' => 'users-asisstance']
         ]);

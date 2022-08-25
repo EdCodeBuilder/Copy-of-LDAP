@@ -13,11 +13,11 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 use App\Modules\CitizenPortal\src\Models\UsersAssistance;
-use App\Modules\CitizenPortal\src\Resources\UsersAsisstanceResource;
+use App\Modules\CitizenPortal\src\Resources\UsersAssistanceResource;
 use Illuminate\Http\Request;
-use App\Modules\CitizenPortal\src\Request\UsersAsisstanceRequest;
+use App\Modules\CitizenPortal\src\Request\UsersAssistanceRequest;
 
-class UsersAsisstanceController extends Controller
+class UsersAssistanceController extends Controller
 {
     /**
      * Initialise common request params
@@ -61,14 +61,14 @@ class UsersAsisstanceController extends Controller
             })
             ->orderBy((new UsersAssistance)->getSortableColumn($this->column), $this->order);
         return $this->success_response(
-            UsersAsisstanceResource::collection(
+            UsersAssistanceResource::collection(
                 (int) $this->per_page > 0
                     ? $query->paginate( $this->per_page )
                     : $query->get()
             ),
             Response::HTTP_OK,
             [
-                'headers'   => UsersAsisstanceResource::headers()
+                'headers'   => UsersAssistanceResource::headers()
             ]
         );
     }
@@ -97,7 +97,7 @@ class UsersAsisstanceController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Modules\CitizenPortal\src\Models\UsersAssistance  $UsersAsisstance
+     * @param  \App\Modules\CitizenPortal\src\Models\UsersAssistance  $UsersAssistance
      * @return \Illuminate\Http\Response
      */
     public function show(UsersAssistance $UsersAssistance)
@@ -108,7 +108,7 @@ class UsersAsisstanceController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Modules\CitizenPortal\src\Models\UsersAssistance  $UsersAsisstance
+     * @param  \App\Modules\CitizenPortal\src\Models\UsersAssistance  $UsersAssistance
      * @return \Illuminate\Http\Response
      */
     public function edit(UsersAssistance $UsersAssistance)
@@ -120,7 +120,7 @@ class UsersAsisstanceController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Modules\CitizenPortal\src\Models\UsersAssistance  $UsersAsisstance
+     * @param  \App\Modules\CitizenPortal\src\Models\UsersAssistance  $UsersAssistance
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, UsersAssistance $UsersAssistance)
@@ -131,7 +131,7 @@ class UsersAsisstanceController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Modules\CitizenPortal\src\Models\UsersAssistance  $UsersAsisstance
+     * @param  \App\Modules\CitizenPortal\src\Models\UsersAssistance  $UsersAssistance
      * @return \Illuminate\Http\Response
      */
     public function destroy(UsersAssistance $UsersAssistance)

@@ -7,7 +7,7 @@ use App\Modules\CitizenPortal\src\Constants\Roles;
 use App\Modules\CitizenPortal\src\Models\UsersAssistance;
 use Illuminate\Support\Str;
 
-class UsersAsisstanceResource extends JsonResource
+class UsersAssistanceResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
