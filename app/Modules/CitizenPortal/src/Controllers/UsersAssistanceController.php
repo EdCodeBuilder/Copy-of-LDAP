@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
-use App\Modules\CitizenPortal\src\Models\Users_assistance;
+use App\Modules\CitizenPortal\src\Models\UsersAssistance;
 use App\Modules\CitizenPortal\src\Resources\UsersAsisstanceResource;
 use Illuminate\Http\Request;
 use App\Modules\CitizenPortal\src\Request\UsersAsisstanceRequest;
@@ -29,7 +29,7 @@ class UsersAsisstanceController extends Controller
             Roles::canAny([
                 [
                     'actions'   => 'view_or_manage',
-                    'model'     => Users_assistance::class
+                    'model'     => UsersAssistance::class
                 ],
                 ['model' => CitizenSchedule::class, 'actions' => 'status'],
                 ['model' => CitizenSchedule::class, 'actions' => 'view_or_manage'],
@@ -40,11 +40,11 @@ class UsersAsisstanceController extends Controller
             ], true, true)
         )
             ->only('index');
-        $this->middleware(Roles::actions(Users_assistance::class, 'create_or_manage'))
+        $this->middleware(Roles::actions(UsersAssistance::class, 'create_or_manage'))
             ->only('store');
-        $this->middleware(Roles::actions(Users_assistance::class, 'update_or_manage'))
+        $this->middleware(Roles::actions(UsersAssistance::class, 'update_or_manage'))
             ->only('update');
-        $this->middleware(Roles::actions(Users_assistance::class, 'destroy_or_manage'))
+        $this->middleware(Roles::actions(UsersAssistance::class, 'destroy_or_manage'))
             ->only('destroy');
     }
 
@@ -55,11 +55,11 @@ class UsersAsisstanceController extends Controller
      */
     public function index()
     {
-        $query = $this->setQuery(Users_assistance::query(), (new Users_assistance)->getSortableColumn($this->column))
+        $query = $this->setQuery(UsersAssistance::query(), (new UsersAssistance)->getSortableColumn($this->column))
             ->when(isset($this->query), function ($query) {
                 return $query->where('activity_id', 'like', "%$this->query%");
             })
-            ->orderBy((new Users_assistance)->getSortableColumn($this->column), $this->order);
+            ->orderBy((new UsersAssistance)->getSortableColumn($this->column), $this->order);
         return $this->success_response(
             UsersAsisstanceResource::collection(
                 (int) $this->per_page > 0
@@ -97,10 +97,10 @@ class UsersAsisstanceController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Modules\CitizenPortal\src\Models\Users_assistance  $UsersAsisstance
+     * @param  \App\Modules\CitizenPortal\src\Models\UsersAssistance  $UsersAsisstance
      * @return \Illuminate\Http\Response
      */
-    public function show(Users_assistance $Users_assistance)
+    public function show(UsersAssistance $UsersAssistance)
     {
         //
     }
@@ -108,10 +108,10 @@ class UsersAsisstanceController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Modules\CitizenPortal\src\Models\Users_assistance  $UsersAsisstance
+     * @param  \App\Modules\CitizenPortal\src\Models\UsersAssistance  $UsersAsisstance
      * @return \Illuminate\Http\Response
      */
-    public function edit(Users_assistance $Users_assistance)
+    public function edit(UsersAssistance $UsersAssistance)
     {
         //
     }
@@ -120,10 +120,10 @@ class UsersAsisstanceController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Modules\CitizenPortal\src\Models\Users_assistance  $UsersAsisstance
+     * @param  \App\Modules\CitizenPortal\src\Models\UsersAssistance  $UsersAsisstance
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Users_assistance $Users_assistance)
+    public function update(Request $request, UsersAssistance $UsersAssistance)
     {
         //
     }
@@ -131,10 +131,10 @@ class UsersAsisstanceController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Modules\CitizenPortal\src\Models\Users_assistance  $UsersAsisstance
+     * @param  \App\Modules\CitizenPortal\src\Models\UsersAssistance  $UsersAsisstance
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Users_assistance $Users_assistance)
+    public function destroy(UsersAssistance $UsersAssistance)
     {
         //
     }

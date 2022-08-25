@@ -3,8 +3,12 @@
 namespace App\Modules\CitizenPortal\src\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Arr;
+use OwenIt\Auditing\Contracts\Auditable;cls
 
-class Users_assistance extends Model
+class UsersAssistance extends Model
 {
     use SoftDeletes, \OwenIt\Auditing\Auditable;
 

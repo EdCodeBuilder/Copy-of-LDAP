@@ -4,7 +4,7 @@ namespace App\Modules\CitizenPortal\src\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Modules\CitizenPortal\src\Constants\Roles;
-use App\Modules\CitizenPortal\src\Models\Users_assistance;
+use App\Modules\CitizenPortal\src\Models\UsersAssistance;
 use Illuminate\Support\Str;
 
 class UsersAsisstanceResource extends JsonResource
